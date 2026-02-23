@@ -53,10 +53,9 @@ test.describe('Builder full scenario', () => {
         expect(code).toContain('activate')
 
         // Step 4: Save
-        await saveButton.click({ force: true })
-        await page.waitForTimeout(500)
+        await page.waitForTimeout(300)
+        await page.locator('button:has-text("Save")').click()
         await expect(page.locator('button[title="Run"]')).toBeVisible({ timeout: 5_000 })
-        await expect(page.locator('button[title="Run"]')).toBeVisible()
 
         // Step 5: Re-run
         await page.locator('button[title="Run"]').click()

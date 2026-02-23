@@ -27,22 +27,53 @@ export function AgentNode({ data }: { data: any }) {
     const progress = data.progress ?? 0
     const secondaryColor = '#06b6d4'
     const tertiaryColor = '#f59e0b'
+    const isWaking = status === 'waking'
+    const isRunning = status === 'running'
+    const knockOut = data.knockSide === 'out'
+    const knockIn = data.knockSide === 'in' || (isWaking && !data.knockSide)
 
     const statusColors: Record<string, string> = {
-        idle: '#475569', running: '#f7df1e', done: '#28c840', error: '#ff5f57',
+        idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
     }
+
+    // Knocking animation: pulsing inset glow on left or right side
+    const knockAnimation = isWaking
+        ? {
+            boxShadow: knockOut
+                ? [
+                    `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                    `inset -4px 0 0 0 ${color}, 0 0 12px ${color}44`,
+                    `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                ]
+                : knockIn
+                    ? [
+                        `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                        `inset 4px 0 0 0 ${color}, 0 0 12px ${color}44`,
+                        `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                    ]
+                    : undefined,
+        }
+        : isRunning
+            ? { scale: [1, 1.02, 1] }
+            : { scale: 1 }
+
+    const knockTransition = isWaking
+        ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
+        : isRunning
+            ? { repeat: Infinity, duration: 1.5 }
+            : {}
 
     return (
         <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            animate={knockAnimation}
+            transition={knockTransition}
             style={{
                 width: w, height: h,
                 padding: 1,
                 borderRadius: 14,
                 background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
-                boxShadow: status === 'running'
+                boxShadow: isRunning
                     ? `0 0 24px ${color}33, 0 4px 16px rgba(0,0,0,0.3)`
                     : `0 4px 16px rgba(0,0,0,0.3)`,
             }}
