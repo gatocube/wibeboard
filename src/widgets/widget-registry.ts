@@ -253,6 +253,11 @@ const WIDGETS: WidgetDefinition[] = [
                 description: 'Expects agent to call a specific tool',
                 defaultData: { label: 'Calls deploy()', variant: 'tool-call', target: 'deploy()', status: 'pending' },
             },
+            {
+                name: 'Pull Request',
+                description: 'Expects agent to create a pull request',
+                defaultData: { label: 'Creates PR', variant: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+            },
         ],
     },
 ]

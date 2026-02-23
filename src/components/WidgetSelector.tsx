@@ -356,11 +356,9 @@ export function WidgetSelector({
                                                 textTransform: 'uppercase',
                                                 letterSpacing: '0.5px',
                                                 color: CATEGORY_COLORS[widget.category] || '#64748b',
-                                                borderTop: lastCategory !== widget.category || filtered.indexOf(widget) > 0
+                                                borderTop: filtered.indexOf(widget) > 0
                                                     ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                                                display: 'flex', alignItems: 'center', gap: 6,
                                             }}>
-                                                {(() => { const CatIcon = CATEGORY_ICONS[widget.category] || Package; return <CatIcon size={10} color={CATEGORY_COLORS[widget.category] || '#64748b'} /> })()}
                                                 {widget.category}
                                             </div>
                                         )}
