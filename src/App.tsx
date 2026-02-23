@@ -4,6 +4,7 @@ import { TestWidgetsPage } from '@/pages/test-widgets'
 import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
 import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
 import { IconsGalleryPage } from '@/pages/test-icons'
+import { FpsMeter } from '@/components/FpsMeter'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette } from 'lucide-react'
 
 type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'widgets' | 'icons'
@@ -65,6 +66,7 @@ export function App() {
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <FpsMeter />
             {/* Top bar */}
             <nav style={{
                 display: 'flex', alignItems: 'center', gap: 8,
