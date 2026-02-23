@@ -133,11 +133,39 @@ export function TwoNodeScenarioPage() {
         },
     ]
 
-    const edges: Edge[] = [
+    // Derive edge color from node states:
+    // - Orange: one node is waking/knocking on the other
+    // - Green: both are active and messages are flowing
+    // - Dim purple: artifact handoff (A done → B starts)
+    const aStatus = state.nodes['a']?.status || 'idle'
+    const bStatus = state.nodes['b']?.status || 'idle'
+    const aKnock = state.nodes['a']?.knockSide
+    const isKnocking = aStatus === 'waking' || bStatus === 'waking'
+    const isMessaging = (aStatus === 'running' && bStatus === 'running') ||
+        (aStatus === 'running' && aKnock) ||
+        (bStatus === 'running' && aKnock)
+    const isHandoff = aStatus === 'done' && bStatus !== 'idle'
+    const edgeActive = isKnocking || isMessaging || isHandoff
+
+    const edgeColor = isKnocking ? '#f97316'   // orange for waking/knocking
+        : isMessaging ? '#22c55e'               // green for active messaging
+            : '#8b5cf655'                           // dim purple for handoff
+
+    const edges: Edge[] = edgeActive ? [
         {
             id: 'a-b', source: 'a', target: 'b',
-            animated: state.nodes['a']?.status === 'done' && state.nodes['b']?.status !== 'idle',
-            style: { stroke: '#8b5cf655', strokeDasharray: '6 3' },
+            animated: true,
+            style: {
+                stroke: edgeColor,
+                strokeWidth: isKnocking || isMessaging ? 2 : 1,
+                filter: isKnocking ? 'drop-shadow(0 0 4px #f97316)' : isMessaging ? 'drop-shadow(0 0 4px #22c55e)' : 'none',
+            },
+        },
+    ] : [
+        {
+            id: 'a-b', source: 'a', target: 'b',
+            animated: false,
+            style: { stroke: '#8b5cf622', strokeDasharray: '6 3' },
         },
     ]
 
