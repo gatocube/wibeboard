@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TestBuilderPage } from '@/pages/test-builder'
 import { TestWidgetsPage } from '@/pages/test-widgets'
 import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
@@ -33,12 +33,33 @@ export function App() {
         return 'builder'
     }
     const [page, setPage] = useState<Page>(initialPage)
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const isWideScreen = typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+    const [sidebarOpen, setSidebarOpen] = useState(isWideScreen)
 
     const navigate = (p: Page) => {
         setPage(p)
-        setSidebarOpen(false)
+        // Update URL so pages are bookmarkable
+        const base = window.location.pathname
+        const url = p === 'builder' ? base : `${base}?page=${p}`
+        window.history.replaceState({}, '', url)
+        // On narrow screens, close sidebar after navigation
+        if (!isWideScreen) setSidebarOpen(false)
     }
+
+    // Handle browser popstate (back/forward) — not strictly needed but nice
+    useEffect(() => {
+        const handler = () => {
+            const params = new URLSearchParams(window.location.search)
+            const p = params.get('page') as Page | null
+            if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets'].includes(p)) {
+                setPage(p)
+            } else {
+                setPage('builder')
+            }
+        }
+        window.addEventListener('popstate', handler)
+        return () => window.removeEventListener('popstate', handler)
+    }, [])
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>

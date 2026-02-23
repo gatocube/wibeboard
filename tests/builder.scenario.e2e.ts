@@ -45,19 +45,22 @@ test.describe('Builder Demo', () => {
     })
 
     test('canvas supports pan', async ({ page }) => {
+        // Close sidebar to get more canvas space
+        await page.locator('[data-testid="sidebar-toggle"]').click()
+        await page.waitForTimeout(300)
+
         const pane = page.locator('.react-flow__viewport')
         const initialTransform = await pane.getAttribute('style')
 
-        // Use the pane element to drag from an empty area (bottom-right corner is usually empty)
+        // Drag from bottom-right corner area which is below all nodes
         const canvas = page.locator('.react-flow__pane')
         const box = await canvas.boundingBox()
         if (box) {
-            // Start from bottom-right area which is less likely to hit nodes
-            const startX = box.x + box.width * 0.9
-            const startY = box.y + box.height * 0.9
+            const startX = box.x + box.width * 0.85
+            const startY = box.y + box.height * 0.85
             await page.mouse.move(startX, startY)
             await page.mouse.down()
-            await page.mouse.move(startX - 100, startY - 50, { steps: 5 })
+            await page.mouse.move(startX - 120, startY - 80, { steps: 5 })
             await page.mouse.up()
         }
 

@@ -43,17 +43,13 @@ test.describe('Pages smoke check', () => {
         await expect(page.locator('text=GitHub Template')).toBeVisible({ timeout: 3_000 })
         visitedPages.push('widgets/github')
 
-        // 3. Home page via sidebar
-        await page.locator('[data-testid="sidebar-toggle"]').click()
-        await page.waitForTimeout(300)
+        // 3. Home page via sidebar (sidebar is open by default on wide screens)
         await page.locator('[data-testid="nav-home"]').click()
         await page.waitForTimeout(500)
         visitedPages.push('home')
 
         // 4. Back to Builder via sidebar
-        await page.locator('[data-testid="sidebar-toggle"]').click()
-        await page.waitForTimeout(300)
-        await page.locator('[data-testid="nav-builder"]').click()
+        await page.locator('[data-testid="nav-builder"]').click({ timeout: 3_000 })
         await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
         await expect(page.locator('text=Planner')).toBeVisible()
         visitedPages.push('builder (return)')
