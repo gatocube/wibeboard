@@ -8,7 +8,7 @@
  */
 
 import { useState } from 'react'
-import { WidgetIcon, getAllIconEntries, CATEGORY_ICONS, WIDGET_ICON_COLORS } from '@/components/WidgetIcon'
+import { WidgetIcon, getAllIconEntries, CATEGORY_ICONS, WIDGET_ICON_COLORS, AnimatedIcon, STATUS_ICONS, STATUS_COLORS, type AnimatedIconName } from '@/components/WidgetIcon'
 import {
     // UI icons used across the app
     Play, Pause, SkipBack, SkipForward, RotateCcw,
@@ -52,6 +52,17 @@ const UI_ICONS: IconItem[] = [
     { name: 'ChevronDown', component: ChevronDown, color: '#8b5cf6', usage: 'Widget selector: show more' },
     { name: 'Construction', component: Construction, color: '#f59e0b', usage: 'Placeholder node icon' },
     { name: 'Cpu', component: Cpu, color: '#8b5cf6', usage: 'Fallback icon for unknown types' },
+]
+
+// All animated icon variants
+const ANIMATED_ICONS: { name: AnimatedIconName; label: string; color: string }[] = [
+    { name: 'spinner', label: 'Loading spinner', color: '#3b82f6' },
+    { name: 'pulse', label: 'Active/alive pulse', color: '#22c55e' },
+    { name: 'thinking', label: 'AI thinking', color: '#8b5cf6' },
+    { name: 'loading-dots', label: 'Loading dots', color: '#f59e0b' },
+    { name: 'processing', label: 'Processing data', color: '#06b6d4' },
+    { name: 'success', label: 'Success check-in', color: '#22c55e' },
+    { name: 'error-shake', label: 'Error shake', color: '#ef4444' },
 ]
 
 // ── Component ────────────────────────────────────────────────────────────────────
@@ -140,6 +151,42 @@ export function IconsGalleryPage() {
                 </div>
             </Section>
 
+            {/* ── 4. Status Icons ── */}
+            <Section title="Status Icons" subtitle="Node state indicators with semantic colors">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                    {Object.entries(STATUS_ICONS).map(([key, Icon]) => (
+                        <IconCard
+                            key={key}
+                            name={key}
+                            label={`Status: ${key}`}
+                            color={STATUS_COLORS[key] || '#8b5cf6'}
+                            isHovered={hovered === `status-${key}`}
+                            onHover={(id) => setHovered(id ? `status-${key}` : null)}
+                        >
+                            <Icon size={24} color={STATUS_COLORS[key] || '#8b5cf6'} />
+                        </IconCard>
+                    ))}
+                </div>
+            </Section>
+
+            {/* ── 5. Animated Icons ── */}
+            <Section title="Animated Icons" subtitle="Framer-motion loading and status animations">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                    {ANIMATED_ICONS.map(icon => (
+                        <IconCard
+                            key={icon.name}
+                            name={icon.name}
+                            label={icon.label}
+                            color={icon.color}
+                            isHovered={hovered === `anim-${icon.name}`}
+                            onHover={(id) => setHovered(id ? `anim-${icon.name}` : null)}
+                        >
+                            <AnimatedIcon name={icon.name} size={24} color={icon.color} />
+                        </IconCard>
+                    ))}
+                </div>
+            </Section>
+
             {/* ── Summary ── */}
             <div style={{
                 marginTop: 24, padding: '12px 16px',
@@ -153,8 +200,10 @@ export function IconsGalleryPage() {
                 <div style={{ fontSize: 9, color: '#94a3b8', lineHeight: 1.6 }}>
                     <strong style={{ color: '#e2e8f0' }}>{widgetIcons.length}</strong> widget type icons ·{' '}
                     <strong style={{ color: '#e2e8f0' }}>{categoryEntries.length}</strong> category icons ·{' '}
+                    <strong style={{ color: '#e2e8f0' }}>{Object.keys(STATUS_ICONS).length}</strong> status icons ·{' '}
+                    <strong style={{ color: '#e2e8f0' }}>{ANIMATED_ICONS.length}</strong> animated icons ·{' '}
                     <strong style={{ color: '#e2e8f0' }}>{UI_ICONS.length}</strong> UI icons ·{' '}
-                    All from <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Lucide React</span> — zero emojis
+                    All from <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Lucide React</span> + <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Framer Motion</span>
                 </div>
             </div>
         </div>
