@@ -34,38 +34,18 @@ export function AgentNode({ data }: { data: any }) {
     const isCompact = w <= 60
 
     const isWaking = status === 'waking'
-    const knockOut = data.knockSide === 'out'
-
-    // Knocking animation
-    const knockAnimation = isWaking ? {
-        boxShadow: knockOut
-            ? [
-                `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                `inset -3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
-                `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-            ]
-            : [
-                `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                `inset 3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
-                `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-            ],
-    } : {}
-    const knockTransition = isWaking
-        ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
-        : {}
+    const knockBorder = isWaking ? '2px solid #f97316' : `1px solid ${gh.border}`
 
     // ── Compact mode (icon size) ──
     if (isCompact) {
         const doneCount = (data.tasks || []).filter((t: any) => t.done).length
         const total = (data.tasks || []).length || 4
         return (
-            <motion.div
-                animate={knockAnimation}
-                transition={knockTransition}
+            <div
                 style={{
                     width: w, height: h,
                     background: gh.bg,
-                    border: `1px solid ${gh.border}`,
+                    border: knockBorder,
                     borderRadius: 6,
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
@@ -91,7 +71,7 @@ export function AgentNode({ data }: { data: any }) {
                     }
                 </div>
                 <span style={{ fontSize: 7, color: gh.fgMuted, fontWeight: 600 }}>{doneCount}/{total}</span>
-            </motion.div>
+            </div>
         )
     }
 
@@ -108,13 +88,11 @@ export function AgentNode({ data }: { data: any }) {
     const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0
 
     return (
-        <motion.div
-            animate={knockAnimation}
-            transition={knockTransition}
+        <div
             style={{
                 width: w, height: h,
                 background: gh.bg,
-                border: `1px solid ${gh.border}`,
+                border: knockBorder,
                 borderRadius: 6,
                 padding: 12,
                 display: 'flex', flexDirection: 'column',
@@ -187,6 +165,6 @@ export function AgentNode({ data }: { data: any }) {
                 <span>{doneCount}/{total} tasks</span>
                 <span>{pct}% complete</span>
             </div>
-        </motion.div>
+        </div>
     )
 }

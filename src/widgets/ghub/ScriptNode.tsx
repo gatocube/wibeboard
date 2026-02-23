@@ -50,7 +50,6 @@ export function ScriptNode({ data }: { data: any }) {
     const isMedium = w <= 160 && !isCompact
 
     const isWaking = status === 'waking'
-    const knockOut = data.knockSide === 'out'
 
     // Status icon + color
     const statusConfig: Record<string, { icon: string; color: string; bg: string }> = {
@@ -62,37 +61,17 @@ export function ScriptNode({ data }: { data: any }) {
     }
     const st = statusConfig[status] || statusConfig.idle
 
-    // Knocking animation
-    const knockAnimation = isWaking
-        ? {
-            boxShadow: knockOut
-                ? [
-                    `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                    `inset -3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
-                    `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                ]
-                : [
-                    `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                    `inset 3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
-                    `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
-                ],
-        }
-        : {}
-
-    const knockTransition = isWaking
-        ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
-        : {}
+    // Knocking: static orange border
+    const knockBorder = isWaking ? '2px solid #f97316' : undefined
 
     // ── Compact mode (icon size) ──
     if (isCompact) {
         return (
-            <motion.div
-                animate={knockAnimation}
-                transition={knockTransition}
+            <div
                 style={{
                     width: w, height: h,
                     background: gh.bg,
-                    border: `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
+                    border: knockBorder || `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
                     borderRadius: 6,
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
@@ -125,19 +104,17 @@ export function ScriptNode({ data }: { data: any }) {
                 <span style={{ fontSize: 7, color: langInfo.color, fontWeight: 600, ...ghMono }}>
                     {lang.toUpperCase()}
                 </span>
-            </motion.div>
+            </div>
         )
     }
 
     // ── Medium / Large mode ──
     return (
-        <motion.div
-            animate={knockAnimation}
-            transition={knockTransition}
+        <div
             style={{
                 width: w, height: h,
                 background: gh.bg,
-                border: `1px solid ${gh.border}`,
+                border: knockBorder || `1px solid ${gh.border}`,
                 borderRadius: 6,
                 display: 'flex', flexDirection: 'column',
                 boxSizing: 'border-box',
@@ -249,6 +226,6 @@ export function ScriptNode({ data }: { data: any }) {
                     <span>{status === 'done' ? '✓ Success' : status === 'error' ? '✗ Failed' : status === 'running' ? '● Running' : '○ Queued'}</span>
                 </div>
             )}
-        </motion.div>
+        </div>
     )
 }

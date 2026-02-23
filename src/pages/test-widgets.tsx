@@ -170,8 +170,14 @@ function WidgetGalleryInner() {
             height: '100%', display: 'flex', overflow: 'hidden',
             background: '#0a0a14',
         }}>
-            {/* CSS to hide handles when connections toggle is off */}
-            <style>{`.hide-handles .react-flow__handle { display: none !important; }`}</style>
+            {/* CSS to hide handles + connection line pulse animation */}
+            <style>{`
+                .hide-handles .react-flow__handle { display: none !important; }
+                @keyframes connPulse {
+                    0%, 100% { opacity: 0.5; }
+                    50% { opacity: 1; }
+                }
+            `}</style>
             {/* Left: WidgetSelector */}
             <div style={{
                 width: 260, flexShrink: 0,
@@ -402,18 +408,36 @@ function WidgetGalleryInner() {
                                                             display: 'flex', alignItems: 'center',
                                                         }}>
                                                             {/* Left connection line (input) */}
-                                                            {showConnections && (
-                                                                <svg width={connLineLen} height={2} style={{ flexShrink: 0 }}>
-                                                                    <line
-                                                                        x1={0} y1={1} x2={connLineLen} y2={1}
-                                                                        stroke={theme.colors.accent}
-                                                                        strokeWidth={1.5}
-                                                                        strokeDasharray="3 2"
-                                                                        opacity={0.5}
-                                                                    />
-                                                                    <circle cx={2} cy={1} r={2} fill={theme.colors.accent} opacity={0.6} />
-                                                                </svg>
-                                                            )}
+                                                            {showConnections && (() => {
+                                                                const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
+                                                                return (
+                                                                    <svg width={connLineLen} height={10} style={{ flexShrink: 0, overflow: 'visible' }}>
+                                                                        {isKnockIn && (
+                                                                            <defs>
+                                                                                <filter id={`glow-in-${size.label}-${theme.name}`}>
+                                                                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                                                                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                                                                                </filter>
+                                                                            </defs>
+                                                                        )}
+                                                                        <line
+                                                                            x1={0} y1={5} x2={connLineLen} y2={5}
+                                                                            stroke={isKnockIn ? '#f97316' : theme.colors.accent}
+                                                                            strokeWidth={isKnockIn ? 2.5 : 1.5}
+                                                                            strokeDasharray="3 2"
+                                                                            opacity={isKnockIn ? 1 : 0.5}
+                                                                            filter={isKnockIn ? `url(#glow-in-${size.label}-${theme.name})` : undefined}
+                                                                            style={isKnockIn ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                        />
+                                                                        <circle
+                                                                            cx={2} cy={5} r={isKnockIn ? 3 : 2}
+                                                                            fill={isKnockIn ? '#f97316' : theme.colors.accent}
+                                                                            opacity={isKnockIn ? 1 : 0.6}
+                                                                            style={isKnockIn ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                        />
+                                                                    </svg>
+                                                                )
+                                                            })()}
 
                                                             {/* The widget — hide handles via CSS when connections are off */}
                                                             <div className={showConnections ? '' : 'hide-handles'}>
@@ -421,21 +445,35 @@ function WidgetGalleryInner() {
                                                             </div>
 
                                                             {/* Right connection line (output) */}
-                                                            {showConnections && (
-                                                                <svg width={connLineLen} height={2} style={{ flexShrink: 0 }}>
-                                                                    <line
-                                                                        x1={0} y1={1} x2={connLineLen} y2={1}
-                                                                        stroke={theme.colors.textMuted}
-                                                                        strokeWidth={1.5}
-                                                                        opacity={0.4}
-                                                                    />
-                                                                    <polygon
-                                                                        points={`${connLineLen - 5},${1 - 3} ${connLineLen},1 ${connLineLen - 5},${1 + 3}`}
-                                                                        fill={theme.colors.textMuted}
-                                                                        opacity={0.5}
-                                                                    />
-                                                                </svg>
-                                                            )}
+                                                            {showConnections && (() => {
+                                                                const isKnockOut = showAnimations && status === 'waking' && knockSide === 'out'
+                                                                return (
+                                                                    <svg width={connLineLen} height={10} style={{ flexShrink: 0, overflow: 'visible' }}>
+                                                                        {isKnockOut && (
+                                                                            <defs>
+                                                                                <filter id={`glow-out-${size.label}-${theme.name}`}>
+                                                                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                                                                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                                                                                </filter>
+                                                                            </defs>
+                                                                        )}
+                                                                        <line
+                                                                            x1={0} y1={5} x2={connLineLen} y2={5}
+                                                                            stroke={isKnockOut ? '#f97316' : theme.colors.textMuted}
+                                                                            strokeWidth={isKnockOut ? 2.5 : 1.5}
+                                                                            opacity={isKnockOut ? 1 : 0.4}
+                                                                            filter={isKnockOut ? `url(#glow-out-${size.label}-${theme.name})` : undefined}
+                                                                            style={isKnockOut ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                        />
+                                                                        <polygon
+                                                                            points={`${connLineLen - 5},${5 - 3} ${connLineLen},5 ${connLineLen - 5},${5 + 3}`}
+                                                                            fill={isKnockOut ? '#f97316' : theme.colors.textMuted}
+                                                                            opacity={isKnockOut ? 1 : 0.5}
+                                                                            style={isKnockOut ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                        />
+                                                                    </svg>
+                                                                )
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 )
