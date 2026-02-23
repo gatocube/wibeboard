@@ -12,7 +12,7 @@
  */
 
 import { useState, useCallback } from 'react'
-import { ReactFlowProvider } from '@xyflow/react'
+import { ReactFlow, ReactFlowProvider, type Node, type Edge, Handle, Position } from '@xyflow/react'
 import { WidgetSelector } from '@/components/WidgetSelector'
 import {
     widgetRegistry,
@@ -44,6 +44,40 @@ const COMM_OPTIONS: { label: string; value: CommSide }[] = [
     { label: '← Emit', value: 'left' },
     { label: 'Emit →', value: 'right' },
 ]
+
+// ── Mini ReactFlow node types ───────────────────────────────────────────────────
+
+/** Tiny dot node — just a circle with handles */
+function DotNode({ data }: { data: { color?: string; side: 'left' | 'right' } }) {
+    const c = data.color || '#64748b'
+    return (
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: c, position: 'relative' }}>
+            {data.side === 'left' && (
+                <Handle type="source" position={Position.Right} style={{ background: c, border: 'none', width: 4, height: 4, right: -2 }} />
+            )}
+            {data.side === 'right' && (
+                <Handle type="target" position={Position.Left} style={{ background: c, border: 'none', width: 4, height: 4, left: -2 }} />
+            )}
+        </div>
+    )
+}
+
+/** Wrapper node — renders the actual widget component inside ReactFlow */
+function WidgetWrapperNode({ data }: { data: { component: React.ComponentType<any>; widgetData: Record<string, any> } }) {
+    const Component = data.component
+    return (
+        <div style={{ position: 'relative' }}>
+            <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1 }} />
+            <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1 }} />
+            <Component data={data.widgetData} />
+        </div>
+    )
+}
+
+const MINI_NODE_TYPES = {
+    dot: DotNode,
+    widget: WidgetWrapperNode,
+}
 
 // ── Size definitions ────────────────────────────────────────────────────────────
 
@@ -178,17 +212,17 @@ function WidgetGalleryInner() {
             height: '100%', display: 'flex', overflow: 'hidden',
             background: '#0a0a14',
         }}>
-            {/* CSS to hide handles + connection line animations */}
+            {/* CSS: hide handles on standalone widgets + reverse-animated edge direction */}
             <style>{`
                 .hide-handles .react-flow__handle { display: none !important; }
-                @keyframes dashToRight {
-                    from { stroke-dashoffset: 10; }
-                    to { stroke-dashoffset: 0; }
+                .mini-flow .react-flow__edge.animated path.react-flow__edge-path {
+                    stroke-dasharray: 6 4;
                 }
-                @keyframes dashToLeft {
-                    from { stroke-dashoffset: 0; }
-                    to { stroke-dashoffset: 10; }
+                .mini-flow .react-flow__edge.reverse-animated path.react-flow__edge-path {
+                    animation-direction: reverse !important;
                 }
+                .mini-flow .react-flow__renderer { overflow: visible !important; }
+                .mini-flow .react-flow__node { cursor: default !important; }
             `}</style>
             {/* Left: WidgetSelector */}
             <div style={{
@@ -419,9 +453,76 @@ function WidgetGalleryInner() {
                                                         data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
                                                     }
                                                 }
-                                                // Pass hideHandles to suppress <Handle> rendering
-                                                if (!showConnections) data.hideHandles = true
+
                                                 const connLineLen = size.label === 'S' ? 60 : 40
+                                                const canvasW = connLineLen + size.width + connLineLen + 40
+                                                const canvasH = Math.max(size.height + 40, 80)
+
+                                                // Determine edge animation states
+                                                const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
+                                                const isKnockOut = showAnimations && status === 'waking' && knockSide === 'out'
+                                                const isCommLeft = showAnimations && commSide === 'left'
+                                                const isCommRight = showAnimations && commSide === 'right'
+                                                const inActive = isKnockIn || isCommLeft
+                                                const outActive = isKnockOut || isCommRight
+
+                                                // Edge colors
+                                                const inColor = isKnockIn ? '#f97316' : isCommLeft ? '#06b6d4' : theme.colors.accent
+                                                const outColor = isKnockOut ? '#f97316' : isCommRight ? '#06b6d4' : theme.colors.textMuted
+
+                                                // Knocking flows TOWARD node = normal direction
+                                                // Communicating flows AWAY from node = reverse direction
+                                                const inReverse = isCommLeft
+                                                const outReverse = isKnockOut
+
+                                                const miniNodes: Node[] = [
+                                                    {
+                                                        id: 'dot-in', type: 'dot',
+                                                        position: { x: 0, y: size.height / 2 - 3 },
+                                                        data: { color: inColor, side: 'left' },
+                                                        draggable: false, selectable: false,
+                                                    },
+                                                    {
+                                                        id: 'widget', type: 'widget',
+                                                        position: { x: connLineLen + 10, y: 0 },
+                                                        data: { component: Component, widgetData: data },
+                                                        draggable: false, selectable: false,
+                                                    },
+                                                    {
+                                                        id: 'dot-out', type: 'dot',
+                                                        position: { x: connLineLen + 10 + size.width + connLineLen, y: size.height / 2 - 3 },
+                                                        data: { color: outColor, side: 'right' },
+                                                        draggable: false, selectable: false,
+                                                    },
+                                                ]
+
+                                                const miniEdges: Edge[] = showConnections ? [
+                                                    {
+                                                        id: 'e-in', source: 'dot-in', target: 'widget',
+                                                        animated: inActive,
+                                                        className: inReverse ? 'reverse-animated' : undefined,
+                                                        data: { testAnimated: inActive },
+                                                        style: {
+                                                            stroke: inColor,
+                                                            strokeWidth: inActive ? 2.5 : 1.5,
+                                                            strokeDasharray: inActive ? undefined : '3 3',
+                                                            opacity: inActive ? 1 : 0.4,
+                                                        },
+                                                    },
+                                                    {
+                                                        id: 'e-out', source: 'widget', target: 'dot-out',
+                                                        animated: outActive,
+                                                        className: outReverse ? 'reverse-animated' : undefined,
+                                                        data: { testAnimated: outActive },
+                                                        style: {
+                                                            stroke: outColor,
+                                                            strokeWidth: outActive ? 2.5 : 1.5,
+                                                            strokeDasharray: outActive ? undefined : '3 3',
+                                                            opacity: outActive ? 1 : 0.4,
+                                                        },
+                                                    },
+                                                ] : []
+
                                                 return (
                                                     <div key={size.label} style={{
                                                         display: 'flex', flexDirection: 'column',
@@ -450,91 +551,25 @@ function WidgetGalleryInner() {
                                                             </span>
                                                         </div>
 
-                                                        {/* Widget with connection lines */}
-                                                        <div style={{
-                                                            position: 'relative',
-                                                            display: 'flex', alignItems: 'flex-start',
-                                                        }}>
-                                                            {/* Left connection line (input) */}
-                                                            {showConnections && (() => {
-                                                                const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
-                                                                const isCommLeft = showAnimations && commSide === 'left'
-                                                                const isActive = isKnockIn || isCommLeft
-                                                                const lineY = size.height / 2
-                                                                const svgH = size.height
-                                                                // Knock-in: dashes march right (toward node). Comm-left: dashes march left (away from node)
-                                                                const dashAnim = isKnockIn ? 'dashToRight' : isCommLeft ? 'dashToLeft' : ''
-                                                                const lineColor = isKnockIn ? '#f97316' : isCommLeft ? '#06b6d4' : theme.colors.accent
-                                                                return (
-                                                                    <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
-                                                                        {isActive && (
-                                                                            <defs>
-                                                                                <filter id={`glow-in-${size.label}-${theme.name}`}>
-                                                                                    <feGaussianBlur stdDeviation="3" result="blur" />
-                                                                                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                                                                                </filter>
-                                                                            </defs>
-                                                                        )}
-                                                                        <line
-                                                                            x1={0} y1={lineY} x2={connLineLen} y2={lineY}
-                                                                            stroke={lineColor}
-                                                                            strokeWidth={isActive ? 3 : 1.5}
-                                                                            strokeDasharray={isActive ? '6 4' : '3 3'}
-                                                                            opacity={isActive ? 1 : 0.4}
-                                                                            filter={isActive ? `url(#glow-in-${size.label}-${theme.name})` : undefined}
-                                                                            style={dashAnim ? { animation: `${dashAnim} 0.3s linear infinite` } : undefined}
-                                                                        />
-                                                                        <circle
-                                                                            cx={2} cy={lineY} r={isActive ? 4 : 2.5}
-                                                                            fill={lineColor}
-                                                                            opacity={isActive ? 1 : 0.5}
-                                                                        />
-                                                                    </svg>
-                                                                )
-                                                            })()}
-
-                                                            {/* The widget — hide handles via CSS when connections are off */}
-                                                            <div className={showConnections ? '' : 'hide-handles'}>
-                                                                <Component data={data} />
-                                                            </div>
-
-                                                            {/* Right connection line (output) */}
-                                                            {showConnections && (() => {
-                                                                const isKnockOut = showAnimations && status === 'waking' && knockSide === 'out'
-                                                                const isCommRight = showAnimations && commSide === 'right'
-                                                                const isActive = isKnockOut || isCommRight
-                                                                const lineY = size.height / 2
-                                                                const svgH = size.height
-                                                                // Knock-out: dashes march left (toward node). Comm-right: dashes march right (away from node)
-                                                                const dashAnim = isKnockOut ? 'dashToLeft' : isCommRight ? 'dashToRight' : ''
-                                                                const lineColor = isKnockOut ? '#f97316' : isCommRight ? '#06b6d4' : theme.colors.textMuted
-                                                                return (
-                                                                    <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
-                                                                        {isActive && (
-                                                                            <defs>
-                                                                                <filter id={`glow-out-${size.label}-${theme.name}`}>
-                                                                                    <feGaussianBlur stdDeviation="3" result="blur" />
-                                                                                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                                                                                </filter>
-                                                                            </defs>
-                                                                        )}
-                                                                        <line
-                                                                            x1={0} y1={lineY} x2={connLineLen} y2={lineY}
-                                                                            stroke={lineColor}
-                                                                            strokeWidth={isActive ? 3 : 1.5}
-                                                                            strokeDasharray={isActive ? '6 4' : '3 3'}
-                                                                            opacity={isActive ? 1 : 0.4}
-                                                                            filter={isActive ? `url(#glow-out-${size.label}-${theme.name})` : undefined}
-                                                                            style={dashAnim ? { animation: `${dashAnim} 0.3s linear infinite` } : undefined}
-                                                                        />
-                                                                        <polygon
-                                                                            points={`${connLineLen - 6},${lineY - 4} ${connLineLen},${lineY} ${connLineLen - 6},${lineY + 4}`}
-                                                                            fill={lineColor}
-                                                                            opacity={isActive ? 1 : 0.5}
-                                                                        />
-                                                                    </svg>
-                                                                )
-                                                            })()}
+                                                        {/* Mini ReactFlow canvas */}
+                                                        <div className="mini-flow" style={{ width: canvasW, height: canvasH }}>
+                                                            <ReactFlowProvider>
+                                                                <ReactFlow
+                                                                    nodes={miniNodes}
+                                                                    edges={miniEdges}
+                                                                    nodeTypes={MINI_NODE_TYPES}
+                                                                    nodesDraggable={false}
+                                                                    nodesConnectable={false}
+                                                                    elementsSelectable={false}
+                                                                    panOnDrag={false}
+                                                                    zoomOnScroll={false}
+                                                                    zoomOnDoubleClick={false}
+                                                                    zoomOnPinch={false}
+                                                                    preventScrolling={false}
+                                                                    proOptions={{ hideAttribution: true }}
+                                                                    style={{ background: 'transparent' }}
+                                                                />
+                                                            </ReactFlowProvider>
                                                         </div>
                                                     </div>
                                                 )

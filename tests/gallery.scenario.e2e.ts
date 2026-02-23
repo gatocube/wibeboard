@@ -48,10 +48,9 @@ test.describe('Widget Gallery compliance', () => {
         // Verify waking status is auto-selected
         await expect(page.locator('[data-testid="status-waking"]')).toBeVisible()
 
-        // Check that animated edges appear (data-testid="edge-animated")
-        const animatedEdges = page.locator('[data-testid="edge-animated"]')
+        // Check that React Flow animated edges appear (class="animated" on edge group)
+        const animatedEdges = page.locator('.react-flow__edge.animated')
         await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
-        // Verify there's at least one animated edge with a dashed line
         const count = await animatedEdges.count()
         expect(count).toBeGreaterThan(0)
 
@@ -69,8 +68,8 @@ test.describe('Widget Gallery compliance', () => {
         await page.locator('[data-testid="comm-right"]').click()
         await page.waitForTimeout(500)
 
-        // Should show animated edges (cyan color, dashes flow outward)
-        const animatedEdges = page.locator('[data-testid="edge-animated"]')
+        // Should show React Flow animated edges (cyan color, dashes flow outward)
+        const animatedEdges = page.locator('.react-flow__edge.animated')
         await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
 
         // Click Comm ← Emit (left side)
