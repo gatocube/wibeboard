@@ -24,8 +24,8 @@ import { templateRegistry, type TemplateName } from '@/templates/template-regist
 
 // Theme node components
 import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup } from '@/widgets/wibeglow'
-import { AgentNode as PixelAgent } from '@/widgets/pixel'
-import { AgentNode as GhubAgent } from '@/widgets/ghub'
+import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
+import { AgentNode as GhubAgent, ScriptNode as GhubScript } from '@/widgets/ghub'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
 
@@ -44,10 +44,10 @@ const KNOCK_OPTIONS: { label: string; value: KnockSide }[] = [
 interface SizeDef { label: string; width: number; height: number; gridLabel: string }
 
 function getSizes(widget: WidgetDefinition): SizeDef[] {
-    const minW = Math.max(widget.minWidth, GRID_CELL * 2)
-    const minH = Math.max(widget.minHeight, GRID_CELL * 2)
+    // S = square icon (2×2 grid = 40×40px)
+    const iconSize = GRID_CELL * 2
     return [
-        { label: 'S', width: minW, height: minH, gridLabel: `${Math.round(minW / GRID_CELL)}×${Math.round(minH / GRID_CELL)}` },
+        { label: 'S', width: iconSize, height: iconSize, gridLabel: '2×2' },
         { label: 'M', width: widget.defaultWidth, height: widget.defaultHeight, gridLabel: `${Math.round(widget.defaultWidth / GRID_CELL)}×${Math.round(widget.defaultHeight / GRID_CELL)}` },
         { label: 'L', width: widget.defaultWidth * 1.5, height: widget.defaultHeight * 1.5, gridLabel: `${Math.round(widget.defaultWidth * 1.5 / GRID_CELL)}×${Math.round(widget.defaultHeight * 1.5 / GRID_CELL)}` },
     ]
@@ -68,9 +68,17 @@ const THEME_COMPONENTS: ThemeComponents = {
     },
     pixel: {
         agent: PixelAgent,
+        'script-js': PixelScript,
+        'script-ts': PixelScript,
+        'script-sh': PixelScript,
+        'script-py': PixelScript,
     },
     ghub: {
         agent: GhubAgent,
+        'script-js': GhubScript,
+        'script-ts': GhubScript,
+        'script-sh': GhubScript,
+        'script-py': GhubScript,
     },
 }
 

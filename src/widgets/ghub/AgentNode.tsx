@@ -31,6 +31,69 @@ export function AgentNode({ data }: { data: any }) {
     const status = data.status || 'idle'
     const w = data.width || 240
     const h = data.height || 160
+    const isCompact = w <= 60
+
+    const isWaking = status === 'waking'
+    const knockOut = data.knockSide === 'out'
+
+    // Knocking animation
+    const knockAnimation = isWaking ? {
+        boxShadow: knockOut
+            ? [
+                `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
+                `inset -3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
+                `inset -1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
+            ]
+            : [
+                `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
+                `inset 3px 0 0 0 ${gh.accent}, 0 0 6px ${gh.accent}33`,
+                `inset 1px 0 0 0 ${gh.accent}, 0 0 2px ${gh.accent}22`,
+            ],
+    } : {}
+    const knockTransition = isWaking
+        ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
+        : {}
+
+    // ── Compact mode (icon size) ──
+    if (isCompact) {
+        const doneCount = (data.tasks || []).filter((t: any) => t.done).length
+        const total = (data.tasks || []).length || 4
+        return (
+            <motion.div
+                animate={knockAnimation}
+                transition={knockTransition}
+                style={{
+                    width: w, height: h,
+                    background: gh.bg,
+                    border: `1px solid ${gh.border}`,
+                    borderRadius: 6,
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    gap: 2, boxSizing: 'border-box',
+                    ...ghFont,
+                }}
+            >
+                <Handle type="target" position={Position.Left} style={{
+                    background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
+                }} />
+                <Handle type="source" position={Position.Right} style={{
+                    background: gh.fgMuted, border: `2px solid ${gh.borderMuted}`, width: 6, height: 6,
+                }} />
+                <div style={{
+                    width: 18, height: 18, borderRadius: 4,
+                    background: status === 'done' ? `${gh.green}22` : `${gh.accent}15`,
+                    border: `1.5px solid ${status === 'done' ? gh.green : gh.accent}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                    {status === 'done'
+                        ? <Check size={10} style={{ color: gh.green }} />
+                        : <span style={{ fontSize: 8, color: gh.accent, fontWeight: 700 }}>{doneCount}</span>
+                    }
+                </div>
+                <span style={{ fontSize: 7, color: gh.fgMuted, fontWeight: 600 }}>{doneCount}/{total}</span>
+            </motion.div>
+        )
+    }
 
     // Build tasks — use data.tasks if provided, else generate from status
     const tasks: { done: boolean; text: string }[] = data.tasks || [
@@ -45,16 +108,19 @@ export function AgentNode({ data }: { data: any }) {
     const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0
 
     return (
-        <div style={{
-            width: w, height: h,
-            background: gh.bg,
-            border: `1px solid ${gh.border}`,
-            borderRadius: 6,
-            padding: 12,
-            display: 'flex', flexDirection: 'column',
-            boxSizing: 'border-box',
-            ...ghFont,
-        }}>
+        <motion.div
+            animate={knockAnimation}
+            transition={knockTransition}
+            style={{
+                width: w, height: h,
+                background: gh.bg,
+                border: `1px solid ${gh.border}`,
+                borderRadius: 6,
+                padding: 12,
+                display: 'flex', flexDirection: 'column',
+                boxSizing: 'border-box',
+                ...ghFont,
+            }}>
             <Handle type="target" position={Position.Left} style={{
                 background: gh.accent, border: `2px solid ${gh.accent}55`, width: 8, height: 8,
             }} />
@@ -121,6 +187,6 @@ export function AgentNode({ data }: { data: any }) {
                 <span>{doneCount}/{total} tasks</span>
                 <span>{pct}% complete</span>
             </div>
-        </div>
+        </motion.div>
     )
 }

@@ -19,27 +19,74 @@ export function AgentNode({ data }: { data: any }) {
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100
+    const isCompact = w <= 60
+
+    const isWaking = status === 'waking'
+    const knockOut = data.knockSide === 'out'
 
     const statusConfig: Record<string, { label: string; color: string }> = {
         idle: { label: 'IDLE', color: '#666' },
+        waking: { label: 'WAKE', color: '#fbbf24' },
         running: { label: 'ACTIVE', color: '#22c55e' },
         done: { label: 'DONE', color: '#3b82f6' },
         error: { label: 'ERROR', color: '#ef4444' },
     }
     const st = statusConfig[status] || statusConfig.idle
 
+    // Knocking animation: border flashes
+    const knockAnimation = isWaking ? {
+        borderColor: knockOut
+            ? ['#1a1a1a', '#fbbf24', '#1a1a1a']
+            : ['#1a1a1a', st.color, '#1a1a1a'],
+    } : {}
+    const knockTransition = isWaking
+        ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
+        : {}
+
+    // ── Compact mode (icon size) ──
+    if (isCompact) {
+        return (
+            <motion.div
+                animate={knockAnimation}
+                transition={knockTransition}
+                style={{
+                    width: w, height: h,
+                    background: '#0a0a0a',
+                    border: '1px solid #1a1a1a',
+                    borderRadius: 2,
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    gap: 2, boxSizing: 'border-box',
+                    fontFamily: "'JetBrains Mono', monospace",
+                }}
+            >
+                <Handle type="target" position={Position.Left} style={{
+                    background: '#fbbf24', border: '2px solid #fbbf2455', width: 4, height: 4, borderRadius: 0,
+                }} />
+                <Handle type="source" position={Position.Right} style={{
+                    background: '#666', border: '2px solid #33333355', width: 4, height: 4, borderRadius: 0,
+                }} />
+                <span style={{ fontSize: 14, color: '#fbbf24' }}>◈</span>
+                <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
+            </motion.div>
+        )
+    }
+
     return (
-        <div style={{
-            width: w, height: h,
-            background: '#0a0a0a',
-            border: '1px solid #1a1a1a',
-            borderRadius: 4,
-            padding: '6px 10px',
-            fontFamily: "'JetBrains Mono', monospace",
-            display: 'flex', flexDirection: 'column',
-            justifyContent: 'space-between',
-            boxSizing: 'border-box',
-        }}>
+        <motion.div
+            animate={knockAnimation}
+            transition={knockTransition}
+            style={{
+                width: w, height: h,
+                background: '#0a0a0a',
+                border: '1px solid #1a1a1a',
+                borderRadius: 4,
+                padding: '6px 10px',
+                fontFamily: "'JetBrains Mono', monospace",
+                display: 'flex', flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxSizing: 'border-box',
+            }}>
             <Handle type="target" position={Position.Left} style={{
                 background: '#fbbf24', border: '2px solid #fbbf2455', width: 6, height: 6, borderRadius: 0,
             }} />
@@ -79,6 +126,6 @@ export function AgentNode({ data }: { data: any }) {
                 <span style={{ color: '#666' }}>PROG</span>
                 <span style={{ color: '#fbbf24' }}>{data.progress ?? 0}%</span>
             </div>
-        </div>
+        </motion.div>
     )
 }
