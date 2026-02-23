@@ -47,31 +47,39 @@ export function AgentNode({ data }: { data: any }) {
     // ── Compact mode (icon size) ──
     if (isCompact) {
         return (
-            <motion.div
-                animate={knockAnimation}
-                transition={knockTransition}
-                style={{
-                    width: w, height: h,
-                    background: '#0a0a0a',
-                    border: '1px solid #1a1a1a',
-                    borderRadius: 2,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: 2, boxSizing: 'border-box',
-                    position: 'relative',
-                    fontFamily: "'JetBrains Mono', monospace",
-                }}
-            >
-                <StatusDot status={status} />
-                <Handle type="target" position={Position.Left} style={{
-                    background: '#fbbf24', border: '2px solid #fbbf2455', width: 4, height: 4, borderRadius: 0,
-                }} />
-                <Handle type="source" position={Position.Right} style={{
-                    background: '#666', border: '2px solid #33333355', width: 4, height: 4, borderRadius: 0,
-                }} />
-                <span style={{ fontSize: 14, color: '#fbbf24' }}>◈</span>
-                <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
-            </motion.div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <motion.div
+                    animate={knockAnimation}
+                    transition={knockTransition}
+                    style={{
+                        width: w, height: h,
+                        background: '#0a0a0a',
+                        border: '1px solid #1a1a1a',
+                        borderRadius: 2,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                        position: 'relative',
+                        fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                >
+                    <StatusDot status={status} />
+                    <Handle type="target" position={Position.Left} style={{
+                        background: '#fbbf24', border: '2px solid #fbbf2455', width: 4, height: 4, borderRadius: 0,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: '#666', border: '2px solid #33333355', width: 4, height: 4, borderRadius: 0,
+                    }} />
+                    <span style={{ fontSize: 14, color: '#fbbf24' }}>◈</span>
+                    <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
+                </motion.div>
+                {/* Node name */}
+                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{data.label || 'Agent'}</span>
+                {/* Thought text */}
+                {data.thought && (
+                    <span style={{ fontSize: 7, color: '#666', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>💭 {data.thought}</span>
+                )}
+            </div>
         )
     }
 

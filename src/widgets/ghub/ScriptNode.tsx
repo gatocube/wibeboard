@@ -73,46 +73,50 @@ export function ScriptNode({ data }: { data: any }) {
     // ── Compact mode (icon size) ──
     if (isCompact) {
         return (
-            <div
-                style={{
-                    width: w, height: h,
-                    background: gh.bg,
-                    border: `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
-                    ...knockStyle,
-                    borderRadius: 6,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: 2, boxSizing: 'border-box',
-                    position: 'relative',
-                    ...ghFont,
-                }}
-            >
-                <StatusDot status={status} />
-                <Handle type="target" position={Position.Left} style={{
-                    background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
-                }} />
-                <Handle type="source" position={Position.Right} style={{
-                    background: gh.fgMuted, border: `2px solid ${gh.borderMuted}`, width: 6, height: 6,
-                }} />
-                {/* Action status icon */}
-                <div style={{
-                    width: 20, height: 20, borderRadius: 10,
-                    background: st.bg,
-                    border: `1.5px solid ${st.color}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, color: st.color,
-                }}>
-                    {status === 'running' ? (
-                        <motion.span
-                            animate={{ rotate: 360 }}
-                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                            style={{ fontSize: 9 }}
-                        >◠</motion.span>
-                    ) : st.icon}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div
+                    style={{
+                        width: w, height: h,
+                        background: gh.bg,
+                        border: `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
+                        ...knockStyle,
+                        borderRadius: 6,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                        position: 'relative',
+                        ...ghFont,
+                    }}
+                >
+                    <StatusDot status={status} />
+                    <Handle type="target" position={Position.Left} style={{
+                        background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: gh.fgMuted, border: `2px solid ${gh.borderMuted}`, width: 6, height: 6,
+                    }} />
+                    {/* Action status icon */}
+                    <div style={{
+                        width: 20, height: 20, borderRadius: 10,
+                        background: st.bg,
+                        border: `1.5px solid ${st.color}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, color: st.color,
+                    }}>
+                        {status === 'running' ? (
+                            <motion.span
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                style={{ fontSize: 9 }}
+                            >◠</motion.span>
+                        ) : st.icon}
+                    </div>
+                    <span style={{ fontSize: 7, color: langInfo.color, fontWeight: 600, ...ghMono }}>
+                        {lang.toUpperCase()}
+                    </span>
                 </div>
-                <span style={{ fontSize: 7, color: langInfo.color, fontWeight: 600, ...ghMono }}>
-                    {lang.toUpperCase()}
-                </span>
+                {/* Node name */}
+                <span style={{ fontSize: 8, color: gh.fg, fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', ...ghFont }}>{data.label || 'Script'}</span>
             </div>
         )
     }

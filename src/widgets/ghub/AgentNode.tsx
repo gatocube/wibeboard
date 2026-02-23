@@ -47,39 +47,47 @@ export function AgentNode({ data }: { data: any }) {
         const doneCount = (data.tasks || []).filter((t: any) => t.done).length
         const total = (data.tasks || []).length || 4
         return (
-            <div
-                style={{
-                    width: w, height: h,
-                    background: gh.bg,
-                    border: `1px solid ${gh.border}`,
-                    ...knockStyle,
-                    borderRadius: 6,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: 2, boxSizing: 'border-box',
-                    position: 'relative',
-                    ...ghFont,
-                }}
-            >
-                <StatusDot status={status} />
-                <Handle type="target" position={Position.Left} style={{
-                    background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
-                }} />
-                <Handle type="source" position={Position.Right} style={{
-                    background: gh.fgMuted, border: `2px solid ${gh.borderMuted}`, width: 6, height: 6,
-                }} />
-                <div style={{
-                    width: 18, height: 18, borderRadius: 4,
-                    background: status === 'done' ? `${gh.green}22` : `${gh.accent}15`,
-                    border: `1.5px solid ${status === 'done' ? gh.green : gh.accent}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                    {status === 'done'
-                        ? <Check size={10} style={{ color: gh.green }} />
-                        : <span style={{ fontSize: 8, color: gh.accent, fontWeight: 700 }}>{doneCount}</span>
-                    }
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div
+                    style={{
+                        width: w, height: h,
+                        background: gh.bg,
+                        border: `1px solid ${gh.border}`,
+                        ...knockStyle,
+                        borderRadius: 6,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                        position: 'relative',
+                        ...ghFont,
+                    }}
+                >
+                    <StatusDot status={status} />
+                    <Handle type="target" position={Position.Left} style={{
+                        background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: gh.fgMuted, border: `2px solid ${gh.borderMuted}`, width: 6, height: 6,
+                    }} />
+                    <div style={{
+                        width: 18, height: 18, borderRadius: 4,
+                        background: status === 'done' ? `${gh.green}22` : `${gh.accent}15`,
+                        border: `1.5px solid ${status === 'done' ? gh.green : gh.accent}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        {status === 'done'
+                            ? <Check size={10} style={{ color: gh.green }} />
+                            : <span style={{ fontSize: 8, color: gh.accent, fontWeight: 700 }}>{doneCount}</span>
+                        }
+                    </div>
+                    <span style={{ fontSize: 7, color: gh.fgMuted, fontWeight: 600 }}>{doneCount}/{total}</span>
                 </div>
-                <span style={{ fontSize: 7, color: gh.fgMuted, fontWeight: 600 }}>{doneCount}/{total}</span>
+                {/* Node name */}
+                <span style={{ fontSize: 8, color: gh.fg, fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', ...ghFont }}>{data.label || 'Agent'}</span>
+                {/* Thought text */}
+                {data.thought && (
+                    <span style={{ fontSize: 7, color: gh.fgMuted, fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', ...ghFont }}>💭 {data.thought}</span>
+                )}
             </div>
         )
     }

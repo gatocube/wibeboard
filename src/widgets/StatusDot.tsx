@@ -24,7 +24,7 @@ export function StatusDot({ status }: { status: string }) {
             transition={isRunning ? { repeat: Infinity, duration: 1, ease: 'easeInOut' } : {}}
             style={{
                 position: 'absolute',
-                top: 3, left: 3,
+                top: 3, right: 3,
                 width: 6, height: 6,
                 borderRadius: '50%',
                 background: color,
