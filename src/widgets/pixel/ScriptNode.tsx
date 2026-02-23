@@ -30,8 +30,7 @@ export function ScriptNode({ data }: { data: any }) {
     const isCompact = w <= 60
     const isMedium = w <= 160 && !isCompact
 
-    const isWaking = status === 'waking'
-    const knockOut = data.knockSide === 'out'
+    const hasKnock = !!(data.knockSide)
 
     // Status labels
     const statusConfig: Record<string, { label: string; color: string }> = {
@@ -43,16 +42,50 @@ export function ScriptNode({ data }: { data: any }) {
     }
     const st = statusConfig[status] || statusConfig.idle
 
-    // Knocking animation
-    const knockAnimation = isWaking ? {
-        borderColor: knockOut
-            ? ['#1a1a1a', langColor, '#1a1a1a']
-            : ['#1a1a1a', '#fbbf24', '#1a1a1a'],
+    // Knocking animation — triggers on knockSide, uses knockColor
+    const kColor = data.knockColor || '#f97316'
+    const knockAnimation = hasKnock ? {
+        borderColor: ['#1a1a1a', kColor, '#1a1a1a'],
     } : {}
 
-    const knockTransition = isWaking
+    const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
+
+    // ── TUI mode — monochrome terminal rendering ──
+    if (data.tuiMode) {
+        const statusChar = status === 'done' ? '✓' : status === 'running' ? '▶' : status === 'error' ? '✗' : '·'
+        const tuiGreen = '#33ff33'
+        const tuiFont = { fontFamily: "'Courier New', Courier, monospace" }
+        return (
+            <div style={{
+                width: w, height: h,
+                background: '#000',
+                border: `1px solid ${hasKnock ? tuiGreen : '#333'}`,
+                padding: isCompact ? 2 : 6,
+                boxSizing: 'border-box',
+                color: tuiGreen, ...tuiFont,
+                fontSize: isCompact ? 6 : 9,
+                lineHeight: isCompact ? '7px' : '12px',
+                overflow: 'hidden',
+                whiteSpace: 'pre',
+            }}>
+                <Handle type="target" position={Position.Left} style={{ background: tuiGreen, width: 4, height: 4, borderRadius: 0 }} />
+                <Handle type="source" position={Position.Right} style={{ background: '#666', width: 4, height: 4, borderRadius: 0 }} />
+                {isCompact ? (
+                    <div style={{ textAlign: 'center' }}>{statusChar}</div>
+                ) : (
+                    <>
+                        <div>{statusChar} {(data.label || 'Script').toUpperCase().slice(0, 20)}</div>
+                        <div style={{ color: '#999' }}>{lang.toUpperCase()} | {st.label}</div>
+                        {logs.slice(-3).map((l: string, i: number) => (
+                            <div key={i} style={{ color: '#666', overflow: 'hidden', textOverflow: 'ellipsis' }}>{'$ '}{l}</div>
+                        ))}
+                    </>
+                )}
+            </div>
+        )
+    }
 
     // ── Compact mode (icon size) ──
     if (isCompact) {

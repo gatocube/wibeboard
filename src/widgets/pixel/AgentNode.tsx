@@ -44,6 +44,44 @@ export function AgentNode({ data }: { data: any }) {
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
+    const tuiGreen = '#33ff33'
+    const tuiFont = { fontFamily: "'Courier New', Courier, monospace" }
+
+    // ── TUI mode — monochrome terminal rendering ──
+    if (data.tuiMode) {
+        const pct = data.progress ?? 0
+        const bar = '█'.repeat(Math.floor(pct / 10)) + '░'.repeat(10 - Math.floor(pct / 10))
+        const statusChar = status === 'done' ? '✓' : status === 'running' ? '▶' : status === 'error' ? '✗' : '·'
+        return (
+            <div style={{
+                width: w, height: h,
+                background: '#000',
+                border: `1px solid ${hasKnock ? tuiGreen : '#333'}`,
+                padding: isCompact ? 2 : 6,
+                boxSizing: 'border-box',
+                color: tuiGreen, ...tuiFont,
+                fontSize: isCompact ? 6 : 9,
+                lineHeight: isCompact ? '7px' : '12px',
+                overflow: 'hidden',
+                whiteSpace: 'pre',
+            }}>
+                <Handle type="target" position={Position.Left} style={{ background: tuiGreen, width: 4, height: 4, borderRadius: 0 }} />
+                <Handle type="source" position={Position.Right} style={{ background: '#666', width: 4, height: 4, borderRadius: 0 }} />
+                {isCompact ? (
+                    <div style={{ textAlign: 'center' }}>{statusChar}</div>
+                ) : (
+                    <>
+                        <div>{statusChar} {(data.label || 'Agent').toUpperCase().slice(0, 20)}</div>
+                        <div>[{bar}] {pct}%</div>
+                        {isLarge && logs.slice(-3).map((l: string, i: number) => (
+                            <div key={i} style={{ color: '#999', overflow: 'hidden', textOverflow: 'ellipsis' }}>{'> '}{l}</div>
+                        ))}
+                    </>
+                )}
+            </div>
+        )
+    }
+
     // ── Compact mode (icon size) ──
     if (isCompact) {
         return (

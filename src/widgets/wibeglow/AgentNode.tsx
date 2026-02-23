@@ -38,6 +38,7 @@ export function AgentNode({ data }: { data: any }) {
     const knockOut = data.knockSide === 'out'
     const knockIn = data.knockSide === 'in'
     const hasKnock = !!(data.knockSide)
+    const staticMode = !!data.staticMode
     const logs: string[] = data.logs || []
     const knockColor = data.knockColor || '#f97316' // use provided color or fallback to orange
 
@@ -47,7 +48,7 @@ export function AgentNode({ data }: { data: any }) {
 
     // Knocking animation: pulsing inset glow on left or right side
     // Triggers whenever knockSide is set (not just when waking)
-    const knockBoxShadow = hasKnock
+    const knockBoxShadow = (hasKnock && !staticMode)
         ? knockOut
             ? [
                 `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
@@ -61,14 +62,18 @@ export function AgentNode({ data }: { data: any }) {
                     `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
                 ]
                 : undefined
-        : undefined
+        : hasKnock
+            ? (knockOut
+                ? `inset -3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`
+                : `inset 3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`)
+            : undefined
 
-    const knockTransition = hasKnock
+    const knockTransition = (hasKnock && !staticMode)
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
     // ── Status indicator ──
-    const statusIndicator = isWaking ? (
+    const statusIndicator = (isWaking && !staticMode) ? (
         <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
@@ -83,8 +88,8 @@ export function AgentNode({ data }: { data: any }) {
         <div style={{
             width: 6, height: 6, borderRadius: '50%',
             background: statusColors[status] || '#475569',
-            boxShadow: status === 'running' ? `0 0 6px ${statusColors[status]}55` : 'none',
-            animation: status === 'running' ? 'pulse 1s ease infinite' : 'none',
+            boxShadow: (status === 'running' && !staticMode) ? `0 0 6px ${statusColors[status]}55` : 'none',
+            animation: (status === 'running' && !staticMode) ? 'pulse 1s ease infinite' : 'none',
         }} />
     )
 
