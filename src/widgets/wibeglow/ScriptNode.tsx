@@ -197,33 +197,40 @@ export function ScriptNode({ data }: { data: any }) {
 
     // ── CONFIGURED MODE — compact runtime view ──
     const isCompact = w <= 60
-    const isLarge = h >= 120
+    const isLarge = h > 200
 
-    // ── Compact mode (icon size) ──
+    // ── Compact mode (icon size) — solid color border like AgentNode ──
     if (isCompact) {
         const lastLog = logs.length > 0 ? logs[logs.length - 1] : null
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Solid color border wrapper */}
                 <div
                     style={{
                         width: w, height: h,
-                        borderRadius: 10,
-                        background: '#1a1b26',
-                        border: `1px solid ${langColor}33`,
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        gap: 2, boxSizing: 'border-box',
+                        padding: 1,
+                        borderRadius: 12,
+                        background: langColor,
+                        boxShadow: `0 2px 8px rgba(0,0,0,0.3)`,
                         position: 'relative',
                     }}
                 >
-                    <StatusDot status={status} />
                     <Handle type="target" position={Position.Left} style={{
                         background: langColor, border: `2px solid ${langColor}55`, width: 6, height: 6,
                     }} />
                     <Handle type="source" position={Position.Right} style={{
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
                     }} />
-                    <Terminal size={16} style={{ color: langColor }} />
+                    <div style={{
+                        background: '#1a1b26', borderRadius: 11,
+                        width: '100%', height: '100%',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                    }}>
+                        <StatusDot status={status} />
+                        <Terminal size={16} style={{ color: langColor }} />
+                    </div>
                 </div>
                 {/* Node name */}
                 <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{data.label || `script.${lang}`}</span>
@@ -235,15 +242,17 @@ export function ScriptNode({ data }: { data: any }) {
         )
     }
 
+    // ── M / L — solid color border wrapper (same technique as AgentNode) ──
+    const codeLines = editingCode.split('\n')
+    const lineCount = codeLines.length
+
     return (
         <div style={{
             width: w, height: h,
-            borderRadius: 10,
-            background: '#1a1b26',
-            border: `1px solid ${langColor}33`,
-            display: 'flex', flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px ${langColor}11`,
+            padding: 1,
+            borderRadius: 14,
+            background: langColor,
+            boxShadow: `0 4px 16px rgba(0,0,0,0.3)`,
         }}>
             <Handle type="target" position={Position.Left} style={{
                 background: langColor, border: `2px solid ${langColor}55`, width: 8, height: 8,
@@ -252,182 +261,227 @@ export function ScriptNode({ data }: { data: any }) {
                 background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
             }} />
 
-            {/* Header */}
             <div style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '5px 10px',
-                background: `${langColor}0a`,
-                borderBottom: `1px solid ${langColor}22`,
-                flexShrink: 0,
+                background: '#1a1b26', borderRadius: 13,
+                height: '100%',
+                display: 'flex', flexDirection: 'column',
+                overflow: 'hidden',
             }}>
-                {/* Status indicator */}
+                {/* Header */}
                 <div style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: status === 'running' ? '#f7df1e'
-                        : status === 'done' ? '#28c840'
-                            : status === 'error' ? '#ff5f57'
-                                : '#475569',
-                    boxShadow: status === 'running' ? '0 0 6px #f7df1e55' : 'none',
-                    animation: status === 'running' ? 'pulse 1s ease infinite' : 'none',
-                }} />
-
-                {/* File name */}
-                <div style={{
-                    flex: 1, fontSize: 10, fontWeight: 600, color: '#94a3b8',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '5px 10px',
+                    background: `${langColor}0a`,
+                    borderBottom: `1px solid ${langColor}22`,
+                    flexShrink: 0,
                 }}>
-                    {data.label || `script.${lang}`}
-                </div>
-
-                {/* Language badge */}
-                <div style={{
-                    fontSize: 7, fontWeight: 700, color: langColor,
-                    background: `${langColor}18`, padding: '1px 5px', borderRadius: 3,
-                    textTransform: 'uppercase', letterSpacing: '0.5px',
-                }}>
-                    {lang}
-                </div>
-
-                {/* Action buttons */}
-                <div className="nodrag nopan" style={{ display: 'flex', gap: 3 }}>
-                    <button
-                        onClick={() => data.onRunScript?.()}
-                        title="Run"
-                        style={{
-                            width: 18, height: 18, borderRadius: 4, border: 'none',
-                            background: '#28c84022', color: '#28c840',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}
-                    >
-                        <Play size={9} />
-                    </button>
-                    <button
-                        onClick={handleEdit}
-                        title="Edit"
-                        style={{
-                            width: 18, height: 18, borderRadius: 4, border: 'none',
-                            background: 'rgba(255,255,255,0.04)', color: '#64748b',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}
-                    >
-                        <Settings size={9} />
-                    </button>
-                </div>
-            </div>
-
-            {isLarge ? (
-                /* ── Large view: terminal log preview ── */
-                <div style={{
-                    flex: 1, overflow: 'hidden',
-                    display: 'flex', flexDirection: 'column',
-                }}>
-                    {/* Terminal header */}
+                    {/* Status indicator */}
                     <div style={{
-                        display: 'flex', alignItems: 'center', gap: 4,
-                        padding: '3px 10px',
-                        background: 'rgba(0,0,0,0.2)',
-                        borderBottom: '1px solid rgba(255,255,255,0.04)',
+                        width: 6, height: 6, borderRadius: '50%',
+                        background: status === 'running' ? '#f7df1e'
+                            : status === 'done' ? '#28c840'
+                                : status === 'error' ? '#ff5f57'
+                                    : '#475569',
+                        boxShadow: status === 'running' ? '0 0 6px #f7df1e55' : 'none',
+                    }} />
+
+                    {/* File name */}
+                    <div style={{
+                        flex: 1, fontSize: 10, fontWeight: 600, color: '#94a3b8',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
-                        <Terminal size={8} style={{ color: '#475569' }} />
-                        <span style={{ fontSize: 8, color: '#475569', fontWeight: 600, fontFamily: 'Inter' }}>
-                            Output
-                        </span>
-                        {logs.length > 0 && (
-                            <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>
-                                ({logs.length})
-                            </span>
-                        )}
+                        {data.label || `script.${lang}`}
                     </div>
 
-                    {/* Log output */}
-                    <div
-                        className="nodrag nopan nowheel"
-                        style={{
-                            flex: 1, padding: '6px 10px',
-                            overflowY: 'auto',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: 9,
-                            lineHeight: '14px',
-                        }}
-                    >
-                        {logs.length === 0 ? (
-                            <div style={{ color: '#334155', fontStyle: 'italic' }}>
-                                No output yet. Click ▶ to run.
+                    {/* Language badge */}
+                    <div style={{
+                        fontSize: 7, fontWeight: 700, color: langColor,
+                        background: `${langColor}18`, padding: '1px 5px', borderRadius: 3,
+                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                    }}>
+                        {lang}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="nodrag nopan" style={{ display: 'flex', gap: 3 }}>
+                        <button
+                            onClick={() => data.onRunScript?.()}
+                            title="Run"
+                            style={{
+                                width: 18, height: 18, borderRadius: 4, border: 'none',
+                                background: '#28c84022', color: '#28c840',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
+                        >
+                            <Play size={9} />
+                        </button>
+                        <button
+                            onClick={handleEdit}
+                            title="Edit"
+                            style={{
+                                width: 18, height: 18, borderRadius: 4, border: 'none',
+                                background: 'rgba(255,255,255,0.04)', color: '#64748b',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
+                        >
+                            <Settings size={9} />
+                        </button>
+                    </div>
+                </div>
+
+                {isLarge ? (
+                    /* ── Large view: code editor with line numbers ── */
+                    <div style={{
+                        flex: 1, overflow: 'hidden',
+                        display: 'flex', flexDirection: 'column',
+                    }}>
+                        {/* Code area */}
+                        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+                            {/* Line numbers */}
+                            <div style={{
+                                position: 'absolute', left: 0, top: 0, bottom: 0, width: 28,
+                                background: 'rgba(0,0,0,0.2)', borderRight: '1px solid rgba(255,255,255,0.04)',
+                                display: 'flex', flexDirection: 'column', paddingTop: 6, userSelect: 'none',
+                                overflow: 'hidden',
+                            }}>
+                                {codeLines.map((_, i) => (
+                                    <div key={i} style={{
+                                        fontSize: 8, color: '#475569', textAlign: 'right',
+                                        paddingRight: 4, lineHeight: '14px', height: 14,
+                                    }}>{i + 1}</div>
+                                ))}
                             </div>
-                        ) : (
-                            logs.map((line, i) => (
-                                <div key={i} style={{
-                                    color: line.startsWith('ERROR')
-                                        ? '#ff5f57'
-                                        : line.startsWith('>')
-                                            ? '#475569'
-                                            : '#94a3b8',
-                                    whiteSpace: 'pre-wrap',
-                                    wordBreak: 'break-all',
-                                }}>
-                                    <span style={{ color: '#334155', marginRight: 4, userSelect: 'none' }}>
-                                        {String(i + 1).padStart(2, ' ')}
-                                    </span>
-                                    {line}
-                                </div>
-                            ))
-                        )}
-                        <div ref={logsEndRef} />
-                    </div>
+                            {/* Code display */}
+                            <div
+                                className="nodrag nopan nowheel"
+                                style={{
+                                    position: 'absolute', left: 28, top: 0, right: 0, bottom: 0,
+                                    padding: '6px 8px',
+                                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                                    fontSize: 9, lineHeight: '14px',
+                                    color: '#e2e8f0',
+                                    overflowY: 'auto', overflowX: 'auto',
+                                    whiteSpace: 'pre',
+                                }}
+                            >
+                                {editingCode}
+                            </div>
+                        </div>
 
-                    {/* Status bar */}
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '3px 10px',
-                        background: `${langColor}05`,
-                        borderTop: '1px solid rgba(255,255,255,0.04)',
-                        flexShrink: 0,
-                    }}>
-                        <span style={{
-                            fontSize: 7, color: '#475569',
-                            fontFamily: "'JetBrains Mono', monospace",
-                        }}>
-                            {status === 'running' ? '⏳ running...'
-                                : status === 'done' ? `✓ done · ${logs.length} lines`
-                                    : status === 'error' ? '✗ error'
-                                        : '● idle'}
-                        </span>
-                    </div>
-                </div>
-            ) : (
-                /* ── Small view: compact script card ── */
-                <div style={{
-                    flex: 1, display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: 8, padding: '0 10px',
-                }}>
-                    <div style={{
-                        width: 28, height: 28, borderRadius: 6,
-                        background: `${langColor}15`, border: `1px solid ${langColor}22`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 14,
-                    }}>
-                        {lang === 'js' ? '🟨' : lang === 'ts' ? '🔷' : lang === 'sh' ? '🐚' : '🐍'}
-                    </div>
-                    <div>
+                        {/* Status bar */}
                         <div style={{
-                            fontSize: 10, fontWeight: 600, color: '#e2e8f0',
-                            fontFamily: "'JetBrains Mono', monospace",
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            padding: '3px 10px',
+                            background: `${langColor}05`,
+                            borderTop: '1px solid rgba(255,255,255,0.04)',
+                            flexShrink: 0,
                         }}>
-                            {data.label || `script.${lang}`}
-                        </div>
-                        <div style={{
-                            fontSize: 8, color: '#64748b',
-                            fontFamily: "'JetBrains Mono', monospace",
-                        }}>
-                            {status === 'running' ? 'running...'
-                                : status === 'done' ? `done · ${logs.length} lines`
-                                    : `${editingCode.split('\n').length} lines`}
+                            <span style={{
+                                fontSize: 7, color: '#475569',
+                                fontFamily: "'JetBrains Mono', monospace",
+                            }}>
+                                {status === 'running' ? '⏳ running...'
+                                    : status === 'done' ? `✓ done · ${logs.length} lines output`
+                                        : status === 'error' ? '✗ error'
+                                            : `${lineCount} lines · ${editingCode.length} chars`}
+                            </span>
                         </div>
                     </div>
-                </div>
-            )}
+                ) : (
+                    /* ── Medium view: terminal output if logs exist, otherwise line count ── */
+                    <div style={{
+                        flex: 1, overflow: 'hidden',
+                        display: 'flex', flexDirection: 'column',
+                    }}>
+                        {logs.length > 0 ? (
+                            <>
+                                {/* Terminal header */}
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 4,
+                                    padding: '3px 10px',
+                                    background: 'rgba(0,0,0,0.2)',
+                                    borderBottom: '1px solid rgba(255,255,255,0.04)',
+                                }}>
+                                    <Terminal size={8} style={{ color: '#475569' }} />
+                                    <span style={{ fontSize: 8, color: '#475569', fontWeight: 600, fontFamily: 'Inter' }}>
+                                        Output
+                                    </span>
+                                    <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>
+                                        ({logs.length})
+                                    </span>
+                                </div>
+
+                                {/* Log output */}
+                                <div
+                                    className="nodrag nopan nowheel"
+                                    style={{
+                                        flex: 1, padding: '6px 10px',
+                                        overflowY: 'auto',
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        fontSize: 9,
+                                        lineHeight: '14px',
+                                    }}
+                                >
+                                    {logs.map((line, i) => (
+                                        <div key={i} style={{
+                                            color: line.startsWith('ERROR')
+                                                ? '#ff5f57'
+                                                : line.startsWith('>')
+                                                    ? '#475569'
+                                                    : '#94a3b8',
+                                            whiteSpace: 'pre-wrap',
+                                            wordBreak: 'break-all',
+                                        }}>
+                                            <span style={{ color: '#334155', marginRight: 4, userSelect: 'none' }}>
+                                                {String(i + 1).padStart(2, ' ')}
+                                            </span>
+                                            {line}
+                                        </div>
+                                    ))}
+                                    <div ref={logsEndRef} />
+                                </div>
+
+                                {/* Status bar */}
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 6,
+                                    padding: '3px 10px',
+                                    background: `${langColor}05`,
+                                    borderTop: '1px solid rgba(255,255,255,0.04)',
+                                    flexShrink: 0,
+                                }}>
+                                    <span style={{
+                                        fontSize: 7, color: '#475569',
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                    }}>
+                                        {status === 'running' ? '⏳ running...'
+                                            : status === 'done' ? `✓ done · ${logs.length} lines`
+                                                : status === 'error' ? '✗ error'
+                                                    : `${lineCount} lines`}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            /* Idle — show icon + line count */
+                            <div style={{
+                                flex: 1, display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center', justifyContent: 'center',
+                                gap: 4, padding: '0 10px',
+                            }}>
+                                <Terminal size={20} style={{ color: langColor, opacity: 0.7 }} />
+                                <div style={{
+                                    fontSize: 9, color: '#94a3b8',
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                    textAlign: 'center',
+                                }}>
+                                    {`${lineCount} lines`}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

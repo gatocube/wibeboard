@@ -23,7 +23,8 @@ test.describe('Builder Demo', () => {
 
     test('Script node is visible in configured mode', async ({ page }) => {
         await expect(page.locator('text=process.js')).toBeVisible()
-        await expect(page.locator('text=No output yet')).toBeVisible()
+        // Script at its default size (280×200) shows line count when idle
+        await expect(page.locator('text=lines').first()).toBeVisible()
         await expect(page.locator('button[title="Run"]')).toBeVisible()
         await expect(page.locator('button[title="Edit"]')).toBeVisible()
     })
