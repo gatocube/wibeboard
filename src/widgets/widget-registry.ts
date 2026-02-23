@@ -53,14 +53,19 @@ const WIDGETS: WidgetDefinition[] = [
         defaultWidth: 200, defaultHeight: 120,
         templates: [
             {
-                name: 'Default',
-                description: 'General-purpose agent',
-                defaultData: { label: 'Agent', agent: 'Default', color: '#8b5cf6', status: 'idle' },
+                name: 'Planner',
+                description: 'Strategic planning agent',
+                defaultData: { label: 'Planner', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
-                name: 'Planner',
-                description: 'Agent that creates plans and delegates',
-                defaultData: { label: 'Planner', agent: 'Planner', color: '#6366f1', status: 'idle' },
+                name: 'Worker',
+                description: 'Task execution agent',
+                defaultData: { label: 'Worker', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
+            },
+            {
+                name: 'Reviewer',
+                description: 'Code review and validation agent',
+                defaultData: { label: 'Reviewer', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
             },
         ],
     },

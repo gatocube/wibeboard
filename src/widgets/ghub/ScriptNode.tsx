@@ -236,7 +236,11 @@ export function ScriptNode({ data }: { data: any }) {
                     background: gh.bgCard,
                     ...ghMono,
                 }}>
-                    <span>{data.execTime || '—'}</span>
+                    <span style={{ display: 'flex', gap: 6 }}>
+                        <span>{data.execTime || '—'}</span>
+                        <span style={{ opacity: 0.4 }}>·</span>
+                        <span>⚡{data.callsCount ?? 0}</span>
+                    </span>
                     <span>{status === 'done' ? '✓ Success' : status === 'error' ? '✗ Failed' : status === 'running' ? '● Running' : '○ Queued'}</span>
                 </div>
             )}

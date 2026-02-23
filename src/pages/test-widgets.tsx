@@ -166,6 +166,9 @@ function buildData(
         base.code = template.defaultData.code || '// empty'
         base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : []
         base.status = status === 'running' ? 'running' : status === 'done' ? 'done' : 'idle'
+        base.execTime = status === 'done' ? '1.8s' : status === 'running' ? '0.6s' : '—'
+        base.callsCount = status === 'done' ? 3 : status === 'running' ? 1 : 0
+        base.progress = progress
     }
 
     // Group-specific

@@ -181,7 +181,11 @@ export function ScriptNode({ data }: { data: any }) {
                     fontSize: 7, color: '#444',
                 }}>
                     <span style={{ color: langColor }}>{lang.toUpperCase()}</span>
-                    <span>{data.execTime || '—'}</span>
+                    <span style={{ display: 'flex', gap: 6 }}>
+                        <span>{data.execTime || '—'}</span>
+                        <span>⚡{data.callsCount ?? 0}</span>
+                        <span style={{ color: st.color }}>{data.progress ?? 0}%</span>
+                    </span>
                 </div>
             )}
         </motion.div>

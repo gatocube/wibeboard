@@ -380,11 +380,17 @@ export function ScriptNode({ data }: { data: any }) {
                             <span style={{
                                 fontSize: 7, color: '#475569',
                                 fontFamily: "'JetBrains Mono', monospace",
+                                display: 'flex', gap: 6,
                             }}>
-                                {status === 'running' ? '⏳ running...'
-                                    : status === 'done' ? `✓ done · ${logs.length} lines output`
-                                        : status === 'error' ? '✗ error'
-                                            : `${lineCount} lines · ${editingCode.length} chars`}
+                                <span>
+                                    {status === 'running' ? '⏳ running...'
+                                        : status === 'done' ? `✓ done · ${logs.length} lines`
+                                            : status === 'error' ? '✗ error'
+                                                : `${lineCount} lines`}
+                                </span>
+                                <span style={{ opacity: 0.5 }}>·</span>
+                                <span>{data.execTime || '—'}</span>
+                                <span>⚡{data.callsCount ?? 0}</span>
                             </span>
                         </div>
                     </div>
@@ -453,11 +459,17 @@ export function ScriptNode({ data }: { data: any }) {
                                     <span style={{
                                         fontSize: 7, color: '#475569',
                                         fontFamily: "'JetBrains Mono', monospace",
+                                        display: 'flex', gap: 6,
                                     }}>
-                                        {status === 'running' ? '⏳ running...'
-                                            : status === 'done' ? `✓ done · ${logs.length} lines`
-                                                : status === 'error' ? '✗ error'
-                                                    : `${lineCount} lines`}
+                                        <span>
+                                            {status === 'running' ? '⏳ running...'
+                                                : status === 'done' ? `✓ done · ${logs.length} lines`
+                                                    : status === 'error' ? '✗ error'
+                                                        : `${lineCount} lines`}
+                                        </span>
+                                        <span style={{ opacity: 0.5 }}>·</span>
+                                        <span>{data.execTime || '—'}</span>
+                                        <span>⚡{data.callsCount ?? 0}</span>
                                     </span>
                                 </div>
                             </>

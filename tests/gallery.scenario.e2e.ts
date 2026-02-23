@@ -106,4 +106,54 @@ test.describe('Widget Gallery compliance', () => {
         // Agent thought should appear (agent is selected by default)
         await expect(page.getByText('Analyzing auth patterns', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
     })
+
+    test('non-compact agent nodes display name, time, calls, and progress', async ({ page }) => {
+        // Agent widget should be selected by default
+        await expect(page.getByText('Agent', { exact: true }).first()).toBeVisible({ timeout: 5_000 })
+
+        // Set status to 'done' so all stats populate
+        await page.locator('[data-testid="status-done"]').click()
+        await page.waitForTimeout(500)
+
+        // M/L nodes are rendered in mini ReactFlow canvases (scaled down).
+        // Check that the stats text is present in the DOM within the .mini-flow containers.
+        const pageText = await page.locator('.mini-flow').allTextContents()
+        const allText = pageText.join(' ')
+
+        // 1. Agent name — "Claude 3.5" should be in M/L nodes
+        expect(allText).toContain('Claude 3.5')
+
+        // 2. Execution time
+        expect(allText).toContain('4.2s')
+
+        // 3. Calls count (⚡7)
+        expect(allText).toContain('⚡7')
+
+        // 4. Progress (0% by default)
+        expect(allText).toContain('0%')
+    })
+
+    test('non-compact script nodes display time, calls, and status text', async ({ page }) => {
+        // Click on "JavaScript" in the widget selector
+        const jsWidget = page.locator('[data-testid="widget-script-js"]')
+        await jsWidget.click()
+        await page.waitForTimeout(500)
+
+        // Set status to 'done'
+        await page.locator('[data-testid="status-done"]').click()
+        await page.waitForTimeout(500)
+
+        // Check stats text in DOM within .mini-flow containers
+        const pageText = await page.locator('.mini-flow').allTextContents()
+        const allText = pageText.join(' ')
+
+        // 1. Execution time (scripts show "1.8s" when done)
+        expect(allText).toContain('1.8s')
+
+        // 2. Calls count (⚡3)
+        expect(allText).toContain('⚡3')
+
+        // 3. Status text (one of: "done", "DONE", "Success")
+        expect(allText).toMatch(/done|DONE|Success/)
+    })
 })
