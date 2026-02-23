@@ -1,9 +1,12 @@
 /**
  * Two-Node Scenario — Agent A (Planner) calls tools + publishes artifact,
- * Agent B (Executor) reads artifact and executes it.
+ * then wakes Agent B (Executor). B asks follow-up questions (green edge),
+ * A responds, B confirms and works independently.
  *
- * 19 scripted steps driven by Automerge StepStore.
- * Features: theme switcher, JSON state inspector, animated knocking.
+ * Edge colors:
+ *   🟠 Orange animated — A is waking B
+ *   🟢 Green animated  — B is asking / A is responding (messaging)
+ *   ⚫ Inactive dashed  — no inter-node communication
  */
 
 import { useState, useEffect, useMemo } from 'react'
@@ -48,6 +51,7 @@ const THEME_LABELS: Record<ThemeKey, string> = {
 
 function makeSteps(): StepDef[] {
     return [
+        // ── Phase 1: A works solo (no edge activity) ──
         { label: 'Node A waking up', apply: (s: FlowState) => { s.nodes['a'].status = 'waking'; s.nodes['a'].logs.push('Initializing...') } },
         { label: 'Node A is working', apply: (s: FlowState) => { s.nodes['a'].status = 'running'; s.nodes['a'].progress = 10; s.nodes['a'].logs.push('Starting planner...') } },
         { label: 'Node A calling tool: search', apply: (s: FlowState) => { s.nodes['a'].progress = 25; s.nodes['a'].logs.push('⚡ tool_call: search("auth patterns")') } },
@@ -55,31 +59,52 @@ function makeSteps(): StepDef[] {
         { label: 'Node A calling tool: analyze', apply: (s: FlowState) => { s.nodes['a'].progress = 55; s.nodes['a'].logs.push('⚡ tool_call: analyze(patterns)') } },
         { label: 'Analysis complete', apply: (s: FlowState) => { s.nodes['a'].progress = 70; s.nodes['a'].logs.push('← result: OAuth2 + JWT recommended') } },
         { label: 'Node A publishing artifact', apply: (s: FlowState) => { s.nodes['a'].progress = 85; s.nodes['a'].logs.push('📦 publish: auth-plan.md'); s.nodes['a'].artifacts.push('auth-plan.md') } },
-        { label: 'Node A done', apply: (s: FlowState) => { s.nodes['a'].status = 'done'; s.nodes['a'].progress = 100; s.nodes['a'].knockSide = null; s.nodes['a'].logs.push('✓ Planner complete') } },
-        { label: 'Node B waking up', apply: (s: FlowState) => { s.nodes['b'].status = 'waking'; s.nodes['b'].logs.push('Initializing...') } },
-        { label: 'Node B reading artifact', apply: (s: FlowState) => { s.nodes['b'].status = 'running'; s.nodes['b'].progress = 10; s.nodes['b'].logs.push('📥 read: auth-plan.md') } },
+
+        // ── Phase 2: A wakes B (orange animated edge A→B) ──
+        {
+            label: 'Node A waking Node B', apply: (s: FlowState) => {
+                s.nodes['a'].progress = 90
+                s.nodes['a'].knockSide = 'out'
+                s.nodes['a'].logs.push('🔔 Waking Executor B...')
+                s.nodes['b'].status = 'waking'
+                s.nodes['b'].knockSide = 'in'
+                s.nodes['b'].logs.push('🔔 Woken by Planner A')
+            }
+        },
+
+        // ── Phase 3: B asks follow-up questions (green animated edge) ──
+        {
+            label: 'Node B asking follow-up', apply: (s: FlowState) => {
+                s.nodes['b'].status = 'running'
+                s.nodes['b'].knockSide = 'out'
+                s.nodes['a'].knockSide = 'in'
+                s.nodes['b'].progress = 5
+                s.nodes['b'].logs.push('❓ What JWT expiry should I use?')
+                s.nodes['a'].logs.push('📥 B asks: What JWT expiry?')
+            }
+        },
+        {
+            label: 'Node A responding', apply: (s: FlowState) => {
+                s.nodes['a'].knockSide = 'out'
+                s.nodes['b'].knockSide = 'in'
+                s.nodes['a'].logs.push('✓ Use 1h access, 7d refresh tokens')
+                s.nodes['b'].logs.push('← A: 1h access, 7d refresh tokens')
+            }
+        },
+        {
+            label: 'Node B confirms — all clear', apply: (s: FlowState) => {
+                s.nodes['b'].knockSide = null
+                s.nodes['a'].knockSide = null
+                s.nodes['a'].status = 'done'
+                s.nodes['a'].progress = 100
+                s.nodes['a'].logs.push('✓ Planner complete — handed off to B')
+                s.nodes['b'].logs.push('✓ Got it, everything is clear. Starting work.')
+            }
+        },
+
+        // ── Phase 4: B works solo (connection inactive) ──
+        { label: 'Node B reading artifact', apply: (s: FlowState) => { s.nodes['b'].progress = 15; s.nodes['b'].logs.push('📥 read: auth-plan.md') } },
         { label: 'Node B implementing auth', apply: (s: FlowState) => { s.nodes['b'].progress = 35; s.nodes['b'].logs.push('Implementing OAuth2 flow...') } },
-        // ── Knocking: B asks A a question ──
-        {
-            label: 'Node B knocking on A', apply: (s: FlowState) => {
-                s.nodes['b'].logs.push('❓ Asking A: confirm JWT expiry setting?')
-                s.nodes['a'].status = 'waking'; s.nodes['a'].knockSide = 'out'
-                s.nodes['a'].logs.push('🔔 B is asking: confirm JWT expiry setting?')
-            }
-        },
-        {
-            label: 'Node A answering B', apply: (s: FlowState) => {
-                s.nodes['a'].status = 'running'; s.nodes['a'].knockSide = null
-                s.nodes['a'].logs.push('✓ Confirmed: 1h access, 7d refresh')
-                s.nodes['b'].logs.push('← A confirmed: 1h access, 7d refresh')
-            }
-        },
-        {
-            label: 'Node A back to done', apply: (s: FlowState) => {
-                s.nodes['a'].status = 'done'; s.nodes['a'].knockSide = null
-            }
-        },
-        // ── Resume B's work ──
         { label: 'Node B writing tests', apply: (s: FlowState) => { s.nodes['b'].progress = 60; s.nodes['b'].logs.push('Writing unit tests...') } },
         { label: 'Node B running tests', apply: (s: FlowState) => { s.nodes['b'].progress = 80; s.nodes['b'].logs.push('⚡ tool_call: run_tests()'); s.nodes['b'].logs.push('← 12/12 tests pass ✓') } },
         { label: 'Node B publishing artifact', apply: (s: FlowState) => { s.nodes['b'].progress = 95; s.nodes['b'].logs.push('📦 publish: auth-module.ts'); s.nodes['b'].artifacts.push('auth-module.ts') } },
@@ -133,32 +158,23 @@ export function TwoNodeScenarioPage() {
         },
     ]
 
-    // Derive edge color from node states:
-    // - Orange: one node is waking/knocking on the other
-    // - Green: both are active and messages are flowing
-    // - Dim purple: artifact handoff (A done → B starts)
-    const aStatus = state.nodes['a']?.status || 'idle'
-    const bStatus = state.nodes['b']?.status || 'idle'
+    // Edge logic: only animated during active inter-node communication
+    // Uses knockSide as the single source of truth — if either node has knockSide set,
+    // the edge is active. Color depends on whether it's waking (orange) or messaging (green).
     const aKnock = state.nodes['a']?.knockSide
-    const isKnocking = aStatus === 'waking' || bStatus === 'waking'
-    const isMessaging = (aStatus === 'running' && bStatus === 'running') ||
-        (aStatus === 'running' && aKnock) ||
-        (bStatus === 'running' && aKnock)
-    const isHandoff = aStatus === 'done' && bStatus !== 'idle'
-    const edgeActive = isKnocking || isMessaging || isHandoff
+    const bKnock = state.nodes['b']?.knockSide
+    const hasKnock = !!(aKnock || bKnock)
+    const isWakingPhase = hasKnock && (state.nodes['b']?.status === 'waking')
+    const edgeColor = isWakingPhase ? '#f97316' : '#22c55e'
 
-    const edgeColor = isKnocking ? '#f97316'   // orange for waking/knocking
-        : isMessaging ? '#22c55e'               // green for active messaging
-            : '#8b5cf655'                           // dim purple for handoff
-
-    const edges: Edge[] = edgeActive ? [
+    const edges: Edge[] = hasKnock ? [
         {
             id: 'a-b', source: 'a', target: 'b',
             animated: true,
             style: {
                 stroke: edgeColor,
-                strokeWidth: isKnocking || isMessaging ? 2 : 1,
-                filter: isKnocking ? 'drop-shadow(0 0 4px #f97316)' : isMessaging ? 'drop-shadow(0 0 4px #22c55e)' : 'none',
+                strokeWidth: 2,
+                filter: `drop-shadow(0 0 4px ${edgeColor})`,
             },
         },
     ] : [
