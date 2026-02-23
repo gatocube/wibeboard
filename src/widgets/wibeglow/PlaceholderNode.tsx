@@ -1,5 +1,6 @@
 import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { Construction } from 'lucide-react'
+import { WidgetIcon } from '@/components/WidgetIcon'
 import { useCallback, useRef } from 'react'
 import { WidgetSelector } from '@/components/WidgetSelector'
 
@@ -111,7 +112,7 @@ export function PlaceholderNode({ data }: { data: any }) {
                     /* ── Widget hover preview ── */
                     <>
                         <div style={{ fontSize: 24, opacity: 0.7, marginBottom: 2 }}>
-                            {hoveredWidget.icon || '📦'}
+                            <WidgetIcon type={hoveredWidget.type || ''} size={24} />
                         </div>
                         <div style={{
                             fontSize: 11, fontWeight: 600, color: '#8b5cf6',

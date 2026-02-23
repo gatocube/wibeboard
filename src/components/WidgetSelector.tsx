@@ -12,22 +12,23 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { widgetRegistry, type WidgetDefinition, type WidgetTemplate, type WidgetCategory } from '@/engine/widget-registry'
+import { WidgetIcon, CATEGORY_ICONS } from '@/components/WidgetIcon'
+import { Package } from 'lucide-react'
 
 // ── Category visual config ──────────────────────────────────────────────────────
 
 interface CategoryTile {
     label: string
     key: WidgetCategory | string
-    icon: string
     color: string
     description: string
 }
 
 const CATEGORY_TILES: CategoryTile[] = [
-    { label: 'AI', key: 'AI', icon: '🤖', color: '#8b5cf6', description: 'Agents & LLMs' },
-    { label: 'Script', key: 'Script', icon: '⚡', color: '#f7df1e', description: 'Code runners' },
-    { label: 'Expectation', key: 'Expectation', icon: '✅', color: '#10b981', description: 'Assertions' },
-    { label: 'Note', key: 'Note', icon: '📝', color: '#f59e0b', description: 'Annotations' },
+    { label: 'AI', key: 'AI', color: '#8b5cf6', description: 'Agents & LLMs' },
+    { label: 'Script', key: 'Script', color: '#f7df1e', description: 'Code runners' },
+    { label: 'Expectation', key: 'Expectation', color: '#10b981', description: 'Assertions' },
+    { label: 'Note', key: 'Note', color: '#f59e0b', description: 'Annotations' },
 ]
 
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -157,7 +158,7 @@ export function WidgetSelector({
             {/* ── Header ── */}
             <div style={{ padding: '4px 12px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: '#8b5cf6', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>📦</span>
+                    <Package size={12} color="#8b5cf6" />
                     <span>Pick a widget</span>
                     {gridSize && (
                         <span style={{ fontSize: 8, color: '#64748b', fontFamily: "'JetBrains Mono', monospace", marginLeft: 'auto' }}>
@@ -227,7 +228,7 @@ export function WidgetSelector({
                                             ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                     }}
                                 >
-                                    <span style={{ fontSize: 14 }}>{widget.icon}</span>
+                                    <WidgetIcon type={widget.type} size={14} />
                                     <span style={{ fontSize: 6, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
                                         {widget.label.length > 5 ? widget.label.slice(0, 5) : widget.label}
                                     </span>
@@ -250,21 +251,21 @@ export function WidgetSelector({
                         }}>
                             Categories
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5 }}>
                             {CATEGORY_TILES.map(cat => {
                                 const isActive = selectedCategory === cat.key
-                                const count = allWidgets.filter(w => w.category === cat.key).length
                                 return (
                                     <div
                                         key={cat.key}
                                         data-testid={`category-${cat.key.toLowerCase()}`}
                                         onClick={() => setSelectedCategory(isActive ? null : cat.key as WidgetCategory)}
                                         style={{
-                                            padding: '6px 8px', borderRadius: 8,
+                                            padding: '8px 4px', borderRadius: 8,
                                             background: isActive ? `${cat.color}20` : 'rgba(255,255,255,0.03)',
                                             border: `1px solid ${isActive ? `${cat.color}44` : 'rgba(255,255,255,0.06)'}`,
                                             cursor: 'pointer',
-                                            display: 'flex', alignItems: 'center', gap: 6,
+                                            display: 'flex', flexDirection: 'column',
+                                            alignItems: 'center', gap: 3,
                                             transition: 'all 0.15s',
                                         }}
                                         onMouseOver={e => {
@@ -280,17 +281,12 @@ export function WidgetSelector({
                                             }
                                         }}
                                     >
-                                        <span style={{ fontSize: 14 }}>{cat.icon}</span>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{
-                                                fontSize: 9, fontWeight: 600,
-                                                color: isActive ? cat.color : '#e2e8f0',
-                                            }}>
-                                                {cat.label}
-                                            </div>
-                                            <div style={{ fontSize: 7, color: '#64748b', lineHeight: 1.2 }}>
-                                                {count > 0 ? `${count} widgets` : 'coming soon'}
-                                            </div>
+                                        {(() => { const CatIcon = CATEGORY_ICONS[cat.key] || Package; return <CatIcon size={14} color={isActive ? cat.color : '#94a3b8'} /> })()}
+                                        <div style={{
+                                            fontSize: 8, fontWeight: 600,
+                                            color: isActive ? cat.color : '#94a3b8',
+                                        }}>
+                                            {cat.label}
                                         </div>
                                     </div>
                                 )
@@ -364,7 +360,7 @@ export function WidgetSelector({
                                         (e.currentTarget as HTMLElement).style.background = 'transparent'
                                     }}
                                 >
-                                    <span style={{ fontSize: 16 }}>{widget.icon}</span>
+                                    <WidgetIcon type={widget.type} size={16} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
                                             {widget.label}

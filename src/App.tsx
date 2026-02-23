@@ -3,9 +3,10 @@ import { TestBuilderPage } from '@/pages/test-builder'
 import { TestWidgetsPage } from '@/pages/test-widgets'
 import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
 import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
-import { Menu, X, Layout, Layers, Home, GitBranch, Network } from 'lucide-react'
+import { IconsGalleryPage } from '@/pages/test-icons'
+import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'widgets'
+type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'widgets' | 'icons'
 
 interface NavItem {
     id: Page
@@ -20,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'two-node', label: 'Two-Node Scenario', icon: <GitBranch size={14} />, description: 'Tool calling + artifact publishing' },
     { id: 'four-node', label: 'Four-Node Concurrent', icon: <Network size={14} />, description: 'Parallel workers with aggregation' },
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
+    { id: 'icons', label: 'Icon Reference', icon: <Palette size={14} />, description: 'All icons used in wibeboard' },
 ]
 
 export function App() {
@@ -27,7 +29,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets'].includes(p)) {
+        if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets', 'icons'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -51,7 +53,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets'].includes(p)) {
+            if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets', 'icons'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -229,6 +231,7 @@ export function App() {
                     {page === 'two-node' && <TwoNodeScenarioPage />}
                     {page === 'four-node' && <FourNodeConcurrentPage />}
                     {page === 'widgets' && <TestWidgetsPage />}
+                    {page === 'icons' && <IconsGalleryPage />}
                 </div>
             </div>
         </div>

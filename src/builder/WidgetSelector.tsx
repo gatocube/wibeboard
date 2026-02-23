@@ -2,16 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { widgetRegistry, type WidgetDefinition, type WidgetTemplate, type WidgetCategory } from '@/widgets/widget-registry'
 import { Search, X, Clock, ChevronDown } from 'lucide-react'
+import { WidgetIcon as WidgetIconComponent, CATEGORY_ICONS as CAT_ICONS } from '@/components/WidgetIcon'
+import { Package } from 'lucide-react'
 
-// ── Category Icons ─────────────────────────────────────────────────────────────
-
-const CATEGORY_ICONS: Record<WidgetCategory, string> = {
-    AI: '🤖',
-    Script: '⚡',
-    Expectation: '✅',
-    Assertion: '🛡️',
-    Note: '📝',
-}
+// Category icons are imported from shared WidgetIcon component
+// CATEGORY_ICONS is now CAT_ICONS (from '@/components/WidgetIcon')
 
 const CATEGORY_COLORS: Record<WidgetCategory, string> = {
     AI: '#8b5cf6',
@@ -171,7 +166,7 @@ export function WidgetSelector({ position, rectSize, gridSize, onSelect, onCance
                             gap: 6, marginBottom: 12,
                         }}>
                             {recent.slice(0, 4).map(widget => (
-                                <WidgetIcon
+                                <WidgetIconTile
                                     key={`recent-${widget.type}`}
                                     widget={widget}
                                     onHover={handleHover}
@@ -216,7 +211,7 @@ export function WidgetSelector({ position, rectSize, gridSize, onSelect, onCance
                                         transition: 'all 0.15s',
                                     }}
                                 >
-                                    <span style={{ fontSize: 11 }}>{CATEGORY_ICONS[cat]}</span>
+                                    {(() => { const CatI = CAT_ICONS[cat] || Package; return <CatI size={11} color={CATEGORY_COLORS[cat] || '#94a3b8'} /> })()}
                                     {cat}
                                 </motion.button>
                             ))}
@@ -238,7 +233,7 @@ export function WidgetSelector({ position, rectSize, gridSize, onSelect, onCance
                     gap: 6,
                 }}>
                     {visibleWidgets.map(widget => (
-                        <WidgetIcon
+                        <WidgetIconTile
                             key={widget.type}
                             widget={widget}
                             onHover={handleHover}
@@ -303,7 +298,7 @@ export function WidgetSelector({ position, rectSize, gridSize, onSelect, onCance
                                 color: hoveredWidget.color, marginBottom: 2,
                                 display: 'flex', alignItems: 'center', gap: 4,
                             }}>
-                                <span>{hoveredWidget.icon}</span>
+                                <WidgetIconComponent type={hoveredWidget.type} size={14} />
                                 <span>{hoveredWidget.label}</span>
                                 <span style={{
                                     fontSize: 8, fontWeight: 400,
@@ -369,9 +364,9 @@ function SectionLabel({ label, icon }: { label: string; icon?: React.ReactNode }
 }
 
 
-// ── Widget Icon (macOS/iOS style) ──────────────────────────────────────────────
+// ── Widget Icon Tile (macOS/iOS style) ─────────────────────────────────────────
 
-function WidgetIcon({ widget, onHover, onClick }: {
+function WidgetIconTile({ widget, onHover, onClick }: {
     widget: WidgetDefinition
     onHover: (w: WidgetDefinition | null) => void
     onClick: () => void
@@ -410,7 +405,7 @@ function WidgetIcon({ widget, onHover, onClick }: {
                 boxShadow: isDisabled ? 'none' : `0 2px 8px ${widget.color}10`,
                 filter: isDisabled ? 'grayscale(0.8)' : 'none',
             }}>
-                {widget.icon}
+                <WidgetIconComponent type={widget.type} size={18} />
             </div>
 
             {/* Label */}

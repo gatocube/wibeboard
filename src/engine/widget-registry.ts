@@ -40,7 +40,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'agent',
         label: 'Agent',
-        icon: '🤖',
+        icon: 'sparkles',
         category: 'AI',
         tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute'],
         description: 'AI agent that executes tasks with tool calls',
@@ -69,7 +69,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'script-js',
         label: 'JavaScript',
-        icon: '🟨',
+        icon: 'terminal',
         category: 'Script',
         tags: ['script', 'javascript', 'js', 'code', 'function'],
         description: 'JavaScript script with activate() entry point',
@@ -88,7 +88,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'script-ts',
         label: 'TypeScript',
-        icon: '🔷',
+        icon: 'terminal',
         category: 'Script',
         tags: ['script', 'typescript', 'ts', 'code', 'typed'],
         description: 'TypeScript script with type-safe activate() entry point',
@@ -107,7 +107,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'script-sh',
         label: 'Shell',
-        icon: '🐚',
+        icon: 'terminal',
         category: 'Script',
         tags: ['script', 'shell', 'bash', 'sh', 'command'],
         description: 'Shell script for system commands',
@@ -126,7 +126,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'script-py',
         label: 'Python',
-        icon: '🐍',
+        icon: 'terminal',
         category: 'Script',
         tags: ['script', 'python', 'py', 'code', 'ml'],
         description: 'Python script for data processing and ML',
@@ -146,7 +146,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'group',
         label: 'Group',
-        icon: '📦',
+        icon: 'package',
         category: 'Layout',
         tags: ['group', 'container', 'pipeline', 'section'],
         description: 'Container that groups related nodes',
