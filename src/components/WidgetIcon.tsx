@@ -34,6 +34,9 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'group': Package,
     'expectation': CheckCircle2,
     'note': StickyNote,
+    'note-sticker': StickyNote,
+    'note-group': Package,
+    'note-label': StickyNote,
 }
 
 // Default colors per widget type (used when no color override is provided)
@@ -46,6 +49,9 @@ export const WIDGET_ICON_COLORS: Record<string, string> = {
     'group': '#6366f1',
     'expectation': '#10b981',
     'note': '#f59e0b',
+    'note-sticker': '#fbbf24',
+    'note-group': '#6366f1',
+    'note-label': '#94a3b8',
 }
 
 // Category icons

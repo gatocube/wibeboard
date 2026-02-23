@@ -1,4 +1,5 @@
 export { AgentNode } from './AgentNode'
 export { ScriptNode } from './ScriptNode'
 export { GroupNode } from './GroupNode'
+export { NoteNode } from './NoteNode'
 export { PlaceholderNode } from './PlaceholderNode'

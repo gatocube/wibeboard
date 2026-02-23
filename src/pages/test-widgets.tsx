@@ -23,7 +23,7 @@ import {
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components
-import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup } from '@/widgets/wibeglow'
+import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote } from '@/widgets/wibeglow'
 import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
 import { AgentNode as GhubAgent, ScriptNode as GhubScript } from '@/widgets/ghub'
 
@@ -105,6 +105,9 @@ const THEME_COMPONENTS: ThemeComponents = {
         'script-sh': WibeGlowScript,
         'script-py': WibeGlowScript,
         group: WibeGlowGroup,
+        'note-sticker': WibeGlowNote,
+        'note-group': WibeGlowNote,
+        'note-label': WibeGlowNote,
     },
     pixel: {
         agent: PixelAgent,
@@ -167,6 +170,13 @@ function buildData(
     // Group-specific
     if (widget.type === 'group') {
         base.color = template.defaultData.color || widget.color
+    }
+
+    // Note-specific
+    if (widget.type.startsWith('note-')) {
+        base.variant = template.defaultData.variant || 'sticker'
+        base.color = template.defaultData.color || widget.color
+        base.content = template.defaultData.content || ''
     }
 
     return base
