@@ -31,17 +31,14 @@ test.describe('Pages smoke check', () => {
 
         // 2. Navigate to widgets using top nav button (exact match)
         await page.getByRole('button', { name: 'widgets', exact: true }).click()
-        await expect(page.locator('text=WibeGlow Template')).toBeVisible({ timeout: 5_000 })
-        visitedPages.push('widgets/wibeglow')
+        // New gallery shows WidgetSelector (left) + 3 theme panes (right)
+        await expect(page.locator('[data-testid="widget-agent"]')).toBeVisible({ timeout: 5_000 })
+        await expect(page.locator('[data-testid="status-idle"]')).toBeVisible({ timeout: 3_000 })
+        visitedPages.push('widgets')
 
-        // Switch templates — use exact match to avoid sidebar text
-        await page.getByRole('button', { name: 'Pixel', exact: true }).click()
-        await expect(page.locator('text=Pixel Template')).toBeVisible({ timeout: 3_000 })
-        visitedPages.push('widgets/pixel')
-
-        await page.getByRole('button', { name: 'GitHub', exact: true }).click()
-        await expect(page.locator('text=GitHub Template')).toBeVisible({ timeout: 3_000 })
-        visitedPages.push('widgets/github')
+        // Verify theme panes show widget labels
+        await expect(page.locator('text=WibeGlow').first()).toBeVisible({ timeout: 3_000 })
+        visitedPages.push('widgets/themes-visible')
 
         // 3. Home page via sidebar (sidebar is open by default on wide screens)
         await page.locator('[data-testid="nav-home"]').click()
