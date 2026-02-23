@@ -140,17 +140,17 @@ export function WidgetSelector({
             style={{
                 ...containerStyle,
                 width: 260,
-                maxHeight: 420,
+                ...(embedded ? { height: '100%' } : { maxHeight: 420 }),
                 background: 'rgba(15,15,26,0.95)',
                 border: '1px solid rgba(139,92,246,0.2)',
-                borderRadius: 12,
+                borderRadius: embedded ? 0 : 12,
                 backdropFilter: 'blur(12px)',
                 padding: '8px 0',
                 fontFamily: 'Inter',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.1)',
+                boxShadow: embedded ? 'none' : '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.1)',
             }}
             onClick={e => e.stopPropagation()}
             onMouseDown={e => e.stopPropagation()}
