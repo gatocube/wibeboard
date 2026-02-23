@@ -5,7 +5,7 @@ import { TestWidgetsPage } from '@/pages/test-widgets'
 type Page = 'home' | 'builder' | 'widgets'
 
 export function App() {
-    const [page, setPage] = useState<Page>('home')
+    const [page, setPage] = useState<Page>('builder')
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
