@@ -89,7 +89,7 @@ function getSizes(widget: WidgetDefinition): SizeDef[] {
     return [
         { label: 'S', width: iconSize, height: iconSize, gridLabel: '3×3' },
         { label: 'M', width: widget.defaultWidth, height: widget.defaultHeight, gridLabel: `${Math.round(widget.defaultWidth / GRID_CELL)}×${Math.round(widget.defaultHeight / GRID_CELL)}` },
-        { label: 'L', width: widget.defaultWidth * 1.5, height: widget.defaultHeight * 1.5, gridLabel: `${Math.round(widget.defaultWidth * 1.5 / GRID_CELL)}×${Math.round(widget.defaultHeight * 1.5 / GRID_CELL)}` },
+        { label: 'L', width: widget.defaultWidth * 1.5, height: widget.defaultHeight * 2, gridLabel: `${Math.round(widget.defaultWidth * 1.5 / GRID_CELL)}×${Math.round(widget.defaultHeight * 2 / GRID_CELL)}` },
     ]
 }
 

@@ -33,6 +33,8 @@ export function AgentNode({ data }: { data: any }) {
     const w = data.width || 240
     const h = data.height || 160
     const isCompact = w <= 60
+    const isLarge = w >= 280
+    const logs: string[] = data.logs || []
 
     const isWaking = status === 'waking'
     const knockSide = data.knockSide || 'in'
@@ -148,6 +150,43 @@ export function AgentNode({ data }: { data: any }) {
                     style={{ height: '100%', borderRadius: 2, background: gh.green }}
                 />
             </div>
+
+            {/* PreviewCanvas — terminal output for large nodes */}
+            {isLarge && logs.length > 0 && (
+                <div style={{
+                    flex: 1, minHeight: 0, marginTop: 4, marginBottom: 4,
+                    background: '#010409',
+                    borderRadius: 6,
+                    border: `1px solid ${gh.borderMuted}`,
+                    padding: '4px 8px',
+                    overflow: 'hidden',
+                    display: 'flex', flexDirection: 'column',
+                }}>
+                    <div style={{
+                        fontSize: 8, color: gh.fgMuted, marginBottom: 2,
+                        display: 'flex', gap: 4, alignItems: 'center',
+                    }}>
+                        <span style={{ color: gh.green }}>●</span> Output
+                    </div>
+                    <div style={{
+                        flex: 1, overflow: 'hidden',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 8, lineHeight: '13px',
+                    }}>
+                        {logs.slice(-5).map((line, i) => (
+                            <div key={i} style={{
+                                color: line.startsWith('⚡') ? '#e3b341'
+                                    : line.startsWith('📦') ? gh.green
+                                        : line.startsWith('←') ? gh.fgMuted
+                                            : '#6e7681',
+                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            }}>
+                                {line}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Task list */}
             <div style={{

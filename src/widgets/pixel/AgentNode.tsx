@@ -21,6 +21,8 @@ export function AgentNode({ data }: { data: any }) {
     const w = data.width || 220
     const h = data.height || 100
     const isCompact = w <= 60
+    const isLarge = w >= 280
+    const logs: string[] = data.logs || []
 
     const isWaking = status === 'waking'
     const knockOut = data.knockSide === 'out'
@@ -121,6 +123,36 @@ export function AgentNode({ data }: { data: any }) {
 
             {/* Divider */}
             <div style={{ height: 1, background: '#333', margin: '2px 0' }} />
+
+            {/* PreviewCanvas — terminal output for large nodes */}
+            {isLarge && logs.length > 0 && (
+                <div style={{
+                    flex: 1, minHeight: 0, marginTop: 4,
+                    background: '#050505',
+                    border: '1px solid #222',
+                    padding: '3px 6px',
+                    overflow: 'hidden',
+                    display: 'flex', flexDirection: 'column',
+                }}>
+                    <div style={{ fontSize: 7, color: '#444', marginBottom: 2 }}>{'>'} OUTPUT</div>
+                    <div style={{
+                        flex: 1, overflow: 'hidden',
+                        fontSize: 8, lineHeight: '12px',
+                    }}>
+                        {logs.slice(-5).map((line, i) => (
+                            <div key={i} style={{
+                                color: line.startsWith('⚡') ? '#fbbf24'
+                                    : line.startsWith('📦') ? '#22c55e'
+                                        : line.startsWith('←') ? '#888'
+                                            : '#555',
+                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            }}>
+                                {line}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Stats grid */}
             <div style={{
