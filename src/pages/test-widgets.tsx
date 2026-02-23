@@ -150,6 +150,8 @@ function WidgetGalleryInner() {
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)
     const [progress, setProgress] = useState(0)
+    const [showConnections, setShowConnections] = useState(true)
+    const [showAnimations, setShowAnimations] = useState(true)
 
     const themes = templateRegistry.getAll()
 
@@ -168,6 +170,8 @@ function WidgetGalleryInner() {
             height: '100%', display: 'flex', overflow: 'hidden',
             background: '#0a0a14',
         }}>
+            {/* CSS to hide handles when connections toggle is off */}
+            <style>{`.hide-handles .react-flow__handle { display: none !important; }`}</style>
             {/* Left: WidgetSelector */}
             <div style={{
                 width: 260, flexShrink: 0,
@@ -274,6 +278,31 @@ function WidgetGalleryInner() {
                             {progress}%
                         </span>
                     </div>
+
+                    {/* Separator */}
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.06)' }} />
+
+                    {/* Toggle switches */}
+                    {[{ label: 'Connections', value: showConnections, set: setShowConnections },
+                    { label: 'Animations', value: showAnimations, set: setShowAnimations },
+                    ].map(toggle => (
+                        <button
+                            key={toggle.label}
+                            onClick={() => toggle.set(!toggle.value)}
+                            style={{
+                                padding: '3px 8px', borderRadius: 4,
+                                border: 'none', cursor: 'pointer',
+                                background: toggle.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
+                                color: toggle.value ? '#8b5cf6' : '#64748b',
+                                fontSize: 9, fontWeight: 600,
+                                fontFamily: "'JetBrains Mono', monospace",
+                                display: 'flex', alignItems: 'center', gap: 4,
+                            }}
+                        >
+                            <span style={{ fontSize: 8 }}>{toggle.value ? '☑' : '☐'}</span>
+                            {toggle.label}
+                        </button>
+                    ))}
                 </div>
 
                 {/* Theme panes */}
@@ -331,10 +360,14 @@ function WidgetGalleryInner() {
                                             {sizes.map(size => {
                                                 const data = buildData(
                                                     selectedWidget, selectedTemplate,
-                                                    status, knockSide,
+                                                    showAnimations ? status : (status === 'waking' ? 'idle' : status),
+                                                    showAnimations ? knockSide : null,
                                                     size.width, size.height,
                                                     progress,
                                                 )
+                                                // Pass hideHandles to suppress <Handle> rendering
+                                                if (!showConnections) data.hideHandles = true
+                                                const connLineLen = Math.min(24, size.width * 0.3)
                                                 return (
                                                     <div key={size.label} style={{
                                                         display: 'flex', flexDirection: 'column',
@@ -363,15 +396,46 @@ function WidgetGalleryInner() {
                                                             </span>
                                                         </div>
 
-                                                        {/* Rendered widget */}
+                                                        {/* Widget with connection lines */}
                                                         <div style={{
                                                             position: 'relative',
-                                                            padding: 8,
-                                                            borderRadius: 8,
-                                                            border: `1px dashed ${theme.colors.border}`,
-                                                            background: `${theme.colors.surface}88`,
+                                                            display: 'flex', alignItems: 'center',
                                                         }}>
-                                                            <Component data={data} />
+                                                            {/* Left connection line (input) */}
+                                                            {showConnections && (
+                                                                <svg width={connLineLen} height={2} style={{ flexShrink: 0 }}>
+                                                                    <line
+                                                                        x1={0} y1={1} x2={connLineLen} y2={1}
+                                                                        stroke={theme.colors.accent}
+                                                                        strokeWidth={1.5}
+                                                                        strokeDasharray="3 2"
+                                                                        opacity={0.5}
+                                                                    />
+                                                                    <circle cx={2} cy={1} r={2} fill={theme.colors.accent} opacity={0.6} />
+                                                                </svg>
+                                                            )}
+
+                                                            {/* The widget — hide handles via CSS when connections are off */}
+                                                            <div className={showConnections ? '' : 'hide-handles'}>
+                                                                <Component data={data} />
+                                                            </div>
+
+                                                            {/* Right connection line (output) */}
+                                                            {showConnections && (
+                                                                <svg width={connLineLen} height={2} style={{ flexShrink: 0 }}>
+                                                                    <line
+                                                                        x1={0} y1={1} x2={connLineLen} y2={1}
+                                                                        stroke={theme.colors.textMuted}
+                                                                        strokeWidth={1.5}
+                                                                        opacity={0.4}
+                                                                    />
+                                                                    <polygon
+                                                                        points={`${connLineLen - 5},${1 - 3} ${connLineLen},1 ${connLineLen - 5},${1 + 3}`}
+                                                                        fill={theme.colors.textMuted}
+                                                                        opacity={0.5}
+                                                                    />
+                                                                </svg>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )
