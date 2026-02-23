@@ -36,11 +36,9 @@ export function AgentNode({ data }: { data: any }) {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
     }
 
-    // Knocking animation: pulsing inset glow on left or right side
+    // Knocking animation: pulsing inset glow on left or right side (no scale/shake)
     const knockAnimation = isWaking
         ? {
-            opacity: 1,
-            scale: 1,
             boxShadow: knockOut
                 ? [
                     `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
@@ -55,15 +53,11 @@ export function AgentNode({ data }: { data: any }) {
                     ]
                     : undefined,
         }
-        : isRunning
-            ? { opacity: 1, scale: [1, 1.02, 1] }
-            : { opacity: 1, scale: 1 }
+        : {}
 
     const knockTransition = isWaking
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
-        : isRunning
-            ? { repeat: Infinity, duration: 1.5 }
-            : {}
+        : {}
 
     return (
         <motion.div

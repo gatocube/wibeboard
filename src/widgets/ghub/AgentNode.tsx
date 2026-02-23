@@ -34,7 +34,12 @@ export function AgentNode({ data }: { data: any }) {
     const isCompact = w <= 60
 
     const isWaking = status === 'waking'
-    const knockBorder = isWaking ? '2px solid #f97316' : `1px solid ${gh.border}`
+    const knockSide = data.knockSide || 'in'
+    const knockStyle = isWaking ? (
+        knockSide === 'out'
+            ? { borderRight: '2px solid #f97316' }
+            : { borderLeft: '2px solid #f97316' }
+    ) : {}
 
     // ── Compact mode (icon size) ──
     if (isCompact) {
@@ -45,7 +50,8 @@ export function AgentNode({ data }: { data: any }) {
                 style={{
                     width: w, height: h,
                     background: gh.bg,
-                    border: knockBorder,
+                    border: `1px solid ${gh.border}`,
+                    ...knockStyle,
                     borderRadius: 6,
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
@@ -92,7 +98,8 @@ export function AgentNode({ data }: { data: any }) {
             style={{
                 width: w, height: h,
                 background: gh.bg,
-                border: knockBorder,
+                border: `1px solid ${gh.border}`,
+                ...knockStyle,
                 borderRadius: 6,
                 padding: 12,
                 display: 'flex', flexDirection: 'column',

@@ -61,8 +61,13 @@ export function ScriptNode({ data }: { data: any }) {
     }
     const st = statusConfig[status] || statusConfig.idle
 
-    // Knocking: static orange border
-    const knockBorder = isWaking ? '2px solid #f97316' : undefined
+    // Knocking: side-specific orange border
+    const knockSide = data.knockSide || 'in'
+    const knockStyle = isWaking ? (
+        knockSide === 'out'
+            ? { borderRight: '2px solid #f97316' }
+            : { borderLeft: '2px solid #f97316' }
+    ) : {}
 
     // ── Compact mode (icon size) ──
     if (isCompact) {
@@ -71,7 +76,8 @@ export function ScriptNode({ data }: { data: any }) {
                 style={{
                     width: w, height: h,
                     background: gh.bg,
-                    border: knockBorder || `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
+                    border: `1px solid ${status === 'running' ? gh.yellow : status === 'done' ? gh.green : gh.border}`,
+                    ...knockStyle,
                     borderRadius: 6,
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
@@ -114,7 +120,8 @@ export function ScriptNode({ data }: { data: any }) {
             style={{
                 width: w, height: h,
                 background: gh.bg,
-                border: knockBorder || `1px solid ${gh.border}`,
+                border: `1px solid ${gh.border}`,
+                ...knockStyle,
                 borderRadius: 6,
                 display: 'flex', flexDirection: 'column',
                 boxSizing: 'border-box',
