@@ -46,26 +46,26 @@ export function AgentNode({ data }: { data: any }) {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
     }
 
-    // Knocking animation: pulsing inset glow on left or right side
-    // Triggers whenever knockSide is set (not just when waking)
+    // Knocking animation: pulsing inset glow on the side TOWARD the other node
+    // 'out' = sending, glow on LEFT (toward receiver); 'in' = receiving, glow on RIGHT (toward sender)
     const knockBoxShadow = (hasKnock && !staticMode)
         ? knockOut
             ? [
-                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
-                `inset -4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
-                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                `inset 4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
+                `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
             ]
             : knockIn
                 ? [
-                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
-                    `inset 4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
-                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                    `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                    `inset -4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
+                    `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
                 ]
                 : undefined
         : hasKnock
             ? (knockOut
-                ? `inset -3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`
-                : `inset 3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`)
+                ? `inset 3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`
+                : `inset -3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`)
             : undefined
 
     const knockTransition = (hasKnock && !staticMode)

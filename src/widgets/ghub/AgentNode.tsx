@@ -71,10 +71,11 @@ export function AgentNode({ data }: { data: any }) {
     const knockSide = data.knockSide
     const hasKnock = !!knockSide
     const kColor = data.knockColor || '#f97316'
+    // Border faces TOWARD the other node: 'out' = sending left, 'in' = receiving from right
     const knockStyle = hasKnock ? (
         knockSide === 'out'
-            ? { borderRight: `2px solid ${kColor}` }
-            : { borderLeft: `2px solid ${kColor}` }
+            ? { borderLeft: `2px solid ${kColor}` }
+            : { borderRight: `2px solid ${kColor}` }
     ) : {}
 
     // Progress

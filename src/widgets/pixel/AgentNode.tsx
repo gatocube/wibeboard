@@ -44,43 +44,10 @@ export function AgentNode({ data }: { data: any }) {
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
-    const tuiGreen = '#33ff33'
-    const tuiFont = { fontFamily: "'Courier New', Courier, monospace" }
-
-    // ── TUI mode — monochrome terminal rendering ──
-    if (data.tuiMode) {
-        const pct = data.progress ?? 0
-        const bar = '█'.repeat(Math.floor(pct / 10)) + '░'.repeat(10 - Math.floor(pct / 10))
-        const statusChar = status === 'done' ? '✓' : status === 'running' ? '▶' : status === 'error' ? '✗' : '·'
-        return (
-            <div style={{
-                width: w, height: h,
-                background: '#000',
-                border: `1px solid ${hasKnock ? tuiGreen : '#333'}`,
-                padding: isCompact ? 2 : 6,
-                boxSizing: 'border-box',
-                color: tuiGreen, ...tuiFont,
-                fontSize: isCompact ? 6 : 9,
-                lineHeight: isCompact ? '7px' : '12px',
-                overflow: 'hidden',
-                whiteSpace: 'pre',
-            }}>
-                <Handle type="target" position={Position.Left} style={{ background: tuiGreen, width: 4, height: 4, borderRadius: 0 }} />
-                <Handle type="source" position={Position.Right} style={{ background: '#666', width: 4, height: 4, borderRadius: 0 }} />
-                {isCompact ? (
-                    <div style={{ textAlign: 'center' }}>{statusChar}</div>
-                ) : (
-                    <>
-                        <div>{statusChar} {(data.label || 'Agent').toUpperCase().slice(0, 20)}</div>
-                        <div>[{bar}] {pct}%</div>
-                        {isLarge && logs.slice(-3).map((l: string, i: number) => (
-                            <div key={i} style={{ color: '#999', overflow: 'hidden', textOverflow: 'ellipsis' }}>{'> '}{l}</div>
-                        ))}
-                    </>
-                )}
-            </div>
-        )
-    }
+    // TUI mode just swaps the font — same layout, no pixel art font
+    const pixelFont = data.tuiMode
+        ? "'Courier New', Courier, monospace"
+        : "'Press Start 2P', monospace"
 
     // ── Compact mode (icon size) ──
     if (isCompact) {
@@ -98,7 +65,7 @@ export function AgentNode({ data }: { data: any }) {
                         alignItems: 'center', justifyContent: 'center',
                         gap: 2, boxSizing: 'border-box',
                         position: 'relative',
-                        fontFamily: "'Press Start 2P', monospace",
+                        fontFamily: pixelFont,
                     }}
                 >
                     <StatusDot status={status} />
@@ -112,10 +79,10 @@ export function AgentNode({ data }: { data: any }) {
                     <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
                 </motion.div>
                 {/* Node name */}
-                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Press Start 2P', monospace" }}>{data.label || 'Agent'}</span>
+                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: pixelFont }}>{data.label || 'Agent'}</span>
                 {/* Thought text */}
                 {data.thought && (
-                    <span style={{ fontSize: 7, color: '#666', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Press Start 2P', monospace" }}>💭 {data.thought}</span>
+                    <span style={{ fontSize: 7, color: '#666', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: pixelFont }}>💭 {data.thought}</span>
                 )}
             </div>
         )
@@ -131,7 +98,7 @@ export function AgentNode({ data }: { data: any }) {
                 border: '1px solid #1a1a1a',
                 borderRadius: 4,
                 padding: '6px 10px',
-                fontFamily: "'Press Start 2P', monospace",
+                fontFamily: pixelFont,
                 display: 'flex', flexDirection: 'column',
                 justifyContent: 'space-between',
                 boxSizing: 'border-box',

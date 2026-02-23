@@ -225,7 +225,7 @@ function WidgetGalleryInner() {
     const [showAnimations, setShowAnimations] = useState(true)
     const [showThinking, setShowThinking] = useState(false)
     const [commSide, setCommSide] = useState<CommSide>(null)
-    const [ghubDay, setGhubDay] = useState(true)       // GHub: day/night
+    const [ghubDay, setGhubDay] = useState(false)      // GHub: day/night (dark default)
     const [wibeglowStatic, setWibeglowStatic] = useState(false) // WibeGlow: animated/static
     const [pixelTui, setPixelTui] = useState(false)     // Pixel: pixel/TUI
 
