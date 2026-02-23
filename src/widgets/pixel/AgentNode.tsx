@@ -24,8 +24,8 @@ export function AgentNode({ data }: { data: any }) {
     const isLarge = w >= 280
     const logs: string[] = data.logs || []
 
-    const isWaking = status === 'waking'
     const knockOut = data.knockSide === 'out'
+    const hasKnock = !!(data.knockSide)
 
     const statusConfig: Record<string, { label: string; color: string }> = {
         idle: { label: 'IDLE', color: '#666' },
@@ -36,13 +36,13 @@ export function AgentNode({ data }: { data: any }) {
     }
     const st = statusConfig[status] || statusConfig.idle
 
-    // Knocking animation: border flashes
-    const knockAnimation = isWaking ? {
+    // Knocking animation: border flashes — triggers on knockSide, not just waking
+    const knockAnimation = hasKnock ? {
         borderColor: knockOut
-            ? ['#1a1a1a', '#fbbf24', '#1a1a1a']
-            : ['#1a1a1a', st.color, '#1a1a1a'],
+            ? ['#1a1a1a', '#f97316', '#1a1a1a']
+            : ['#1a1a1a', '#f97316', '#1a1a1a'],
     } : {}
-    const knockTransition = isWaking
+    const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
@@ -62,7 +62,7 @@ export function AgentNode({ data }: { data: any }) {
                         alignItems: 'center', justifyContent: 'center',
                         gap: 2, boxSizing: 'border-box',
                         position: 'relative',
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "'Press Start 2P', monospace",
                     }}
                 >
                     <StatusDot status={status} />
@@ -76,10 +76,10 @@ export function AgentNode({ data }: { data: any }) {
                     <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
                 </motion.div>
                 {/* Node name */}
-                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{data.label || 'Agent'}</span>
+                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Press Start 2P', monospace" }}>{data.label || 'Agent'}</span>
                 {/* Thought text */}
                 {data.thought && (
-                    <span style={{ fontSize: 7, color: '#666', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>💭 {data.thought}</span>
+                    <span style={{ fontSize: 7, color: '#666', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Press Start 2P', monospace" }}>💭 {data.thought}</span>
                 )}
             </div>
         )
@@ -95,7 +95,7 @@ export function AgentNode({ data }: { data: any }) {
                 border: '1px solid #1a1a1a',
                 borderRadius: 4,
                 padding: '6px 10px',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "'Press Start 2P', monospace",
                 display: 'flex', flexDirection: 'column',
                 justifyContent: 'space-between',
                 boxSizing: 'border-box',

@@ -36,31 +36,34 @@ export function AgentNode({ data }: { data: any }) {
     const isWaking = status === 'waking'
     const isRunning = status === 'running'
     const knockOut = data.knockSide === 'out'
-    const knockIn = data.knockSide === 'in' || (isWaking && !data.knockSide)
+    const knockIn = data.knockSide === 'in'
+    const hasKnock = !!(data.knockSide)
     const logs: string[] = data.logs || []
+    const knockColor = '#f97316' // orange for knock border
 
     const statusColors: Record<string, string> = {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
     }
 
     // Knocking animation: pulsing inset glow on left or right side
-    const knockBoxShadow = isWaking
+    // Triggers whenever knockSide is set (not just when waking)
+    const knockBoxShadow = hasKnock
         ? knockOut
             ? [
-                `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
-                `inset -4px 0 0 0 ${color}, 0 0 12px ${color}44`,
-                `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                `inset -4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
+                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
             ]
             : knockIn
                 ? [
-                    `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
-                    `inset 4px 0 0 0 ${color}, 0 0 12px ${color}44`,
-                    `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                    `inset 4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
+                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
                 ]
                 : undefined
         : undefined
 
-    const knockTransition = isWaking
+    const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 

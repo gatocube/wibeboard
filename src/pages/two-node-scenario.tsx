@@ -58,7 +58,8 @@ function makeSteps(): StepDef[] {
         { label: 'Tool result received', apply: (s: FlowState) => { s.nodes['a'].progress = 40; s.nodes['a'].logs.push('← result: 5 patterns found') } },
         { label: 'Node A calling tool: analyze', apply: (s: FlowState) => { s.nodes['a'].progress = 55; s.nodes['a'].logs.push('⚡ tool_call: analyze(patterns)') } },
         { label: 'Analysis complete', apply: (s: FlowState) => { s.nodes['a'].progress = 70; s.nodes['a'].logs.push('← result: OAuth2 + JWT recommended') } },
-        { label: 'Node A publishing artifact', apply: (s: FlowState) => { s.nodes['a'].progress = 85; s.nodes['a'].logs.push('📦 publish: auth-plan.md'); s.nodes['a'].artifacts.push('auth-plan.md') } },
+        { label: 'Node A publishing artifact', apply: (s: FlowState) => { s.nodes['a'].progress = 80; s.nodes['a'].logs.push('📦 publish: auth-plan.md'); s.nodes['a'].artifacts.push('auth-plan.md') } },
+        { label: 'Node A creating TODO', apply: (s: FlowState) => { s.nodes['a'].progress = 88; s.nodes['a'].logs.push('📋 publish: todo-auth.md'); s.nodes['a'].artifacts.push('todo-auth.md') } },
 
         // ── Phase 2: A wakes B (orange animated edge A→B) ──
         {

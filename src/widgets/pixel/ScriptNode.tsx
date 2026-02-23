@@ -70,7 +70,7 @@ export function ScriptNode({ data }: { data: any }) {
                         alignItems: 'center', justifyContent: 'center',
                         gap: 2, boxSizing: 'border-box',
                         position: 'relative',
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "'Press Start 2P', monospace",
                     }}
                 >
                     <StatusDot status={status} />
@@ -84,7 +84,7 @@ export function ScriptNode({ data }: { data: any }) {
                     <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
                 </motion.div>
                 {/* Node name */}
-                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{data.label || 'Script'}</span>
+                <span style={{ fontSize: 8, color: '#888', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Press Start 2P', monospace" }}>{data.label || 'Script'}</span>
             </div>
         )
     }
@@ -101,7 +101,7 @@ export function ScriptNode({ data }: { data: any }) {
                 borderRadius: 4,
                 display: 'flex', flexDirection: 'column',
                 boxSizing: 'border-box',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "'Press Start 2P', monospace",
                 overflow: 'hidden',
             }}
         >

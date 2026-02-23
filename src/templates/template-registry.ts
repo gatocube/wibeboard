@@ -21,6 +21,14 @@ export interface TemplateDefinition {
         textMuted: string
         accent: string
     }
+    colorsLight?: {
+        bg: string
+        surface: string
+        border: string
+        text: string
+        textMuted: string
+        accent: string
+    }
     supportsDarkMode: boolean
     supportsLightMode: boolean
     animationLevel: 'none' | 'minimal' | 'full'
@@ -29,6 +37,33 @@ export interface TemplateDefinition {
 // ── Template Definitions ────────────────────────────────────────────────────────
 
 const TEMPLATES: TemplateDefinition[] = [
+    {
+        name: 'wibeglow',
+        label: 'WibeGlow',
+        description: 'Modern dark design with glowing accents. Advanced animations, dark/darkish mode only.',
+        characteristics: [
+            'Modern, premium aesthetics',
+            'Advanced animations (framer-motion)',
+            'Dark/darkish mode with glow effects',
+            'Latest web technologies',
+        ],
+        fonts: {
+            heading: "'Inter', -apple-system, sans-serif",
+            body: "'Inter', -apple-system, sans-serif",
+            mono: "'JetBrains Mono', 'Fira Code', monospace",
+        },
+        colors: {
+            bg: '#0a0a14',
+            surface: '#0f0f1e',
+            border: 'rgba(255,255,255,0.08)',
+            text: '#e2e8f0',
+            textMuted: '#64748b',
+            accent: '#8b5cf6',
+        },
+        supportsDarkMode: true,
+        supportsLightMode: false,
+        animationLevel: 'full',
+    },
     {
         name: 'pixel',
         label: 'Pixel',
@@ -40,9 +75,9 @@ const TEMPLATES: TemplateDefinition[] = [
             'Renderable in terminal',
         ],
         fonts: {
-            heading: "'Courier New', Courier, monospace",
-            body: "'Courier New', Courier, monospace",
-            mono: "'Courier New', Courier, monospace",
+            heading: "'Press Start 2P', monospace",
+            body: "'Press Start 2P', monospace",
+            mono: "'Press Start 2P', monospace",
         },
         colors: {
             bg: '#1a1a2e',
@@ -79,36 +114,17 @@ const TEMPLATES: TemplateDefinition[] = [
             textMuted: '#8d96a0',
             accent: '#58a6ff',
         },
+        colorsLight: {
+            bg: '#ffffff',
+            surface: '#f6f8fa',
+            border: '#d0d7de',
+            text: '#1f2328',
+            textMuted: '#656d76',
+            accent: '#0969da',
+        },
         supportsDarkMode: true,
         supportsLightMode: true,
         animationLevel: 'minimal',
-    },
-    {
-        name: 'wibeglow',
-        label: 'WibeGlow',
-        description: 'Modern dark design with glowing accents. Advanced animations, dark/darkish mode only.',
-        characteristics: [
-            'Modern, premium aesthetics',
-            'Advanced animations (framer-motion)',
-            'Dark/darkish mode with glow effects',
-            'Latest web technologies',
-        ],
-        fonts: {
-            heading: "'Inter', -apple-system, sans-serif",
-            body: "'Inter', -apple-system, sans-serif",
-            mono: "'JetBrains Mono', 'Fira Code', monospace",
-        },
-        colors: {
-            bg: '#0a0a14',
-            surface: '#0f0f1e',
-            border: 'rgba(255,255,255,0.08)',
-            text: '#e2e8f0',
-            textMuted: '#64748b',
-            accent: '#8b5cf6',
-        },
-        supportsDarkMode: true,
-        supportsLightMode: false,
-        animationLevel: 'full',
     },
 ]
 

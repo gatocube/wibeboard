@@ -222,6 +222,7 @@ function WidgetGalleryInner() {
     const [showAnimations, setShowAnimations] = useState(true)
     const [showThinking, setShowThinking] = useState(false)
     const [commSide, setCommSide] = useState<CommSide>(null)
+    const [ghubDay, setGhubDay] = useState(true) // GHub starts in day mode
 
     const themes = templateRegistry.getAll()
 
@@ -420,43 +421,63 @@ function WidgetGalleryInner() {
                     }}>
                         {themes.map((theme, ti) => {
                             const Component = getComponent(theme.name, selectedWidget.type)
+                            // GHub day/night: swap colors when in day mode
+                            const useLight = theme.name === 'ghub' && ghubDay && theme.colorsLight
+                            const activeColors = useLight ? theme.colorsLight! : theme.colors
                             return (
                                 <div
                                     key={theme.name}
                                     style={{
                                         flex: 1,
-                                        background: theme.colors.bg,
-                                        borderRight: ti < themes.length - 1 ? `1px solid ${theme.colors.border}` : 'none',
+                                        background: activeColors.bg,
+                                        borderRight: ti < themes.length - 1 ? `1px solid ${activeColors.border}` : 'none',
                                         display: 'flex', flexDirection: 'column',
                                         overflow: 'auto',
+                                        transition: 'background 0.3s ease',
                                     }}
                                 >
                                     {/* Theme header */}
                                     <div style={{
                                         padding: '8px 16px',
-                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                        borderBottom: `1px solid ${activeColors.border}`,
                                         display: 'flex', alignItems: 'center', gap: 8,
                                         flexShrink: 0,
                                     }}>
                                         <div style={{
                                             width: 8, height: 8, borderRadius: '50%',
-                                            background: theme.colors.accent,
+                                            background: activeColors.accent,
                                         }} />
                                         <span style={{
                                             fontSize: 11, fontWeight: 700,
-                                            color: theme.colors.text,
+                                            color: activeColors.text,
                                             fontFamily: theme.fonts.heading,
                                         }}>
                                             {theme.label}
                                         </span>
                                         <span style={{
-                                            fontSize: 8, color: theme.colors.textMuted,
+                                            fontSize: 8, color: activeColors.textMuted,
                                             fontFamily: theme.fonts.mono,
                                             padding: '1px 6px', borderRadius: 3,
-                                            background: `${theme.colors.accent}15`,
+                                            background: `${activeColors.accent}15`,
                                         }}>
                                             {theme.animationLevel}
                                         </span>
+                                        {/* Day/Night toggle for GHub */}
+                                        {theme.supportsLightMode && (
+                                            <button
+                                                data-testid="ghub-day-night"
+                                                onClick={() => setGhubDay(!ghubDay)}
+                                                style={{
+                                                    marginLeft: 'auto',
+                                                    background: 'none', border: 'none', cursor: 'pointer',
+                                                    fontSize: 12, padding: '2px 4px', borderRadius: 4,
+                                                    color: activeColors.textMuted,
+                                                }}
+                                                title={ghubDay ? 'Switch to night' : 'Switch to day'}
+                                            >
+                                                {ghubDay ? '☀️' : '🌙'}
+                                            </button>
+                                        )}
                                     </div>
 
                                     {/* Size variants */}

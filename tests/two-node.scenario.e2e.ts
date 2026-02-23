@@ -53,12 +53,12 @@ test.describe('Two-node scenario with Automerge player', () => {
 
         // ── Step through to waking phase (step 8: A wakes B) ──
         // Steps 4-7: continue through tool calls and artifact publishing
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 5; i++) {
             await page.locator('[data-testid="btn-next"]').click()
             await page.waitForTimeout(200)
         }
 
-        // Step 8: Node A waking Node B
+        // Step 9: Node A waking Node B
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(300)
         await expect(page.locator('[data-testid="step-label"]')).toContainText('waking', { timeout: 3_000 })
@@ -73,16 +73,16 @@ test.describe('Two-node scenario with Automerge player', () => {
         await expect(page.getByText('auth-plan.md', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
         await expect(page.getByText('auth-module.ts', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
 
-        // Verify step counter (now 17 steps)
-        await expect(page.getByText('17/17')).toBeVisible({ timeout: 3_000 })
+        // Verify step counter (now 18 steps)
+        await expect(page.getByText('18/18')).toBeVisible({ timeout: 3_000 })
 
         // ── Undo/redo test ──
         for (let i = 0; i < 3; i++) {
             await page.locator('[data-testid="btn-prev"]').click()
             await page.waitForTimeout(400)
         }
-        // Should NOT show 17/17 anymore
-        await expect(page.getByText('17/17')).not.toBeVisible({ timeout: 3_000 })
+        // Should NOT show 18/18 anymore
+        await expect(page.getByText('18/18')).not.toBeVisible({ timeout: 3_000 })
 
         // Reset
         await page.locator('[data-testid="btn-reset"]').click()

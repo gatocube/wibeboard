@@ -36,9 +36,9 @@ export function AgentNode({ data }: { data: any }) {
     const isLarge = w >= 280
     const logs: string[] = data.logs || []
 
-    const isWaking = status === 'waking'
-    const knockSide = data.knockSide || 'in'
-    const knockStyle = isWaking ? (
+    const knockSide = data.knockSide
+    const hasKnock = !!knockSide
+    const knockStyle = hasKnock ? (
         knockSide === 'out'
             ? { borderRight: '2px solid #f97316' }
             : { borderLeft: '2px solid #f97316' }
