@@ -17,7 +17,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.width / data.height — dimensions
  */
 
-const gh = {
+const ghDark = {
     bg: '#0d1117',
     bgCard: '#161b22',
     border: '#30363d',
@@ -30,6 +30,19 @@ const gh = {
     accent: '#58a6ff',
     bgOverlay: '#1c2128',
 }
+const ghLightColors = {
+    bg: '#ffffff',
+    bgCard: '#f6f8fa',
+    border: '#d0d7de',
+    borderMuted: '#d8dee4',
+    fg: '#1f2328',
+    fgMuted: '#656d76',
+    green: '#1a7f37',
+    yellow: '#9a6700',
+    red: '#cf222e',
+    accent: '#0969da',
+    bgOverlay: '#f6f8fa',
+}
 const ghFont = { fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" }
 const ghMono = { fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" }
 
@@ -41,6 +54,7 @@ const LANG_ICONS: Record<string, { color: string; label: string }> = {
 }
 
 export function ScriptNode({ data }: { data: any }) {
+    const gh = data.dayMode ? ghLightColors : ghDark
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 120

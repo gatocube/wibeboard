@@ -25,7 +25,7 @@ import { templateRegistry, type TemplateName } from '@/templates/template-regist
 // Theme node components
 import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation } from '@/widgets/wibeglow'
 import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
-import { AgentNode as GhubAgent, ScriptNode as GhubScript } from '@/widgets/ghub'
+import { AgentNode as GhubAgent, ScriptNode as GhubScript, NoteNode as GhubNote } from '@/widgets/ghub'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
 
@@ -123,6 +123,9 @@ const THEME_COMPONENTS: ThemeComponents = {
         'script-ts': GhubScript,
         'script-sh': GhubScript,
         'script-py': GhubScript,
+        'note-sticker': GhubNote,
+        'note-group': GhubNote,
+        'note-label': GhubNote,
     },
 }
 
@@ -501,6 +504,11 @@ function WidgetGalleryInner() {
                                                     } else if (selectedWidget.type.startsWith('script-')) {
                                                         data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
                                                     }
+                                                }
+
+                                                // Pass dayMode to GHub theme nodes
+                                                if (theme.name === 'ghub' && ghubDay) {
+                                                    data.dayMode = true
                                                 }
 
                                                 const connLineLen = size.label === 'S' ? 60 : 40

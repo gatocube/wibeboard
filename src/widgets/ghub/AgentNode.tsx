@@ -16,7 +16,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.width / data.height — dimensions
  */
 
-const gh = {
+const ghDark = {
     bg: '#0d1117',
     bgCard: '#161b22',
     border: '#30363d',
@@ -26,9 +26,20 @@ const gh = {
     green: '#3fb950',
     accent: '#58a6ff',
 }
+const ghLight = {
+    bg: '#ffffff',
+    bgCard: '#f6f8fa',
+    border: '#d0d7de',
+    borderMuted: '#d8dee4',
+    fg: '#1f2328',
+    fgMuted: '#656d76',
+    green: '#1a7f37',
+    accent: '#0969da',
+}
 const ghFont = { fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" }
 
 export function AgentNode({ data }: { data: any }) {
+    const gh = data.dayMode ? ghLight : ghDark
     const status = data.status || 'idle'
     const w = data.width || 240
     const h = data.height || 160
