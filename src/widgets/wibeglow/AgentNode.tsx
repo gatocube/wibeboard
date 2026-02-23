@@ -1,8 +1,9 @@
 import { Handle, Position } from '@xyflow/react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { StatusDot } from '@/widgets/StatusDot'
+import { ShimmeringText, SplittingText } from '@/components/animate-ui'
 
 /**
  * AgentNode (wibeglow) — #26 Gradient Border design.
@@ -12,12 +13,14 @@ import { StatusDot } from '@/widgets/StatusDot'
  *
  * data.label — node name (e.g. "Code Generator")
  * data.color — primary accent color
- * data.status — 'idle' | 'running' | 'done' | 'error'
+ * data.status — 'idle' | 'waking' | 'running' | 'done' | 'error'
  * data.agent — agent model name (e.g. "Claude 3.5")
  * data.task — current task description
+ * data.thought — agent's current thinking text
  * data.progress — 0-100 progress percentage
  * data.execTime — execution time string (e.g. "8.1s")
  * data.callsCount — number of tool calls
+ * data.logs — string[] terminal output lines
  * data.width / data.height — dimensions
  */
 export function AgentNode({ data }: { data: any }) {
@@ -26,6 +29,7 @@ export function AgentNode({ data }: { data: any }) {
     const w = data.width || 200
     const h = data.height || 120
     const isCompact = w <= 60
+    const isLarge = w >= 280
     const progress = data.progress ?? 0
     const secondaryColor = '#06b6d4'
     const tertiaryColor = '#f59e0b'
@@ -33,6 +37,7 @@ export function AgentNode({ data }: { data: any }) {
     const isRunning = status === 'running'
     const knockOut = data.knockSide === 'out'
     const knockIn = data.knockSide === 'in' || (isWaking && !data.knockSide)
+    const logs: string[] = data.logs || []
 
     const statusColors: Record<string, string> = {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
@@ -59,11 +64,32 @@ export function AgentNode({ data }: { data: any }) {
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
+    // ── Status indicator ──
+    const statusIndicator = isWaking ? (
+        <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+            style={{
+                width: 8, height: 8, borderRadius: '50%',
+                border: `2px solid ${color}33`,
+                borderTopColor: color,
+                boxSizing: 'border-box',
+            }}
+        />
+    ) : (
+        <div style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: statusColors[status] || '#475569',
+            boxShadow: status === 'running' ? `0 0 6px ${statusColors[status]}55` : 'none',
+            animation: status === 'running' ? 'pulse 1s ease infinite' : 'none',
+        }} />
+    )
+
     // ── Compact mode (icon size) — gradient border like M/L ──
     if (isCompact) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {/* Gradient border wrapper (same as M/L: gradient bg + padding:1 + inner dark bg) */}
+                {/* Gradient border wrapper */}
                 <motion.div
                     style={{
                         width: w, height: h,
@@ -140,9 +166,10 @@ export function AgentNode({ data }: { data: any }) {
                     display: 'flex', flexDirection: 'column',
                     justifyContent: 'space-between',
                     boxSizing: 'border-box',
+                    overflow: 'hidden',
                 }}
             >
-                {/* Header — icon + label */}
+                {/* Header — icon + label + status */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <motion.div
                         animate={status === 'running' ? { rotate: [0, 15, -15, 0] } : {}}
@@ -153,29 +180,102 @@ export function AgentNode({ data }: { data: any }) {
                     <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: 'Inter', flex: 1 }}>
                         {data.label || 'Agent'}
                     </span>
-                    {/* Status dot */}
-                    <div style={{
-                        width: 6, height: 6, borderRadius: '50%',
-                        background: statusColors[status] || '#475569',
-                        boxShadow: status === 'running' ? `0 0 6px ${statusColors[status]}55` : 'none',
-                        animation: status === 'running' ? 'pulse 1s ease infinite' : 'none',
-                    }} />
+                    {statusIndicator}
                 </div>
 
-                {/* Task description */}
+                {/* Task description — shimmer when running */}
                 {data.task && (
-                    <p style={{
-                        fontSize: 9, color: '#94a3b8', margin: '4px 0 6px',
+                    <div style={{
+                        fontSize: 9, margin: '4px 0 2px',
                         fontFamily: 'Inter', lineHeight: 1.4,
                         overflow: 'hidden', textOverflow: 'ellipsis',
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                     }}>
-                        {data.task}
-                    </p>
+                        {isRunning ? (
+                            <ShimmeringText
+                                text={data.task}
+                                color="#94a3b8"
+                                shimmeringColor="#e2e8f0"
+                                duration={2.5}
+                                style={{ fontSize: 9, fontFamily: 'Inter' }}
+                            />
+                        ) : (
+                            <span style={{ color: '#94a3b8' }}>{data.task}</span>
+                        )}
+                    </div>
+                )}
+
+                {/* Thought — splitting text effect */}
+                <AnimatePresence mode="wait">
+                    {data.thought && (
+                        <motion.div
+                            key={data.thought}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            style={{
+                                fontSize: 8, fontFamily: 'Inter', fontStyle: 'italic',
+                                overflow: 'hidden', marginBottom: 2,
+                            }}
+                        >
+                            <SplittingText
+                                text={`💭 ${data.thought}`}
+                                variant="blur"
+                                delay={0.02}
+                                duration={0.3}
+                                style={{ fontSize: 8, color: '#64748b' }}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* PreviewCanvas — terminal output for large nodes */}
+                {isLarge && logs.length > 0 && (
+                    <div style={{
+                        flex: 1, minHeight: 0, marginTop: 4,
+                        background: 'rgba(0,0,0,0.4)',
+                        borderRadius: 6,
+                        border: '1px solid rgba(255,255,255,0.04)',
+                        padding: '4px 8px',
+                        overflow: 'hidden',
+                        display: 'flex', flexDirection: 'column',
+                    }}>
+                        {/* Terminal header */}
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            marginBottom: 3,
+                        }}>
+                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff5f57' }} />
+                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#febc2e' }} />
+                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#28c840' }} />
+                            <span style={{ fontSize: 7, color: '#475569', marginLeft: 4, fontFamily: "'JetBrains Mono', monospace" }}>
+                                output
+                            </span>
+                        </div>
+                        {/* Log lines */}
+                        <div style={{
+                            flex: 1, overflow: 'hidden',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: 8, lineHeight: '13px',
+                        }}>
+                            {logs.slice(-5).map((line, i) => (
+                                <div key={i} style={{
+                                    color: line.startsWith('⚡') ? '#fbbf24'
+                                        : line.startsWith('📦') ? '#22c55e'
+                                            : line.startsWith('←') ? '#94a3b8'
+                                                : line.startsWith('ERROR') ? '#ff5f57'
+                                                    : '#64748b',
+                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                }}>
+                                    {line}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 )}
 
                 {/* Progress bar + percentage */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: isLarge ? 4 : 0 }}>
                     <div style={{
                         height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)',
                         overflow: 'hidden', flex: 1,

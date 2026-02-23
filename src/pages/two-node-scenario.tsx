@@ -2,21 +2,47 @@
  * Two-Node Scenario — Agent A (Planner) calls tools + publishes artifact,
  * Agent B (Executor) reads artifact and executes it.
  *
- * 15 scripted steps driven by Automerge StepStore.
+ * 19 scripted steps driven by Automerge StepStore.
+ * Features: theme switcher, JSON state inspector, animated knocking.
  */
 
 import { useState, useEffect, useMemo } from 'react'
 import {
     ReactFlow,
+    ReactFlowProvider,
     Background,
+    Panel,
     type Node,
     type Edge,
+    type NodeTypes,
 } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
-import { AgentNode } from '@/widgets/wibeglow/AgentNode'
+import { AgentNode as WibeGlowAgent } from '@/widgets/wibeglow/AgentNode'
+import { AgentNode as PixelAgent } from '@/widgets/pixel/AgentNode'
+import { AgentNode as GHubAgent } from '@/widgets/ghub/AgentNode'
 
-const nodeTypes = { agent: AgentNode }
+// ── Theme configs ────────────────────────────────────────────────────────────
+
+type ThemeKey = 'wibeglow' | 'pixel' | 'ghub'
+
+const THEME_NODE_TYPES: Record<ThemeKey, NodeTypes> = {
+    wibeglow: { agent: WibeGlowAgent },
+    pixel: { agent: PixelAgent },
+    ghub: { agent: GHubAgent },
+}
+
+const THEME_BG: Record<ThemeKey, { color: string; bg: string }> = {
+    wibeglow: { color: '#1e1e3a', bg: '#0a0a14' },
+    pixel: { color: '#1a1a1a', bg: '#080808' },
+    ghub: { color: '#21262d', bg: '#0d1117' },
+}
+
+const THEME_LABELS: Record<ThemeKey, string> = {
+    wibeglow: 'WibeGlow',
+    pixel: 'Pixel',
+    ghub: 'GitHub',
+}
 
 // ── Step definitions ─────────────────────────────────────────────────────────
 
@@ -66,8 +92,13 @@ function makeSteps(): StepDef[] {
 export function TwoNodeScenarioPage() {
     const store = useMemo(() => new StepStore(['a', 'b'], makeSteps()), [])
     const [state, setState] = useState(store.getState())
+    const [theme, setTheme] = useState<ThemeKey>('wibeglow')
+    const [showJson, setShowJson] = useState(false)
 
     useEffect(() => store.subscribe(() => setState(store.getState())), [store])
+
+    const nodeTypes = useMemo(() => THEME_NODE_TYPES[theme], [theme])
+    const themeBg = THEME_BG[theme]
 
     const nodes: Node[] = [
         {
@@ -77,58 +108,142 @@ export function TwoNodeScenarioPage() {
                 status: state.nodes['a']?.status || 'idle',
                 knockSide: state.nodes['a']?.knockSide || null,
                 task: 'Search patterns, analyze, publish plan',
+                thought: state.nodes['a']?.status === 'running' ? 'Analyzing authentication patterns...' : undefined,
                 progress: state.nodes['a']?.progress || 0,
                 execTime: state.nodes['a']?.status === 'done' ? '12.3s' : '—',
                 callsCount: state.nodes['a']?.logs.filter(l => l.includes('tool_call')).length || 0,
-                width: 240, height: 140,
+                logs: state.nodes['a']?.logs || [],
+                width: 260, height: 180,
             },
         },
         {
-            id: 'b', type: 'agent', position: { x: 400, y: 80 },
+            id: 'b', type: 'agent', position: { x: 420, y: 80 },
             data: {
                 label: 'Executor (B)', agent: 'Claude 3.5', color: '#06b6d4',
                 status: state.nodes['b']?.status || 'idle',
                 knockSide: state.nodes['b']?.knockSide || null,
                 task: 'Read plan, implement, test, publish module',
+                thought: state.nodes['b']?.status === 'running' ? 'Implementing OAuth2 flow...' : undefined,
                 progress: state.nodes['b']?.progress || 0,
                 execTime: state.nodes['b']?.status === 'done' ? '18.7s' : '—',
                 callsCount: state.nodes['b']?.logs.filter(l => l.includes('tool_call')).length || 0,
-                width: 240, height: 140,
+                logs: state.nodes['b']?.logs || [],
+                width: 260, height: 180,
             },
         },
     ]
 
     const edges: Edge[] = [
-        { id: 'a-b', source: 'a', target: 'b', animated: state.nodes['a']?.status === 'done' && state.nodes['b']?.status !== 'idle', style: { stroke: '#8b5cf655', strokeDasharray: '6 3' } },
+        {
+            id: 'a-b', source: 'a', target: 'b',
+            animated: state.nodes['a']?.status === 'done' && state.nodes['b']?.status !== 'idle',
+            style: { stroke: '#8b5cf655', strokeDasharray: '6 3' },
+        },
     ]
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: themeBg.bg }}>
             <div style={{ flex: 1 }}>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    nodeTypes={nodeTypes}
-                    fitView
-                    nodesDraggable
-                    panOnDrag
-                    zoomOnScroll={false}
-                    proOptions={{ hideAttribution: true }}
-                >
-                    <Background color="#1e1e3a" gap={20} />
-                </ReactFlow>
+                <ReactFlowProvider>
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        nodeTypes={nodeTypes}
+                        fitView
+                        nodesDraggable
+                        panOnDrag
+                        zoomOnScroll={false}
+                        proOptions={{ hideAttribution: true }}
+                    >
+                        <Background color={themeBg.color} gap={20} />
+
+                        {/* Theme switcher panel */}
+                        <Panel position="top-right">
+                            <div style={{
+                                display: 'flex', gap: 4, padding: '4px 6px',
+                                background: 'rgba(15,15,26,0.9)',
+                                borderRadius: 8,
+                                border: '1px solid rgba(255,255,255,0.06)',
+                            }}>
+                                {(Object.keys(THEME_LABELS) as ThemeKey[]).map(key => (
+                                    <button
+                                        key={key}
+                                        data-testid={`theme-${key}`}
+                                        onClick={() => setTheme(key)}
+                                        style={{
+                                            padding: '3px 10px', borderRadius: 5,
+                                            border: 'none', cursor: 'pointer',
+                                            background: theme === key ? 'rgba(139,92,246,0.2)' : 'transparent',
+                                            color: theme === key ? '#8b5cf6' : '#64748b',
+                                            fontSize: 10, fontWeight: 600, fontFamily: 'Inter',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                    >
+                                        {THEME_LABELS[key]}
+                                    </button>
+                                ))}
+                                <button
+                                    data-testid="toggle-json"
+                                    onClick={() => setShowJson(!showJson)}
+                                    style={{
+                                        padding: '3px 10px', borderRadius: 5,
+                                        border: 'none', cursor: 'pointer',
+                                        background: showJson ? 'rgba(34,197,94,0.2)' : 'transparent',
+                                        color: showJson ? '#22c55e' : '#64748b',
+                                        fontSize: 10, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
+                                    }}
+                                >
+                                    {'{}'}
+                                </button>
+                            </div>
+                        </Panel>
+                    </ReactFlow>
+                </ReactFlowProvider>
             </div>
 
-            {/* Log panels */}
+            {/* Bottom panels: logs + optional JSON state */}
             <div style={{
                 display: 'flex', gap: 1,
-                height: 120,
+                height: showJson ? 180 : 120,
                 background: 'rgba(10,10,20,0.95)',
                 borderTop: '1px solid rgba(255,255,255,0.06)',
                 overflow: 'hidden',
+                transition: 'height 0.2s ease',
             }}>
                 <LogPanel title="Planner (A)" logs={state.nodes['a']?.logs || []} color="#8b5cf6" artifacts={state.nodes['a']?.artifacts || []} />
                 <LogPanel title="Executor (B)" logs={state.nodes['b']?.logs || []} color="#06b6d4" artifacts={state.nodes['b']?.artifacts || []} />
+
+                {/* JSON State Inspector */}
+                {showJson && (
+                    <div style={{
+                        width: 280, flexShrink: 0,
+                        padding: '6px 10px', overflow: 'auto',
+                        borderLeft: '1px solid rgba(255,255,255,0.04)',
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 8,
+                        lineHeight: '14px',
+                        background: 'rgba(0,0,0,0.3)',
+                    }}>
+                        <div style={{ color: '#22c55e', fontWeight: 600, marginBottom: 4, fontSize: 9 }}>
+                            State Inspector
+                        </div>
+                        <pre style={{
+                            margin: 0, color: '#94a3b8', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                        }}>
+                            {JSON.stringify({
+                                step: state.currentStep,
+                                nodes: Object.fromEntries(
+                                    Object.entries(state.nodes).map(([id, n]) => [id, {
+                                        status: n.status,
+                                        progress: n.progress,
+                                        knockSide: n.knockSide,
+                                        artifacts: n.artifacts,
+                                        logCount: n.logs.length,
+                                    }])
+                                ),
+                            }, null, 2)}
+                        </pre>
+                    </div>
+                )}
             </div>
 
             <StepPlayer store={store} />

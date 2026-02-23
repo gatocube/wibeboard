@@ -155,9 +155,15 @@ function buildData(
         base.agent = template.defaultData.agent || 'Claude 3.5'
         base.color = template.defaultData.color || widget.color
         base.task = status !== 'idle' ? 'Processing authentication module...' : undefined
+        base.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
         base.progress = progress
         base.execTime = status === 'done' ? '4.2s' : '—'
         base.callsCount = status === 'done' ? 7 : status === 'running' ? 3 : 0
+        base.logs = status === 'running'
+            ? ['⚡ tool_call: search("auth patterns")', '← result: 5 patterns found', '⚡ tool_call: analyze(patterns)']
+            : status === 'done'
+                ? ['⚡ tool_call: search("auth")', '← 5 patterns found', '⚡ tool_call: analyze()', '← OAuth2 + JWT', '📦 auth-plan.md', '✓ Complete']
+                : []
     }
 
     // Script-specific
@@ -554,23 +560,14 @@ function WidgetGalleryInner() {
                                                         display: 'flex', flexDirection: 'column',
                                                         alignItems: 'center', gap: 6,
                                                     }}>
-                                                        {/* Size letter badge */}
+                                                        {/* Size label — below node */}
                                                         <div style={{
-                                                            fontSize: 8, fontWeight: 700, color: theme.colors.textMuted,
+                                                            fontSize: 7, fontWeight: 700, color: theme.colors.textMuted,
                                                             fontFamily: theme.fonts.mono,
-                                                            textTransform: 'uppercase',
-                                                            letterSpacing: '1px',
-                                                            display: 'flex', gap: 8, alignItems: 'center',
+                                                            opacity: 0.5,
+                                                            textAlign: 'center',
                                                         }}>
-                                                            <span style={{
-                                                                width: 18, height: 18, borderRadius: 4,
-                                                                background: `${theme.colors.accent}15`,
-                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                fontSize: 9, fontWeight: 800,
-                                                                color: theme.colors.accent,
-                                                            }}>
-                                                                {size.label}
-                                                            </span>
+                                                            {size.label} · {size.gridLabel}
                                                         </div>
 
                                                         {/* Mini ReactFlow canvas */}

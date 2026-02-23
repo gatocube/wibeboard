@@ -82,8 +82,8 @@ test.describe('Widget Gallery compliance', () => {
     })
 
     test('compact mode nodes show name below', async ({ page }) => {
-        // The gallery should show S (compact) size labels
-        const sizeLabels = page.getByText('S', { exact: true })
+        // The gallery should show S size labels (now in format "S · 3×3")
+        const sizeLabels = page.getByText(/^S · /)
         await expect(sizeLabels.first()).toBeVisible({ timeout: 5_000 })
 
         // The agent widget should be selected by default

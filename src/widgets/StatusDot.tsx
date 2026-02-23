@@ -2,6 +2,7 @@
  * StatusDot — colored status indicator for compact (2×2) job nodes.
  *
  * Positioned in the top-left corner. Blinks when running.
+ * Spins as a progress ring when waking.
  */
 
 import { motion } from 'framer-motion'
@@ -17,6 +18,27 @@ export const STATUS_DOT_COLORS: Record<string, string> = {
 export function StatusDot({ status }: { status: string }) {
     const color = STATUS_DOT_COLORS[status] || STATUS_DOT_COLORS.idle
     const isRunning = status === 'running'
+    const isWaking = status === 'waking'
+
+    // Waking: spinning progress ring
+    if (isWaking) {
+        return (
+            <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+                style={{
+                    position: 'absolute',
+                    top: 2, right: 2,
+                    width: 8, height: 8,
+                    borderRadius: '50%',
+                    border: `2px solid ${color}33`,
+                    borderTopColor: color,
+                    boxSizing: 'border-box',
+                    zIndex: 10,
+                }}
+            />
+        )
+    }
 
     return (
         <motion.div
