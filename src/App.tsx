@@ -25,7 +25,7 @@ export function App() {
                         letterSpacing: '-0.5px',
                     }}
                 >
-                    wideboard
+                    wibeboard
                 </span>
                 <span style={{ color: '#1e293b' }}>|</span>
                 {(['builder', 'widgets'] as Page[]).map(p => (
@@ -71,7 +71,7 @@ function HomePage({ onNavigate }: { onNavigate: (p: Page) => void }) {
             justifyContent: 'center', height: '100%', gap: 20,
         }}>
             <div style={{ fontSize: 48, fontWeight: 800, color: '#8b5cf6', fontFamily: "'JetBrains Mono', monospace" }}>
-                wideboard
+                wibeboard
             </div>
             <div style={{ fontSize: 14, color: '#64748b', fontFamily: 'Inter', textAlign: 'center', maxWidth: 400 }}>
                 Interactive widget-based flow builder with customizable visual themes.

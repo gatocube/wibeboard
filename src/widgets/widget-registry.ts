@@ -1,5 +1,5 @@
 /**
- * Widget Registry — defines all available widgets for wideboard.
+ * Widget Registry — defines all available widgets for wibeboard.
  *
  * Each widget has templates for all 3 visual themes (pixel, ghub, wibeglow).
  * This is the core registry that the WidgetSelector and builder use.

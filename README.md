@@ -1,23 +1,23 @@
 # Wideboard
 
-[![Build & Deploy](https://github.com/gatocube/wideboard/actions/workflows/deploy.yml/badge.svg)](https://github.com/gatocube/wideboard/actions/workflows/deploy.yml)
-[![Tests](https://github.com/gatocube/wideboard/actions/workflows/test.yml/badge.svg)](https://github.com/gatocube/wideboard/actions/workflows/test.yml)
+[![Build & Deploy](https://github.com/gatocube/wibeboard/actions/workflows/deploy.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/deploy.yml)
+[![Tests](https://github.com/gatocube/wibeboard/actions/workflows/test.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/test.yml)
 
 Interactive widget-based flow builder with customizable visual themes.
 Like [n8n](https://n8n.io) but with interactive widget nodes.
 
-**🌐 [Live Demo →](https://gatocube.github.io/wideboard/)**
+**🌐 [Live Demo →](https://gatocube.github.io/wibeboard/)**
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/gatocube/wideboard.git
-cd wideboard
+git clone https://github.com/gatocube/wibeboard.git
+cd wibeboard
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173/wideboard/](http://localhost:5173/wideboard/) in your browser.
+Open [http://localhost:5173/wibeboard/](http://localhost:5173/wibeboard/) in your browser.
 
 ## Scripts
 

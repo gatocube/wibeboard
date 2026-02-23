@@ -1,5 +1,5 @@
 /**
- * Template Registry — 3 visual themes for wideboard widgets.
+ * Template Registry — 3 visual themes for wibeboard widgets.
  *
  * Each widget must provide a React component for all 3 templates.
  * Templates define the visual identity: colors, fonts, animations, layout.

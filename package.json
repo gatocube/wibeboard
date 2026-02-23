@@ -1,5 +1,5 @@
 {
-    "name": "wideboard",
+    "name": "wibeboard",
     "version": "0.1.0",
     "type": "module",
     "description": "Interactive widget-based flow builder with customizable visual themes",

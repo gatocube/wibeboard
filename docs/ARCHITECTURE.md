@@ -8,7 +8,7 @@ It provides 3 visual themes ("templates") and a registry of reusable widget node
 ## Project Structure
 
 ```
-wideboard/
+wibeboard/
 ├── src/
 │   ├── App.tsx                    # Main app — nav bar + page router
 │   ├── main.tsx                   # React entry point

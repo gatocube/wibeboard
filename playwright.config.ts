@@ -9,7 +9,7 @@ export default defineConfig({
     workers: process.env.CI ? 1 : undefined,
     reporter: 'list',
     use: {
-        baseURL: 'http://localhost:5173/wideboard/',
+        baseURL: 'http://localhost:5173/wibeboard/',
         trace: 'on-first-retry',
     },
     projects: [
@@ -20,7 +20,7 @@ export default defineConfig({
     ],
     webServer: {
         command: 'npm run dev',
-        url: 'http://localhost:5173/wideboard/',
+        url: 'http://localhost:5173/wibeboard/',
         reuseExistingServer: !process.env.CI,
     },
 })

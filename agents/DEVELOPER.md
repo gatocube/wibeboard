@@ -3,7 +3,7 @@
 ## Project Structure
 
 ```
-wideboard/
+wibeboard/
 ├── src/
 │   ├── App.tsx                        # Main app with nav + testing pages
 │   ├── main.tsx                       # React entry point
