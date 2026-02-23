@@ -152,6 +152,7 @@ function WidgetGalleryInner() {
     const [progress, setProgress] = useState(0)
     const [showConnections, setShowConnections] = useState(true)
     const [showAnimations, setShowAnimations] = useState(true)
+    const [showThinking, setShowThinking] = useState(false)
 
     const themes = templateRegistry.getAll()
 
@@ -291,6 +292,7 @@ function WidgetGalleryInner() {
                     {/* Toggle switches */}
                     {[{ label: 'Connections', value: showConnections, set: setShowConnections },
                     { label: 'Animations', value: showAnimations, set: setShowAnimations },
+                    { label: 'Thinking', value: showThinking, set: setShowThinking },
                     ].map(toggle => (
                         <button
                             key={toggle.label}
@@ -371,9 +373,17 @@ function WidgetGalleryInner() {
                                                     size.width, size.height,
                                                     progress,
                                                 )
+                                                // Add thought/log data when thinking toggle is on
+                                                if (showThinking) {
+                                                    if (selectedWidget.type === 'agent') {
+                                                        data.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
+                                                    } else if (selectedWidget.type.startsWith('script-')) {
+                                                        data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
+                                                    }
+                                                }
                                                 // Pass hideHandles to suppress <Handle> rendering
                                                 if (!showConnections) data.hideHandles = true
-                                                const connLineLen = Math.min(24, size.width * 0.3)
+                                                const connLineLen = size.label === 'S' ? 60 : 40
                                                 return (
                                                     <div key={size.label} style={{
                                                         display: 'flex', flexDirection: 'column',

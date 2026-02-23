@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
+import { StatusDot } from '@/widgets/StatusDot'
 
 /**
  * AgentNode (wibeglow) — #26 Gradient Border design.
@@ -24,6 +25,7 @@ export function AgentNode({ data }: { data: any }) {
     const status = data.status || 'idle'
     const w = data.width || 200
     const h = data.height || 120
+    const isCompact = w <= 60
     const progress = data.progress ?? 0
     const secondaryColor = '#06b6d4'
     const tertiaryColor = '#f59e0b'
@@ -56,6 +58,43 @@ export function AgentNode({ data }: { data: any }) {
     const knockTransition = isWaking
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
+
+    // ── Compact mode (icon size) ──
+    if (isCompact) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <motion.div
+                    animate={knockBoxShadow ? { boxShadow: knockBoxShadow } : {}}
+                    transition={knockTransition}
+                    style={{
+                        width: w, height: h,
+                        borderRadius: 10,
+                        background: '#0f0f1a',
+                        border: `1px solid ${color}33`,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                        position: 'relative',
+                    }}
+                >
+                    <StatusDot status={status} />
+                    <Handle type="target" position={Position.Left} style={{
+                        background: color, border: `2px solid ${color}55`, width: 6, height: 6,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
+                    }} />
+                    <Sparkles size={16} style={{ color }} />
+                </motion.div>
+                {/* Node name */}
+                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>{data.label || 'Agent'}</span>
+                {/* Thought text */}
+                {data.thought && (
+                    <span style={{ fontSize: 7, color: '#64748b', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>💭 {data.thought}</span>
+                )}
+            </div>
+        )
+    }
 
     return (
         <motion.div

@@ -1,6 +1,7 @@
 import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { Play, Settings, Check, Terminal } from 'lucide-react'
+import { StatusDot } from '@/widgets/StatusDot'
 
 /**
  * ScriptNode — JavaScript script node with editing + configured modes.
@@ -58,7 +59,7 @@ export function ScriptNode({ data }: { data: any }) {
     }, [])
 
     // ── EDITING MODE — show code editor via NodeToolbar ──
-    if (isEditing) {
+    if (isEditing && w > 60) {
         return (
             <>
                 {/* Code editor in NodeToolbar */}
@@ -195,7 +196,44 @@ export function ScriptNode({ data }: { data: any }) {
     }
 
     // ── CONFIGURED MODE — compact runtime view ──
+    const isCompact = w <= 60
     const isLarge = h >= 120
+
+    // ── Compact mode (icon size) ──
+    if (isCompact) {
+        const lastLog = logs.length > 0 ? logs[logs.length - 1] : null
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div
+                    style={{
+                        width: w, height: h,
+                        borderRadius: 10,
+                        background: '#1a1b26',
+                        border: `1px solid ${langColor}33`,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 2, boxSizing: 'border-box',
+                        position: 'relative',
+                    }}
+                >
+                    <StatusDot status={status} />
+                    <Handle type="target" position={Position.Left} style={{
+                        background: langColor, border: `2px solid ${langColor}55`, width: 6, height: 6,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
+                    }} />
+                    <Terminal size={16} style={{ color: langColor }} />
+                </div>
+                {/* Node name */}
+                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{data.label || `script.${lang}`}</span>
+                {/* Last output line */}
+                {lastLog && (
+                    <span style={{ fontSize: 7, color: '#64748b', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'JetBrains Mono', monospace" }}>{lastLog}</span>
+                )}
+            </div>
+        )
+    }
 
     return (
         <div style={{
