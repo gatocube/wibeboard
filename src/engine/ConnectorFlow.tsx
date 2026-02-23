@@ -269,7 +269,8 @@ export function ConnectorFlowOverlay({
                 const d = `M ${start.x} ${start.y} C ${start.x + cpOffset} ${start.y}, ${end.x - cpOffset} ${end.y}, ${end.x} ${end.y}`
                 return (
                     <svg style={{
-                        position: 'absolute', inset: 0,
+                        position: 'fixed', top: 0, left: 0,
+                        width: '100vw', height: '100vh',
                         zIndex: 4, pointerEvents: 'none',
                         overflow: 'visible',
                     }}>
