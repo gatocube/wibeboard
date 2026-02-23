@@ -18,6 +18,7 @@ export interface NodeState {
     logs: string[]
     artifacts: string[]
     progress: number
+    knockSide?: 'in' | 'out' | null
 }
 
 export interface FlowState {

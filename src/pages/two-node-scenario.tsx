@@ -29,10 +29,31 @@ function makeSteps(): StepDef[] {
         { label: 'Node A calling tool: analyze', apply: (s: FlowState) => { s.nodes['a'].progress = 55; s.nodes['a'].logs.push('⚡ tool_call: analyze(patterns)') } },
         { label: 'Analysis complete', apply: (s: FlowState) => { s.nodes['a'].progress = 70; s.nodes['a'].logs.push('← result: OAuth2 + JWT recommended') } },
         { label: 'Node A publishing artifact', apply: (s: FlowState) => { s.nodes['a'].progress = 85; s.nodes['a'].logs.push('📦 publish: auth-plan.md'); s.nodes['a'].artifacts.push('auth-plan.md') } },
-        { label: 'Node A done', apply: (s: FlowState) => { s.nodes['a'].status = 'done'; s.nodes['a'].progress = 100; s.nodes['a'].logs.push('✓ Planner complete') } },
+        { label: 'Node A done', apply: (s: FlowState) => { s.nodes['a'].status = 'done'; s.nodes['a'].progress = 100; s.nodes['a'].knockSide = null; s.nodes['a'].logs.push('✓ Planner complete') } },
         { label: 'Node B waking up', apply: (s: FlowState) => { s.nodes['b'].status = 'waking'; s.nodes['b'].logs.push('Initializing...') } },
         { label: 'Node B reading artifact', apply: (s: FlowState) => { s.nodes['b'].status = 'running'; s.nodes['b'].progress = 10; s.nodes['b'].logs.push('📥 read: auth-plan.md') } },
         { label: 'Node B implementing auth', apply: (s: FlowState) => { s.nodes['b'].progress = 35; s.nodes['b'].logs.push('Implementing OAuth2 flow...') } },
+        // ── Knocking: B asks A a question ──
+        {
+            label: 'Node B knocking on A', apply: (s: FlowState) => {
+                s.nodes['b'].logs.push('❓ Asking A: confirm JWT expiry setting?')
+                s.nodes['a'].status = 'waking'; s.nodes['a'].knockSide = 'out'
+                s.nodes['a'].logs.push('🔔 B is asking: confirm JWT expiry setting?')
+            }
+        },
+        {
+            label: 'Node A answering B', apply: (s: FlowState) => {
+                s.nodes['a'].status = 'running'; s.nodes['a'].knockSide = null
+                s.nodes['a'].logs.push('✓ Confirmed: 1h access, 7d refresh')
+                s.nodes['b'].logs.push('← A confirmed: 1h access, 7d refresh')
+            }
+        },
+        {
+            label: 'Node A back to done', apply: (s: FlowState) => {
+                s.nodes['a'].status = 'done'; s.nodes['a'].knockSide = null
+            }
+        },
+        // ── Resume B's work ──
         { label: 'Node B writing tests', apply: (s: FlowState) => { s.nodes['b'].progress = 60; s.nodes['b'].logs.push('Writing unit tests...') } },
         { label: 'Node B running tests', apply: (s: FlowState) => { s.nodes['b'].progress = 80; s.nodes['b'].logs.push('⚡ tool_call: run_tests()'); s.nodes['b'].logs.push('← 12/12 tests pass ✓') } },
         { label: 'Node B publishing artifact', apply: (s: FlowState) => { s.nodes['b'].progress = 95; s.nodes['b'].logs.push('📦 publish: auth-module.ts'); s.nodes['b'].artifacts.push('auth-module.ts') } },
@@ -54,6 +75,7 @@ export function TwoNodeScenarioPage() {
             data: {
                 label: 'Planner (A)', agent: 'Claude 3.5', color: '#8b5cf6',
                 status: state.nodes['a']?.status || 'idle',
+                knockSide: state.nodes['a']?.knockSide || null,
                 task: 'Search patterns, analyze, publish plan',
                 progress: state.nodes['a']?.progress || 0,
                 execTime: state.nodes['a']?.status === 'done' ? '12.3s' : '—',
@@ -66,6 +88,7 @@ export function TwoNodeScenarioPage() {
             data: {
                 label: 'Executor (B)', agent: 'Claude 3.5', color: '#06b6d4',
                 status: state.nodes['b']?.status || 'idle',
+                knockSide: state.nodes['b']?.knockSide || null,
                 task: 'Read plan, implement, test, publish module',
                 progress: state.nodes['b']?.progress || 0,
                 execTime: state.nodes['b']?.status === 'done' ? '18.7s' : '—',

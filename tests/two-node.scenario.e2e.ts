@@ -51,7 +51,21 @@ test.describe('Two-node scenario with Automerge player', () => {
         // Verify tool call appears in log panel
         await expect(page.getByText('tool_call: search', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
 
-        // Play through remaining steps
+        // ── Step through to knocking phase (step 12: B knocks on A) ──
+        // Steps 4-11: continue through tool calls and artifact publishing
+        for (let i = 0; i < 8; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
+
+        // Step 12: Node B knocking on A
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(300)
+        await expect(page.locator('[data-testid="step-label"]')).toContainText('knocking', { timeout: 3_000 })
+        // Verify knock log entry
+        await expect(page.getByText('Asking A', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+
+        // Play through remaining steps (13-18)
         await page.locator('[data-testid="btn-play"]').click()
         await expect(page.locator('[data-testid="step-label"]')).toContainText('Both nodes done', { timeout: 15_000 })
 
@@ -59,8 +73,8 @@ test.describe('Two-node scenario with Automerge player', () => {
         await expect(page.getByText('auth-plan.md', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
         await expect(page.getByText('auth-module.ts', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
 
-        // Verify step counter
-        await expect(page.getByText('15/15')).toBeVisible({ timeout: 3_000 })
+        // Verify step counter (now 18 steps)
+        await expect(page.getByText('18/18')).toBeVisible({ timeout: 3_000 })
 
         // ── Undo/redo test ──
         // Step back 3 times (undo x3) — should go from 15/15 to 12/15
@@ -68,8 +82,8 @@ test.describe('Two-node scenario with Automerge player', () => {
             await page.locator('[data-testid="btn-prev"]').click()
             await page.waitForTimeout(400)
         }
-        // Should NOT show 15/15 anymore
-        await expect(page.getByText('15/15')).not.toBeVisible({ timeout: 3_000 })
+        // Should NOT show 18/18 anymore
+        await expect(page.getByText('18/18')).not.toBeVisible({ timeout: 3_000 })
 
         // Reset
         await page.locator('[data-testid="btn-reset"]').click()
