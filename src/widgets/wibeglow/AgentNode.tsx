@@ -60,7 +60,8 @@ export function AgentNode({ data }: { data: any }) {
     return (
         <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={isRunning ? { opacity: 1, scale: [1, 1.03, 1] } : { opacity: 1, scale: 1 }}
+            transition={isRunning ? { repeat: Infinity, duration: 1.5 } : {}}
             style={{
                 width: w, height: h,
                 padding: 1,
