@@ -36,26 +36,22 @@ export function AgentNode({ data }: { data: any }) {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',
     }
 
-    // Knocking animation: pulsing inset glow on left or right side (no scale/shake)
-    const knockAnimation = isWaking
-        ? {
-            opacity: 1,
-            scale: 1,
-            boxShadow: knockOut
+    // Knocking animation: pulsing inset glow on left or right side
+    const knockBoxShadow = isWaking
+        ? knockOut
+            ? [
+                `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                `inset -4px 0 0 0 ${color}, 0 0 12px ${color}44`,
+                `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+            ]
+            : knockIn
                 ? [
-                    `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
-                    `inset -4px 0 0 0 ${color}, 0 0 12px ${color}44`,
-                    `inset -1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                    `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
+                    `inset 4px 0 0 0 ${color}, 0 0 12px ${color}44`,
+                    `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
                 ]
-                : knockIn
-                    ? [
-                        `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
-                        `inset 4px 0 0 0 ${color}, 0 0 12px ${color}44`,
-                        `inset 1px 0 0 0 ${color}, 0 0 4px ${color}22`,
-                    ]
-                    : undefined,
-        }
-        : { opacity: 1, scale: 1 }
+                : undefined
+        : undefined
 
     const knockTransition = isWaking
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
@@ -64,8 +60,7 @@ export function AgentNode({ data }: { data: any }) {
     return (
         <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={knockAnimation}
-            transition={knockTransition}
+            animate={{ opacity: 1, scale: 1 }}
             style={{
                 width: w, height: h,
                 padding: 1,
@@ -83,14 +78,19 @@ export function AgentNode({ data }: { data: any }) {
                 background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
             }} />
 
-            <div style={{
-                background: '#0f0f1a', borderRadius: 13,
-                padding: '10px 14px',
-                height: '100%',
-                display: 'flex', flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxSizing: 'border-box',
-            }}>
+            {/* Inner content div — knock animation lives here so inset shadow is visible */}
+            <motion.div
+                animate={knockBoxShadow ? { boxShadow: knockBoxShadow } : {}}
+                transition={knockTransition}
+                style={{
+                    background: '#0f0f1a', borderRadius: 13,
+                    padding: '10px 14px',
+                    height: '100%',
+                    display: 'flex', flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxSizing: 'border-box',
+                }}
+            >
                 {/* Header — icon + label */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <motion.div
@@ -148,7 +148,7 @@ export function AgentNode({ data }: { data: any }) {
                         <AnimatedNumber value={data.callsCount ?? 0} prefix="⚡" />
                     </span>
                 </div>
-            </div>
+            </motion.div>
         </motion.div>
     )
 }
