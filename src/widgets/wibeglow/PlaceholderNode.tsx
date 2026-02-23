@@ -1,7 +1,7 @@
 import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { Construction } from 'lucide-react'
 import { useCallback, useRef } from 'react'
-import { WidgetSelector } from '@/builder/WidgetSelector'
+import { WidgetSelector } from '@/components/WidgetSelector'
 
 /**
  * PlaceholderNode — dashed "under construction" node.
@@ -68,13 +68,12 @@ export function PlaceholderNode({ data }: { data: any }) {
                 style={{ zIndex: 1000 }}
             >
                 <WidgetSelector
-                    position={{ x: 0, y: 0 }} // position handled by NodeToolbar
                     rectSize={{ width: w, height: h }}
                     gridSize={{ cols: gridCols, rows: gridRows }}
                     onSelect={(widget, template) => data.onSelectWidget?.(widget, template)}
                     onCancel={() => data.onCancelSelector?.()}
                     onHoverWidget={(widget) => data.onHoverWidget?.(widget)}
-                    embedded // new prop: skip fixed positioning
+                    embedded
                 />
             </NodeToolbar>
 
