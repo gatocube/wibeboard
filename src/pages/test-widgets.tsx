@@ -23,7 +23,7 @@ import {
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components
-import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote } from '@/widgets/wibeglow'
+import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation } from '@/widgets/wibeglow'
 import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
 import { AgentNode as GhubAgent, ScriptNode as GhubScript } from '@/widgets/ghub'
 
@@ -108,6 +108,7 @@ const THEME_COMPONENTS: ThemeComponents = {
         'note-sticker': WibeGlowNote,
         'note-group': WibeGlowNote,
         'note-label': WibeGlowNote,
+        expectation: WibeGlowExpectation,
     },
     pixel: {
         agent: PixelAgent,
@@ -177,6 +178,14 @@ function buildData(
         base.variant = template.defaultData.variant || 'sticker'
         base.color = template.defaultData.color || widget.color
         base.content = template.defaultData.content || ''
+    }
+
+    // Expectation-specific
+    if (widget.type === 'expectation') {
+        base.variant = template.defaultData.variant || 'artifact'
+        base.target = template.defaultData.target || ''
+        // Map gallery status to expectation status
+        base.status = status === 'done' ? 'pass' : status === 'running' ? 'pending' : status === 'waking' ? 'fail' : 'pending'
     }
 
     return base

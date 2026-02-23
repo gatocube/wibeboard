@@ -16,7 +16,7 @@ export interface WidgetTemplate {
     defaultData: Record<string, any>
 }
 
-export type WidgetCategory = 'AI' | 'Script' | 'Layout' | 'Note'
+export type WidgetCategory = 'AI' | 'Script' | 'Layout' | 'Note' | 'Expectation'
 
 export interface WidgetDefinition {
     type: string
@@ -228,6 +228,30 @@ const WIDGETS: WidgetDefinition[] = [
                 name: 'Caption',
                 description: 'Small description text',
                 defaultData: { label: 'Step 1', content: 'Initialize the pipeline and fetch data', variant: 'label', color: '#94a3b8' },
+            },
+        ],
+    },
+    // ── Expectation ──
+    {
+        type: 'expectation',
+        label: 'Expectation',
+        icon: 'check-circle-2',
+        category: 'Expectation',
+        tags: ['expectation', 'assert', 'verify', 'check', 'artifact', 'tool', 'test'],
+        description: 'Asserts that an agent produces an artifact or calls a tool',
+        color: '#10b981',
+        minWidth: 60, minHeight: 40,
+        defaultWidth: 160, defaultHeight: 60,
+        templates: [
+            {
+                name: 'Artifact',
+                description: 'Expects agent to generate an artifact',
+                defaultData: { label: 'Creates README.md', variant: 'artifact', target: 'README.md', status: 'pending' },
+            },
+            {
+                name: 'Tool Call',
+                description: 'Expects agent to call a specific tool',
+                defaultData: { label: 'Calls deploy()', variant: 'tool-call', target: 'deploy()', status: 'pending' },
             },
         ],
     },
