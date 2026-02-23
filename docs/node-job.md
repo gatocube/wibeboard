@@ -20,15 +20,16 @@ export function activate(ctx) {
 
 ## Sizing
 
-We use **grid cells** to define node dimensions.
+We use **grid cells** (20 px each) to define node dimensions. See [UI Guidelines](./ui.md) for the full grid system.
 
-| Size    | Grid   | Pixels   | Notes                  |
-|---------|--------|----------|------------------------|
-| Minimal | 2 × 2  | 40 × 40  | Square icon with status dot |
-| Medium  | —      | 200 × 120 | Default card view       |
-| Large   | —      | 300 × 180 | Extended detail view    |
+| Size    | Grid   | Pixels    | Notes                         |
+|---------|--------|-----------|-------------------------------|
+| Compact | 3 × 3  | 60 × 60   | Square icon with status dot   |
+| Medium  | 5 × 4  | 100 × 80  | Condensed card view           |
+| Default | 10 × 6 | 200 × 120 | Standard card view            |
+| Large   | 15 × 9 | 300 × 180 | Extended detail view          |
 
-> **Minimum size is 2 × 2** (40 × 40 px). At this size the node renders as a compact icon.
+> **Minimum size is 3 × 3** (60 × 60 px). This meets the 44 pt minimum touch target for comfortable iPad use.
 
 ## Status indicator
 

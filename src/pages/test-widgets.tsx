@@ -44,10 +44,10 @@ const KNOCK_OPTIONS: { label: string; value: KnockSide }[] = [
 interface SizeDef { label: string; width: number; height: number; gridLabel: string }
 
 function getSizes(widget: WidgetDefinition): SizeDef[] {
-    // S = square icon (2×2 grid = 40×40px)
-    const iconSize = GRID_CELL * 2
+    // S = compact icon (3×3 grid = 60×60px — meets 44pt touch target for iPad)
+    const iconSize = GRID_CELL * 3
     return [
-        { label: 'S', width: iconSize, height: iconSize, gridLabel: '2×2' },
+        { label: 'S', width: iconSize, height: iconSize, gridLabel: '3×3' },
         { label: 'M', width: widget.defaultWidth, height: widget.defaultHeight, gridLabel: `${Math.round(widget.defaultWidth / GRID_CELL)}×${Math.round(widget.defaultHeight / GRID_CELL)}` },
         { label: 'L', width: widget.defaultWidth * 1.5, height: widget.defaultHeight * 1.5, gridLabel: `${Math.round(widget.defaultWidth * 1.5 / GRID_CELL)}×${Math.round(widget.defaultHeight * 1.5 / GRID_CELL)}` },
     ]
