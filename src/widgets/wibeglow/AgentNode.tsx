@@ -39,7 +39,7 @@ export function AgentNode({ data }: { data: any }) {
     const knockIn = data.knockSide === 'in'
     const hasKnock = !!(data.knockSide)
     const logs: string[] = data.logs || []
-    const knockColor = '#f97316' // orange for knock border
+    const knockColor = data.knockColor || '#f97316' // use provided color or fallback to orange
 
     const statusColors: Record<string, string> = {
         idle: '#475569', waking: color, running: '#f7df1e', done: '#28c840', error: '#ff5f57',

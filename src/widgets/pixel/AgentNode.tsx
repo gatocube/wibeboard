@@ -24,7 +24,6 @@ export function AgentNode({ data }: { data: any }) {
     const isLarge = w >= 280
     const logs: string[] = data.logs || []
 
-    const knockOut = data.knockSide === 'out'
     const hasKnock = !!(data.knockSide)
 
     const statusConfig: Record<string, { label: string; color: string }> = {
@@ -37,10 +36,9 @@ export function AgentNode({ data }: { data: any }) {
     const st = statusConfig[status] || statusConfig.idle
 
     // Knocking animation: border flashes — triggers on knockSide, not just waking
+    const kColor = data.knockColor || '#f97316'
     const knockAnimation = hasKnock ? {
-        borderColor: knockOut
-            ? ['#1a1a1a', '#f97316', '#1a1a1a']
-            : ['#1a1a1a', '#f97316', '#1a1a1a'],
+        borderColor: ['#1a1a1a', kColor, '#1a1a1a'],
     } : {}
     const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }

@@ -70,10 +70,11 @@ export function AgentNode({ data }: { data: any }) {
 
     const knockSide = data.knockSide
     const hasKnock = !!knockSide
+    const kColor = data.knockColor || '#f97316'
     const knockStyle = hasKnock ? (
         knockSide === 'out'
-            ? { borderRight: '2px solid #f97316' }
-            : { borderLeft: '2px solid #f97316' }
+            ? { borderRight: `2px solid ${kColor}` }
+            : { borderLeft: `2px solid ${kColor}` }
     ) : {}
 
     // Progress

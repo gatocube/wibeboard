@@ -126,6 +126,16 @@ export function TwoNodeScenarioPage() {
     const nodeTypes = useMemo(() => THEME_NODE_TYPES[theme], [theme])
     const themeBg = THEME_BG[theme]
 
+    // Edge logic: only animated during active inter-node communication
+    // Uses knockSide as the single source of truth — if either node has knockSide set,
+    // the edge is active. Color depends on whether it's waking (orange) or messaging (green).
+    const aKnock = state.nodes['a']?.knockSide
+    const bKnock = state.nodes['b']?.knockSide
+    const hasKnock = !!(aKnock || bKnock)
+    const isWakingPhase = hasKnock && (state.nodes['b']?.status === 'waking')
+    const edgeColor = isWakingPhase ? '#f97316' : '#22c55e'
+    const knockColor = hasKnock ? edgeColor : undefined // borders match edge color
+
     const nodes: Node[] = [
         {
             id: 'a', type: 'agent', position: { x: 50, y: 80 },
@@ -133,6 +143,7 @@ export function TwoNodeScenarioPage() {
                 label: 'Planner (A)', agent: 'Claude 3.5', color: '#8b5cf6',
                 status: state.nodes['a']?.status || 'idle',
                 knockSide: state.nodes['a']?.knockSide || null,
+                knockColor,
                 task: 'Search patterns, analyze, publish plan',
                 thought: state.nodes['a']?.status === 'running' ? 'Analyzing authentication patterns...' : undefined,
                 progress: state.nodes['a']?.progress || 0,
@@ -148,6 +159,7 @@ export function TwoNodeScenarioPage() {
                 label: 'Executor (B)', agent: 'Claude 3.5', color: '#06b6d4',
                 status: state.nodes['b']?.status || 'idle',
                 knockSide: state.nodes['b']?.knockSide || null,
+                knockColor,
                 task: 'Read plan, implement, test, publish module',
                 thought: state.nodes['b']?.status === 'running' ? 'Implementing OAuth2 flow...' : undefined,
                 progress: state.nodes['b']?.progress || 0,
@@ -158,15 +170,6 @@ export function TwoNodeScenarioPage() {
             },
         },
     ]
-
-    // Edge logic: only animated during active inter-node communication
-    // Uses knockSide as the single source of truth — if either node has knockSide set,
-    // the edge is active. Color depends on whether it's waking (orange) or messaging (green).
-    const aKnock = state.nodes['a']?.knockSide
-    const bKnock = state.nodes['b']?.knockSide
-    const hasKnock = !!(aKnock || bKnock)
-    const isWakingPhase = hasKnock && (state.nodes['b']?.status === 'waking')
-    const edgeColor = isWakingPhase ? '#f97316' : '#22c55e'
 
     const edges: Edge[] = hasKnock ? [
         {

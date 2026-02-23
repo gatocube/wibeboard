@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
-import { CheckCircle, Circle, Loader2, FileCode2, Terminal } from 'lucide-react'
+import { CheckCircle, Circle, Loader2, Terminal } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
 
 /**
@@ -73,10 +73,11 @@ export function ScriptNode({ data }: { data: any }) {
 
     const knockSide = data.knockSide
     const hasKnock = !!knockSide
+    const kColor = data.knockColor || '#f97316'
     const knockStyle = hasKnock ? (
         knockSide === 'out'
-            ? { borderRight: '2px solid #f97316' }
-            : { borderLeft: '2px solid #f97316' }
+            ? { borderRight: `2px solid ${kColor}` }
+            : { borderLeft: `2px solid ${kColor}` }
     ) : {}
 
     // Status icon matching GitHub Actions

@@ -225,7 +225,9 @@ function WidgetGalleryInner() {
     const [showAnimations, setShowAnimations] = useState(true)
     const [showThinking, setShowThinking] = useState(false)
     const [commSide, setCommSide] = useState<CommSide>(null)
-    const [ghubDay, setGhubDay] = useState(true) // GHub starts in day mode
+    const [ghubDay, setGhubDay] = useState(true)       // GHub: day/night
+    const [wibeglowStatic, setWibeglowStatic] = useState(false) // WibeGlow: animated/static
+    const [pixelTui, setPixelTui] = useState(false)     // Pixel: pixel/TUI
 
     const themes = templateRegistry.getAll()
 
@@ -481,6 +483,38 @@ function WidgetGalleryInner() {
                                                 {ghubDay ? '☀️' : '🌙'}
                                             </button>
                                         )}
+                                        {/* Animated/Static toggle for WibeGlow */}
+                                        {theme.name === 'wibeglow' && (
+                                            <button
+                                                data-testid="wibeglow-mode"
+                                                onClick={() => setWibeglowStatic(!wibeglowStatic)}
+                                                style={{
+                                                    marginLeft: theme.supportsLightMode ? 0 : 'auto',
+                                                    background: 'none', border: 'none', cursor: 'pointer',
+                                                    fontSize: 12, padding: '2px 4px', borderRadius: 4,
+                                                    color: activeColors.textMuted,
+                                                }}
+                                                title={wibeglowStatic ? 'Switch to animated' : 'Switch to static'}
+                                            >
+                                                {wibeglowStatic ? '⚡' : '✨'}
+                                            </button>
+                                        )}
+                                        {/* Pixel/TUI toggle for Pixel */}
+                                        {theme.name === 'pixel' && (
+                                            <button
+                                                data-testid="pixel-mode"
+                                                onClick={() => setPixelTui(!pixelTui)}
+                                                style={{
+                                                    marginLeft: 'auto',
+                                                    background: 'none', border: 'none', cursor: 'pointer',
+                                                    fontSize: 12, padding: '2px 4px', borderRadius: 4,
+                                                    color: activeColors.textMuted,
+                                                }}
+                                                title={pixelTui ? 'Switch to pixel' : 'Switch to TUI'}
+                                            >
+                                                {pixelTui ? '🖥️' : '🎮'}
+                                            </button>
+                                        )}
                                     </div>
 
                                     {/* Size variants */}
@@ -509,6 +543,14 @@ function WidgetGalleryInner() {
                                                 // Pass dayMode to GHub theme nodes
                                                 if (theme.name === 'ghub' && ghubDay) {
                                                     data.dayMode = true
+                                                }
+                                                // Pass staticMode to WibeGlow nodes
+                                                if (theme.name === 'wibeglow' && wibeglowStatic) {
+                                                    data.staticMode = true
+                                                }
+                                                // Pass tuiMode to Pixel nodes
+                                                if (theme.name === 'pixel' && pixelTui) {
+                                                    data.tuiMode = true
                                                 }
 
                                                 const connLineLen = size.label === 'S' ? 60 : 40
