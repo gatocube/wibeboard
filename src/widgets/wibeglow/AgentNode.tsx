@@ -1,13 +1,21 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
-import { Bot } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
 /**
- * AgentNode (wibeglow) — AI agent node with status indicator and glow effects.
+ * AgentNode (wibeglow) — #26 Gradient Border design.
  *
- * data.label — node name
- * data.color — accent color
+ * Modern dark node with a vibrant gradient border, progress bar,
+ * and agent stats in monospace.
+ *
+ * data.label — node name (e.g. "Code Generator")
+ * data.color — primary accent color
  * data.status — 'idle' | 'running' | 'done' | 'error'
+ * data.agent — agent model name (e.g. "Claude 3.5")
+ * data.task — current task description
+ * data.progress — 0-100 progress percentage
+ * data.execTime — execution time string (e.g. "8.1s")
+ * data.callsCount — number of tool calls
  * data.width / data.height — dimensions
  */
 export function AgentNode({ data }: { data: any }) {
@@ -15,6 +23,13 @@ export function AgentNode({ data }: { data: any }) {
     const status = data.status || 'idle'
     const w = data.width || 200
     const h = data.height || 120
+    const progress = data.progress ?? 0
+    const secondaryColor = '#06b6d4'
+    const tertiaryColor = '#f59e0b'
+
+    const statusColors: Record<string, string> = {
+        idle: '#475569', running: '#f7df1e', done: '#28c840', error: '#ff5f57',
+    }
 
     return (
         <motion.div
@@ -23,13 +38,11 @@ export function AgentNode({ data }: { data: any }) {
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             style={{
                 width: w, height: h,
-                borderRadius: 12,
-                background: `linear-gradient(135deg, ${color}08 0%, ${color}04 100%)`,
-                border: `1px solid ${color}33`,
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden',
+                padding: 1,
+                borderRadius: 14,
+                background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
                 boxShadow: status === 'running'
-                    ? `0 0 20px ${color}22, 0 4px 16px rgba(0,0,0,0.3)`
+                    ? `0 0 24px ${color}33, 0 4px 16px rgba(0,0,0,0.3)`
                     : `0 4px 16px rgba(0,0,0,0.3)`,
             }}
         >
@@ -40,50 +53,69 @@ export function AgentNode({ data }: { data: any }) {
                 background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
             }} />
 
-            {/* Header */}
             <div style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '8px 12px',
-                borderBottom: `1px solid ${color}22`,
+                background: '#0f0f1a', borderRadius: 13,
+                padding: '10px 14px',
+                height: '100%',
+                display: 'flex', flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxSizing: 'border-box',
             }}>
-                <div style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: status === 'running' ? '#f7df1e'
-                        : status === 'done' ? '#28c840'
-                            : status === 'error' ? '#ff5f57'
-                                : '#475569',
-                    boxShadow: status === 'running' ? '0 0 6px #f7df1e55' : 'none',
-                }} />
-                <span style={{
-                    flex: 1, fontSize: 11, fontWeight: 600, color: '#e2e8f0',
-                    fontFamily: 'Inter',
-                }}>
-                    {data.label || 'Agent'}
-                </span>
-                <span style={{
-                    fontSize: 8, fontWeight: 600, color,
-                    background: `${color}15`, padding: '1px 6px', borderRadius: 4,
-                    textTransform: 'uppercase', letterSpacing: '0.5px',
-                }}>
-                    {status}
-                </span>
-            </div>
+                {/* Header — icon + label */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <motion.div
+                        animate={status === 'running' ? { rotate: [0, 15, -15, 0] } : {}}
+                        transition={status === 'running' ? { duration: 1.5, repeat: Infinity } : {}}
+                    >
+                        <Sparkles size={14} style={{ color }} />
+                    </motion.div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: 'Inter', flex: 1 }}>
+                        {data.label || 'Agent'}
+                    </span>
+                    {/* Status dot */}
+                    <div style={{
+                        width: 6, height: 6, borderRadius: '50%',
+                        background: statusColors[status] || '#475569',
+                        boxShadow: status === 'running' ? `0 0 6px ${statusColors[status]}55` : 'none',
+                        animation: status === 'running' ? 'pulse 1s ease infinite' : 'none',
+                    }} />
+                </div>
 
-            {/* Body — icon + description */}
-            <div style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 8, padding: '0 12px',
-            }}>
-                <motion.div
-                    animate={status === 'running' ? { rotate: [0, 360] } : {}}
-                    transition={status === 'running' ? { duration: 2, repeat: Infinity, ease: 'linear' } : {}}
-                >
-                    <Bot size={24} style={{ color: `${color}88` }} />
-                </motion.div>
-                <div>
-                    <div style={{ fontSize: 10, color: '#94a3b8', fontFamily: 'Inter' }}>
-                        {data.agent || 'Default'} agent
-                    </div>
+                {/* Task description */}
+                {data.task && (
+                    <p style={{
+                        fontSize: 9, color: '#94a3b8', margin: '4px 0 6px',
+                        fontFamily: 'Inter', lineHeight: 1.4,
+                        overflow: 'hidden', textOverflow: 'ellipsis',
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                    }}>
+                        {data.task}
+                    </p>
+                )}
+
+                {/* Progress bar */}
+                <div style={{
+                    height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)',
+                    overflow: 'hidden', width: '100%',
+                }}>
+                    <motion.div
+                        style={{ height: '100%', borderRadius: 3, background: color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.6 }}
+                    />
+                </div>
+
+                {/* Stats row */}
+                <div style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
+                    color: '#64748b', marginTop: 4,
+                    display: 'flex', justifyContent: 'space-between',
+                }}>
+                    <span>{data.agent || 'Default'}</span>
+                    <span>
+                        {data.execTime || '0s'} · ⚡{data.callsCount ?? 0}
+                    </span>
                 </div>
             </div>
         </motion.div>

@@ -19,7 +19,11 @@ const initialNodes: Node[] = [
         id: 'agent-1',
         type: 'agent',
         position: { x: 50, y: 80 },
-        data: { label: 'Planner', agent: 'Planner', color: '#8b5cf6', status: 'idle', width: 200, height: 120 },
+        data: {
+            label: 'Planner', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle',
+            task: 'Implementing auth module', progress: 65, execTime: '8.1s', callsCount: 12,
+            width: 200, height: 120,
+        },
     },
     {
         id: 'script-1',

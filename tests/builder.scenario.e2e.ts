@@ -18,7 +18,8 @@ test.describe('Builder Demo', () => {
     })
 
     test('Agent node is visible with correct label', async ({ page }) => {
-        await expect(page.locator('text=Planner agent')).toBeVisible()
+        await expect(page.locator('text=Planner')).toBeVisible()
+        await expect(page.locator('text=Claude 3.5')).toBeVisible()
     })
 
     test('Script node is visible in configured mode', async ({ page }) => {
