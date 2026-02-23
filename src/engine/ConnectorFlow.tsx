@@ -12,9 +12,13 @@
  * Ported from magnetic-filament's ConnectorFlow.tsx.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useReactFlow, type XYPosition } from '@xyflow/react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useReactFlow, type XYPosition, type Node, type Edge } from '@xyflow/react'
 import { type WidgetDefinition, type WidgetTemplate, GRID_CELL, MIN_GRID } from '@/engine/widget-registry'
+
+// ── Ghost node/edge IDs (used for the positioning preview) ──────────────────
+const GHOST_NODE_ID = '__connector-ghost__'
+const GHOST_EDGE_ID = '__connector-preview__'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -233,6 +237,32 @@ export function useConnectorFlow(callbacks: ConnectorFlowCallbacks) {
         setPhase({ type: 'idle' })
     }, [])
 
+    // ── Ghost node + edge for positioning preview (rendered by React Flow) ──
+    const ghostNode: Node | null = useMemo(() => {
+        if (phase.type !== 'positioning') return null
+        return {
+            id: GHOST_NODE_ID,
+            type: 'default',
+            position: phase.cursorPos,
+            data: {},
+            style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' as const },
+            draggable: false,
+            selectable: false,
+            connectable: false,
+        }
+    }, [phase.type === 'positioning' ? phase.cursorPos.x : 0, phase.type === 'positioning' ? phase.cursorPos.y : 0, phase.type])
+
+    const ghostEdge: Edge | null = useMemo(() => {
+        if (phase.type !== 'positioning') return null
+        return {
+            id: GHOST_EDGE_ID,
+            source: phase.sourceId,
+            target: GHOST_NODE_ID,
+            animated: true,
+            style: { stroke: 'rgba(139,92,246,0.6)', strokeWidth: 2, strokeDasharray: '6 4' },
+        }
+    }, [phase.type === 'positioning' ? phase.sourceId : '', phase.type])
+
     return {
         phase,
         attachHandleInterceptor,
@@ -241,6 +271,10 @@ export function useConnectorFlow(callbacks: ConnectorFlowCallbacks) {
         currentGrid: phase.type === 'placed'
             ? { cols: phase.gridCols, rows: phase.gridRows }
             : gridRef.current,
+        /** Inject into nodes array: [...nodes, ...connector.previewNodes] */
+        previewNodes: ghostNode ? [ghostNode] : [] as Node[],
+        /** Inject into edges array: [...edges, ...connector.previewEdges] */
+        previewEdges: ghostEdge ? [ghostEdge] : [] as Edge[],
         flowToScreenPosition,
     }
 }
@@ -250,62 +284,29 @@ export function useConnectorFlow(callbacks: ConnectorFlowCallbacks) {
 export function ConnectorFlowOverlay({
     phase,
     currentGrid,
-    flowToScreenPosition,
 }: {
     phase: ConnectorPhase
     currentGrid: { cols: number; rows: number }
-    flowToScreenPosition: (pos: XYPosition) => XYPosition
 }) {
     if (phase.type === 'idle') return null
 
     return (
-        <>
-            {/* Phase 1: POSITIONING — SVG bezier from source to cursor */}
-            {phase.type === 'positioning' && (() => {
-                const start = flowToScreenPosition(phase.sourcePos)
-                const end = flowToScreenPosition(phase.cursorPos)
-                const dx = Math.abs(end.x - start.x)
-                const cpOffset = Math.max(60, dx * 0.4)
-                const d = `M ${start.x} ${start.y} C ${start.x + cpOffset} ${start.y}, ${end.x - cpOffset} ${end.y}, ${end.x} ${end.y}`
-                return (
-                    <svg style={{
-                        position: 'fixed', top: 0, left: 0,
-                        width: '100vw', height: '100vh',
-                        zIndex: 4, pointerEvents: 'none',
-                        overflow: 'visible',
-                    }}>
-                        <path
-                            d={d}
-                            fill="none"
-                            stroke="rgba(139,92,246,0.6)"
-                            strokeWidth={2}
-                            strokeDasharray="6 4"
-                        />
-                        <circle
-                            cx={end.x} cy={end.y} r={5}
-                            fill="#8b5cf6" opacity={0.8}
-                        />
-                    </svg>
-                )
-            })()}
-
-            {/* Phase indicator */}
-            <div style={{
-                position: 'fixed',
-                bottom: 60, left: '50%',
-                transform: 'translateX(-50%)',
-                padding: '4px 12px', borderRadius: 6,
-                background: 'rgba(15,15,26,0.9)',
-                border: '1px solid rgba(139,92,246,0.2)',
-                fontSize: 9, color: '#8b5cf6',
-                fontFamily: 'Inter', fontWeight: 500,
-                zIndex: 100, pointerEvents: 'none',
-                display: 'flex', alignItems: 'center', gap: 6,
-            }}>
-                {phase.type === 'positioning' && '🔗 Click on canvas to place node · ESC to cancel'}
-                {phase.type === 'sizing' && `📐 Move to resize (${currentGrid.cols}×${currentGrid.rows}) · Click to confirm · ESC to cancel`}
-                {phase.type === 'placed' && `✅ Size confirmed (${currentGrid.cols}×${currentGrid.rows}) · Pick a widget · ESC to cancel`}
-            </div>
-        </>
+        /* Phase indicator — connection preview is now handled by React Flow edges */
+        <div style={{
+            position: 'fixed',
+            bottom: 60, left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '4px 12px', borderRadius: 6,
+            background: 'rgba(15,15,26,0.9)',
+            border: '1px solid rgba(139,92,246,0.2)',
+            fontSize: 9, color: '#8b5cf6',
+            fontFamily: 'Inter', fontWeight: 500,
+            zIndex: 100, pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+            {phase.type === 'positioning' && '🔗 Click on canvas to place node · ESC to cancel'}
+            {phase.type === 'sizing' && `📐 Move to resize (${currentGrid.cols}×${currentGrid.rows}) · Click to confirm · ESC to cancel`}
+            {phase.type === 'placed' && `✅ Size confirmed (${currentGrid.cols}×${currentGrid.rows}) · Pick a widget · ESC to cancel`}
+        </div>
     )
 }

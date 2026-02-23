@@ -323,8 +323,8 @@ function BuilderInner() {
             `}</style>
 
             <ReactFlow
-                nodes={nodesWithCallbacks}
-                edges={edges}
+                nodes={[...nodesWithCallbacks, ...connector.previewNodes]}
+                edges={[...edges, ...connector.previewEdges]}
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 nodesDraggable
@@ -402,7 +402,6 @@ function BuilderInner() {
             <ConnectorFlowOverlay
                 phase={connector.phase}
                 currentGrid={connector.currentGrid}
-                flowToScreenPosition={connector.flowToScreenPosition}
             />
         </div>
     )
