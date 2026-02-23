@@ -331,95 +331,124 @@ export function WidgetSelector({
                     )}
 
                     <AnimatePresence>
-                        {filtered.map(widget => (
-                            <motion.div
-                                key={widget.type}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                layout
-                            >
-                                <div
-                                    data-testid={`widget-${widget.type}`}
-                                    style={{
-                                        padding: '6px 12px',
-                                        cursor: 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: 8,
-                                        transition: 'background 0.1s',
-                                    }}
-                                    onMouseEnter={() => {
-                                        onHoverWidget?.(widget)
-                                        if (widget.templates.length <= 1) setExpandedWidget(null)
-                                    }}
-                                    onMouseLeave={() => onHoverWidget?.(null)}
-                                    onClick={() => handleWidgetClick(widget)}
-                                    onMouseOver={e => {
-                                        (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'
-                                    }}
-                                    onMouseOut={e => {
-                                        (e.currentTarget as HTMLElement).style.background = 'transparent'
-                                    }}
-                                >
-                                    <WidgetIcon type={widget.type} size={16} />
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
-                                            {widget.label}
-                                        </div>
-                                        <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.3 }}>
-                                            {widget.description}
-                                        </div>
-                                    </div>
-                                    <span style={{
-                                        fontSize: 7, padding: '1px 4px', borderRadius: 3,
-                                        background: `${CATEGORY_COLORS[widget.category] || '#475569'}22`,
-                                        color: CATEGORY_COLORS[widget.category] || '#475569',
-                                        fontWeight: 600,
-                                    }}>
-                                        {widget.category}
-                                    </span>
-                                </div>
+                        {(() => {
+                            // Group by category when showing "All widgets" (no filter, no search)
+                            const showCategoryHeaders = !isSearching && !selectedCategory
+                            let lastCategory = ''
 
-                                {/* Expanded templates */}
-                                <AnimatePresence>
-                                    {expandedWidget === widget.type && widget.templates.length > 1 && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            style={{ overflow: 'hidden', paddingLeft: 36 }}
+                            return filtered.map(widget => {
+                                const needsHeader = showCategoryHeaders && widget.category !== lastCategory
+                                lastCategory = widget.category
+
+                                return (
+                                    <motion.div
+                                        key={widget.type}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        layout
+                                    >
+                                        {/* Category header */}
+                                        {needsHeader && (
+                                            <div style={{
+                                                padding: '8px 12px 3px',
+                                                fontSize: 8, fontWeight: 700,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px',
+                                                color: CATEGORY_COLORS[widget.category] || '#64748b',
+                                                borderTop: lastCategory !== widget.category || filtered.indexOf(widget) > 0
+                                                    ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                                display: 'flex', alignItems: 'center', gap: 6,
+                                            }}>
+                                                {(() => { const CatIcon = CATEGORY_ICONS[widget.category] || Package; return <CatIcon size={10} color={CATEGORY_COLORS[widget.category] || '#64748b'} /> })()}
+                                                {widget.category}
+                                            </div>
+                                        )}
+
+                                        {/* Widget row */}
+                                        <div
+                                            data-testid={`widget-${widget.type}`}
+                                            style={{
+                                                padding: '6px 12px',
+                                                cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', gap: 8,
+                                                transition: 'background 0.1s',
+                                            }}
+                                            onMouseEnter={() => {
+                                                onHoverWidget?.(widget)
+                                                if (widget.templates.length <= 1) setExpandedWidget(null)
+                                            }}
+                                            onMouseLeave={() => onHoverWidget?.(null)}
+                                            onClick={() => handleWidgetClick(widget)}
+                                            onMouseOver={e => {
+                                                (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'
+                                            }}
+                                            onMouseOut={e => {
+                                                (e.currentTarget as HTMLElement).style.background = 'transparent'
+                                            }}
                                         >
-                                            {widget.templates.map((tmpl, i) => (
-                                                <div
-                                                    key={i}
-                                                    data-testid={`template-${widget.type}-${i}`}
-                                                    style={{
-                                                        padding: '4px 12px', cursor: 'pointer',
-                                                        fontSize: 9, color: '#94a3b8',
-                                                        borderLeft: `2px solid ${widget.color}33`,
-                                                        transition: 'all 0.1s',
-                                                    }}
-                                                    onClick={e => {
-                                                        e.stopPropagation()
-                                                        handleSelect(widget, tmpl)
-                                                    }}
-                                                    onMouseOver={e => {
-                                                        (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.06)'
-                                                            ; (e.currentTarget as HTMLElement).style.color = '#e2e8f0'
-                                                    }}
-                                                    onMouseOut={e => {
-                                                        (e.currentTarget as HTMLElement).style.background = 'transparent'
-                                                            ; (e.currentTarget as HTMLElement).style.color = '#94a3b8'
-                                                    }}
-                                                >
-                                                    <div style={{ fontWeight: 600 }}>{tmpl.name}</div>
-                                                    <div style={{ fontSize: 8, color: '#64748b' }}>{tmpl.description}</div>
+                                            <WidgetIcon type={widget.type} size={16} />
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
+                                                    {widget.label}
                                                 </div>
-                                            ))}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.div>
-                        ))}
+                                                <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.3 }}>
+                                                    {widget.description}
+                                                </div>
+                                            </div>
+                                            <span style={{
+                                                fontSize: 7, padding: '1px 4px', borderRadius: 3,
+                                                background: `${CATEGORY_COLORS[widget.category] || '#475569'}22`,
+                                                color: CATEGORY_COLORS[widget.category] || '#475569',
+                                                fontWeight: 600,
+                                            }}>
+                                                {widget.category}
+                                            </span>
+                                        </div>
+
+                                        {/* Expanded templates */}
+                                        <AnimatePresence>
+                                            {expandedWidget === widget.type && widget.templates.length > 1 && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    style={{ overflow: 'hidden', paddingLeft: 36 }}
+                                                >
+                                                    {widget.templates.map((tmpl, i) => (
+                                                        <div
+                                                            key={i}
+                                                            data-testid={`template-${widget.type}-${i}`}
+                                                            style={{
+                                                                padding: '4px 12px', cursor: 'pointer',
+                                                                fontSize: 9, color: '#94a3b8',
+                                                                borderLeft: `2px solid ${widget.color}33`,
+                                                                transition: 'all 0.1s',
+                                                            }}
+                                                            onClick={e => {
+                                                                e.stopPropagation()
+                                                                handleSelect(widget, tmpl)
+                                                            }}
+                                                            onMouseOver={e => {
+                                                                (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.06)'
+                                                                    ; (e.currentTarget as HTMLElement).style.color = '#e2e8f0'
+                                                            }}
+                                                            onMouseOut={e => {
+                                                                (e.currentTarget as HTMLElement).style.background = 'transparent'
+                                                                    ; (e.currentTarget as HTMLElement).style.color = '#94a3b8'
+                                                            }}
+                                                        >
+                                                            <div style={{ fontWeight: 600 }}>{tmpl.name}</div>
+                                                            <div style={{ fontSize: 8, color: '#64748b' }}>{tmpl.description}</div>
+                                                        </div>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
+                                )
+                            })
+                        })()}
                     </AnimatePresence>
 
                     {filtered.length === 0 && (

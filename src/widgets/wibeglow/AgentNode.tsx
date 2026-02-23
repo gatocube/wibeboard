@@ -174,28 +174,37 @@ export function AgentNode({ data }: { data: any }) {
                     </p>
                 )}
 
-                {/* Progress bar */}
-                <div style={{
-                    height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)',
-                    overflow: 'hidden', width: '100%',
-                }}>
-                    <motion.div
-                        style={{ height: '100%', borderRadius: 3, background: color }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.6 }}
-                    />
+                {/* Progress bar + percentage */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{
+                        height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden', flex: 1,
+                    }}>
+                        <motion.div
+                            style={{ height: '100%', borderRadius: 3, background: color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.6 }}
+                        />
+                    </div>
+                    <span style={{
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 8, color, fontWeight: 600, flexShrink: 0,
+                    }}>
+                        {progress}%
+                    </span>
                 </div>
 
-                {/* Stats row */}
+                {/* Stats row: agent · time · calls */}
                 <div style={{
                     fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
                     color: '#64748b', marginTop: 4,
                     display: 'flex', justifyContent: 'space-between',
                 }}>
                     <span>{data.agent || 'Default'}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        {data.execTime || '0s'} ·{' '}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span>{data.execTime || '0s'}</span>
+                        <span style={{ opacity: 0.4 }}>·</span>
                         <AnimatedNumber value={data.callsCount ?? 0} prefix="⚡" />
                     </span>
                 </div>

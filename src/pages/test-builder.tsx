@@ -10,6 +10,7 @@ import { useState, useCallback, useRef } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { useConnectorFlow, ConnectorFlowOverlay, anchorMouseToGridRect } from '@/engine/ConnectorFlow'
 import { GRID_CELL, widgetRegistry } from '@/engine/widget-registry'
+import { TimelineDots } from '@/components/TimelineDots'
 
 // ── Node types ──
 const nodeTypes = {
@@ -327,7 +328,7 @@ function BuilderInner() {
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 nodesDraggable
-                fitView
+                defaultViewport={{ x: 80, y: 60, zoom: 0.65 }}
                 proOptions={{ hideAttribution: true }}
                 style={{ background: 'transparent' }}
             >
@@ -382,6 +383,19 @@ function BuilderInner() {
                             </>
                         )}
                     </div>
+                </Panel>
+
+                <Panel position="bottom-left">
+                    <TimelineDots
+                        nodes={nodes
+                            .filter(n => n.type !== 'placeholder')
+                            .map(n => ({
+                                id: n.id,
+                                label: (n.data as any).label || n.id,
+                                status: (n.data as any).status || 'idle',
+                                type: n.type,
+                            }))}
+                    />
                 </Panel>
             </ReactFlow>
 

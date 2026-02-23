@@ -175,13 +175,19 @@ export function AgentNode({ data }: { data: any }) {
                 ))}
             </div>
 
-            {/* Footer stats */}
+            {/* Footer stats: tasks · time · calls · progress */}
             <div style={{
                 fontSize: 9, color: gh.fgMuted, marginTop: 6,
-                display: 'flex', justifyContent: 'space-between',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
                 <span>{doneCount}/{total} tasks</span>
-                <span>{pct}% complete</span>
+                <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <span>{data.execTime || '—'}</span>
+                    <span style={{ opacity: 0.4 }}>·</span>
+                    <span>⚡{data.callsCount ?? 0}</span>
+                    <span style={{ opacity: 0.4 }}>·</span>
+                    <span style={{ color: gh.green }}>{pct}%</span>
+                </span>
             </div>
         </div>
     )
