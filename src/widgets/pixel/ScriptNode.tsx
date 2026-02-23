@@ -1,5 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
+import { StatusDot } from '@/widgets/StatusDot'
 
 /**
  * ScriptNode (pixel) — Terminal/retro style.
@@ -67,9 +68,11 @@ export function ScriptNode({ data }: { data: any }) {
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
                     gap: 2, boxSizing: 'border-box',
+                    position: 'relative',
                     fontFamily: "'JetBrains Mono', monospace",
                 }}
             >
+                <StatusDot status={status} />
                 <Handle type="target" position={Position.Left} style={{
                     background: '#fbbf24', border: '2px solid #fbbf2455', width: 4, height: 4, borderRadius: 0,
                 }} />

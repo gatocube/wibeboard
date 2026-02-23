@@ -1,5 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
+import { StatusDot } from '@/widgets/StatusDot'
 
 /**
  * ScriptNode (ghub) — GitHub Actions workflow run style.
@@ -82,9 +83,11 @@ export function ScriptNode({ data }: { data: any }) {
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
                     gap: 2, boxSizing: 'border-box',
+                    position: 'relative',
                     ...ghFont,
                 }}
             >
+                <StatusDot status={status} />
                 <Handle type="target" position={Position.Left} style={{
                     background: gh.accent, border: `2px solid ${gh.accent}55`, width: 6, height: 6,
                 }} />
