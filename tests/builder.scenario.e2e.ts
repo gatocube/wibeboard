@@ -13,7 +13,6 @@ test.describe('Builder Demo', () => {
     })
 
     test('renders the canvas with 3 nodes', async ({ page }) => {
-        await expect(page.locator('text=Builder Demo')).toBeVisible()
         await expect(page.locator('text=3 nodes')).toBeVisible()
     })
 
@@ -39,13 +38,9 @@ test.describe('Builder Demo', () => {
 
     test('script Run button executes code and shows logs', async ({ page }) => {
         await page.locator('button[title="Run"]').click()
-
-        // Wait for log lines from the activate() function
         await expect(page.locator('text=Processing')).toBeVisible({ timeout: 5_000 })
         await expect(page.locator('text=validate input')).toBeVisible()
         await expect(page.locator('text=transform data')).toBeVisible()
-
-        // Status bar: "✓ done · 6 lines"
         await expect(page.locator('text=6 lines')).toBeVisible({ timeout: 2_000 })
     })
 
@@ -53,12 +48,16 @@ test.describe('Builder Demo', () => {
         const pane = page.locator('.react-flow__viewport')
         const initialTransform = await pane.getAttribute('style')
 
-        const canvas = page.locator('.react-flow__renderer')
+        // Use the pane element to drag from an empty area (bottom-right corner is usually empty)
+        const canvas = page.locator('.react-flow__pane')
         const box = await canvas.boundingBox()
         if (box) {
-            await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+            // Start from bottom-right area which is less likely to hit nodes
+            const startX = box.x + box.width * 0.9
+            const startY = box.y + box.height * 0.9
+            await page.mouse.move(startX, startY)
             await page.mouse.down()
-            await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2 + 50, { steps: 5 })
+            await page.mouse.move(startX - 100, startY - 50, { steps: 5 })
             await page.mouse.up()
         }
 

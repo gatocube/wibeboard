@@ -58,7 +58,7 @@ export function ScriptNode({ data }: { data: any }) {
     }, [])
 
     // ── EDITING MODE — show code editor via NodeToolbar ──
-    if (isEditing && !isConfigured) {
+    if (isEditing) {
         return (
             <>
                 {/* Code editor in NodeToolbar */}

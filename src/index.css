@@ -56,6 +56,15 @@ body {
     cursor: grabbing;
 }
 
+/* Override React Flow's default group node background */
+.react-flow__node-group {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 4px;
