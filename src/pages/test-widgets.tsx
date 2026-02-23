@@ -455,8 +455,12 @@ function WidgetGalleryInner() {
                                                 }
 
                                                 const connLineLen = size.label === 'S' ? 60 : 40
+                                                // Compact nodes render extra text below the box (name label ~14px + margin ~4px)
+                                                // so the actual Handle center is lower than size.height/2
+                                                const isCompactSize = size.label === 'S'
+                                                const dotY = isCompactSize ? (size.height / 2 + 6) : (size.height / 2 - 3)
                                                 const canvasW = connLineLen + size.width + connLineLen + 40
-                                                const canvasH = Math.max(size.height + 40, 80)
+                                                const canvasH = isCompactSize ? size.height + 50 : Math.max(size.height + 40, 80)
 
                                                 // Determine edge animation states
                                                 const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
@@ -478,7 +482,7 @@ function WidgetGalleryInner() {
                                                 const miniNodes: Node[] = [
                                                     {
                                                         id: 'dot-in', type: 'dot',
-                                                        position: { x: 0, y: size.height / 2 - 3 },
+                                                        position: { x: 0, y: dotY },
                                                         data: { color: inColor, side: 'left' },
                                                         draggable: false, selectable: false,
                                                     },
@@ -490,7 +494,7 @@ function WidgetGalleryInner() {
                                                     },
                                                     {
                                                         id: 'dot-out', type: 'dot',
-                                                        position: { x: connLineLen + 10 + size.width + connLineLen, y: size.height / 2 - 3 },
+                                                        position: { x: connLineLen + 10 + size.width + connLineLen, y: dotY },
                                                         data: { color: outColor, side: 'right' },
                                                         draggable: false, selectable: false,
                                                     },
@@ -528,7 +532,7 @@ function WidgetGalleryInner() {
                                                         display: 'flex', flexDirection: 'column',
                                                         alignItems: 'center', gap: 6,
                                                     }}>
-                                                        {/* Size label */}
+                                                        {/* Size letter badge */}
                                                         <div style={{
                                                             fontSize: 8, fontWeight: 700, color: theme.colors.textMuted,
                                                             fontFamily: theme.fonts.mono,
@@ -544,10 +548,6 @@ function WidgetGalleryInner() {
                                                                 color: theme.colors.accent,
                                                             }}>
                                                                 {size.label}
-                                                            </span>
-                                                            <span>{size.gridLabel}</span>
-                                                            <span style={{ color: `${theme.colors.textMuted}88` }}>
-                                                                {size.width}×{size.height}px
                                                             </span>
                                                         </div>
 
