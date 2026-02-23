@@ -181,17 +181,13 @@ function WidgetGalleryInner() {
             {/* CSS to hide handles + connection line animations */}
             <style>{`
                 .hide-handles .react-flow__handle { display: none !important; }
-                @keyframes connPulse {
-                    0%, 100% { opacity: 0.5; }
-                    50% { opacity: 1; }
+                @keyframes dashToRight {
+                    from { stroke-dashoffset: 10; }
+                    to { stroke-dashoffset: 0; }
                 }
-                @keyframes dashFlowLeft {
+                @keyframes dashToLeft {
                     from { stroke-dashoffset: 0; }
-                    to { stroke-dashoffset: -20; }
-                }
-                @keyframes dashFlowRight {
-                    from { stroke-dashoffset: 0; }
-                    to { stroke-dashoffset: 20; }
+                    to { stroke-dashoffset: 10; }
                 }
             `}</style>
             {/* Left: WidgetSelector */}
@@ -457,41 +453,41 @@ function WidgetGalleryInner() {
                                                         {/* Widget with connection lines */}
                                                         <div style={{
                                                             position: 'relative',
-                                                            display: 'flex', alignItems: 'center',
+                                                            display: 'flex', alignItems: 'flex-start',
                                                         }}>
                                                             {/* Left connection line (input) */}
                                                             {showConnections && (() => {
                                                                 const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
                                                                 const isCommLeft = showAnimations && commSide === 'left'
                                                                 const isActive = isKnockIn || isCommLeft
-                                                                const svgH = Math.max(size.height, 20)
-                                                                const cy = svgH / 2
-                                                                // Knock-in: dashes flow right (toward node). Comm-left: dashes flow left (away from node)
-                                                                const dashAnim = isKnockIn ? 'dashFlowLeft' : isCommLeft ? 'dashFlowRight' : ''
+                                                                const lineY = size.height / 2
+                                                                const svgH = size.height
+                                                                // Knock-in: dashes march right (toward node). Comm-left: dashes march left (away from node)
+                                                                const dashAnim = isKnockIn ? 'dashToRight' : isCommLeft ? 'dashToLeft' : ''
                                                                 const lineColor = isKnockIn ? '#f97316' : isCommLeft ? '#06b6d4' : theme.colors.accent
                                                                 return (
                                                                     <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
                                                                         {isActive && (
                                                                             <defs>
                                                                                 <filter id={`glow-in-${size.label}-${theme.name}`}>
-                                                                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                                                                    <feGaussianBlur stdDeviation="3" result="blur" />
                                                                                     <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                                                                                 </filter>
                                                                             </defs>
                                                                         )}
                                                                         <line
-                                                                            x1={0} y1={cy} x2={connLineLen} y2={cy}
+                                                                            x1={0} y1={lineY} x2={connLineLen} y2={lineY}
                                                                             stroke={lineColor}
-                                                                            strokeWidth={isActive ? 2.5 : 1.5}
-                                                                            strokeDasharray={isActive ? '6 4' : '3 2'}
-                                                                            opacity={isActive ? 1 : 0.5}
+                                                                            strokeWidth={isActive ? 3 : 1.5}
+                                                                            strokeDasharray={isActive ? '6 4' : '3 3'}
+                                                                            opacity={isActive ? 1 : 0.4}
                                                                             filter={isActive ? `url(#glow-in-${size.label}-${theme.name})` : undefined}
-                                                                            style={dashAnim ? { animation: `${dashAnim} 0.4s linear infinite` } : undefined}
+                                                                            style={dashAnim ? { animation: `${dashAnim} 0.3s linear infinite` } : undefined}
                                                                         />
                                                                         <circle
-                                                                            cx={2} cy={cy} r={isActive ? 3 : 2}
+                                                                            cx={2} cy={lineY} r={isActive ? 4 : 2.5}
                                                                             fill={lineColor}
-                                                                            opacity={isActive ? 1 : 0.6}
+                                                                            opacity={isActive ? 1 : 0.5}
                                                                         />
                                                                     </svg>
                                                                 )
@@ -507,32 +503,32 @@ function WidgetGalleryInner() {
                                                                 const isKnockOut = showAnimations && status === 'waking' && knockSide === 'out'
                                                                 const isCommRight = showAnimations && commSide === 'right'
                                                                 const isActive = isKnockOut || isCommRight
-                                                                const svgH = Math.max(size.height, 20)
-                                                                const cy = svgH / 2
-                                                                // Knock-out: dashes flow left (toward node). Comm-right: dashes flow right (away from node)
-                                                                const dashAnim = isKnockOut ? 'dashFlowRight' : isCommRight ? 'dashFlowLeft' : ''
+                                                                const lineY = size.height / 2
+                                                                const svgH = size.height
+                                                                // Knock-out: dashes march left (toward node). Comm-right: dashes march right (away from node)
+                                                                const dashAnim = isKnockOut ? 'dashToLeft' : isCommRight ? 'dashToRight' : ''
                                                                 const lineColor = isKnockOut ? '#f97316' : isCommRight ? '#06b6d4' : theme.colors.textMuted
                                                                 return (
                                                                     <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
                                                                         {isActive && (
                                                                             <defs>
                                                                                 <filter id={`glow-out-${size.label}-${theme.name}`}>
-                                                                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                                                                    <feGaussianBlur stdDeviation="3" result="blur" />
                                                                                     <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                                                                                 </filter>
                                                                             </defs>
                                                                         )}
                                                                         <line
-                                                                            x1={0} y1={cy} x2={connLineLen} y2={cy}
+                                                                            x1={0} y1={lineY} x2={connLineLen} y2={lineY}
                                                                             stroke={lineColor}
-                                                                            strokeWidth={isActive ? 2.5 : 1.5}
-                                                                            strokeDasharray={isActive ? '6 4' : '3 2'}
+                                                                            strokeWidth={isActive ? 3 : 1.5}
+                                                                            strokeDasharray={isActive ? '6 4' : '3 3'}
                                                                             opacity={isActive ? 1 : 0.4}
                                                                             filter={isActive ? `url(#glow-out-${size.label}-${theme.name})` : undefined}
-                                                                            style={dashAnim ? { animation: `${dashAnim} 0.4s linear infinite` } : undefined}
+                                                                            style={dashAnim ? { animation: `${dashAnim} 0.3s linear infinite` } : undefined}
                                                                         />
                                                                         <polygon
-                                                                            points={`${connLineLen - 5},${cy - 3} ${connLineLen},${cy} ${connLineLen - 5},${cy + 3}`}
+                                                                            points={`${connLineLen - 6},${lineY - 4} ${connLineLen},${lineY} ${connLineLen - 6},${lineY + 4}`}
                                                                             fill={lineColor}
                                                                             opacity={isActive ? 1 : 0.5}
                                                                         />

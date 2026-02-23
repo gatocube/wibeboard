@@ -33,7 +33,7 @@ We use **grid cells** (20 px each) to define node dimensions. See [UI Guidelines
 
 ## Status indicator
 
-At minimal (2 × 2) size, the node displays a **colored status dot** in the top-left corner.
+At compact size, the node displays a **colored status dot** in the **top-right** corner.
 
 | Status   | Color             | Behavior       |
 |----------|-------------------|----------------|
@@ -44,3 +44,35 @@ At minimal (2 × 2) size, the node displays a **colored status dot** in the top-
 | error    | `#ef4444` (red)   | Static         |
 
 The dot must be visible across all themes (WibeGlow, GitHub, Pixel).
+
+## Compact mode layout
+
+In compact mode, nodes render as a square icon box with:
+
+1. **Status dot** — top-right corner of the box
+2. **Icon** — centered in the box (Sparkles for AI, Terminal for Script)
+3. **Name label** — below the box, truncated with ellipsis
+4. **AI thoughts / Script output** — below the name (italic, muted):
+   - Agent: shows `data.thought` prefixed with 💭
+   - Script: shows last line of `data.logs`
+
+## Default Theme: WibeGlow
+
+WibeGlow is the default theme. It uses a **colored gradient border** for AI Agent nodes:
+
+```
+background: linear-gradient(135deg, primary, secondary, tertiary)
+padding: 1px  (the gradient shows through as a border)
+inner: #0f0f1a background with border-radius - 1
+```
+
+This gradient border is applied consistently across **all sizes** (S, M, L).
+
+## Connection animations
+
+| Animation      | Color              | Dash direction        | Trigger           |
+|----------------|--------------------|-----------------------|-------------------|
+| **Knocking**   | `#f97316` (orange) | Toward the node       | `waking` status   |
+| **Communicating** | `#06b6d4` (cyan) | Away from the node    | Manual toggle     |
+
+Animations use CSS `stroke-dashoffset` with `6 4` dash pattern and `0.3s linear infinite` timing.

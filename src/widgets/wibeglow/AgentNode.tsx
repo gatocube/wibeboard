@@ -59,32 +59,43 @@ export function AgentNode({ data }: { data: any }) {
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
-    // ── Compact mode (icon size) ──
+    // ── Compact mode (icon size) — gradient border like M/L ──
     if (isCompact) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Gradient border wrapper (same as M/L: gradient bg + padding:1 + inner dark bg) */}
                 <motion.div
-                    animate={knockBoxShadow ? { boxShadow: knockBoxShadow } : {}}
-                    transition={knockTransition}
                     style={{
                         width: w, height: h,
-                        borderRadius: 10,
-                        background: '#0f0f1a',
-                        border: `1px solid ${color}33`,
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        gap: 2, boxSizing: 'border-box',
+                        padding: 1,
+                        borderRadius: 12,
+                        background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
+                        boxShadow: isRunning
+                            ? `0 0 16px ${color}33, 0 2px 8px rgba(0,0,0,0.3)`
+                            : `0 2px 8px rgba(0,0,0,0.3)`,
                         position: 'relative',
                     }}
                 >
-                    <StatusDot status={status} />
                     <Handle type="target" position={Position.Left} style={{
                         background: color, border: `2px solid ${color}55`, width: 6, height: 6,
                     }} />
                     <Handle type="source" position={Position.Right} style={{
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
                     }} />
-                    <Sparkles size={16} style={{ color }} />
+                    <motion.div
+                        animate={knockBoxShadow ? { boxShadow: knockBoxShadow } : {}}
+                        transition={knockTransition}
+                        style={{
+                            background: '#0f0f1a', borderRadius: 11,
+                            width: '100%', height: '100%',
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            gap: 2, boxSizing: 'border-box',
+                        }}
+                    >
+                        <StatusDot status={status} />
+                        <Sparkles size={16} style={{ color }} />
+                    </motion.div>
                 </motion.div>
                 {/* Node name */}
                 <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>{data.label || 'Agent'}</span>
