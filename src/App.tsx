@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { TestBuilderPage } from '@/pages/test-builder'
 import { TestWidgetsPage } from '@/pages/test-widgets'
-import { Menu, X, Layout, Layers, Home } from 'lucide-react'
+import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
+import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
+import { Menu, X, Layout, Layers, Home, GitBranch, Network } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'widgets'
+type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'widgets'
 
 interface NavItem {
     id: Page
@@ -15,11 +17,22 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: <Home size={14} />, description: 'Overview' },
     { id: 'builder', label: 'Builder Demo', icon: <Layout size={14} />, description: 'Flow builder with Agent, Script & Group nodes' },
+    { id: 'two-node', label: 'Two-Node Scenario', icon: <GitBranch size={14} />, description: 'Tool calling + artifact publishing' },
+    { id: 'four-node', label: 'Four-Node Concurrent', icon: <Network size={14} />, description: 'Parallel workers with aggregation' },
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
 ]
 
 export function App() {
-    const [page, setPage] = useState<Page>('builder')
+    // Support ?page=X for direct navigation (used by E2E tests)
+    const initialPage = (): Page => {
+        const params = new URLSearchParams(window.location.search)
+        const p = params.get('page')
+        if (p && ['home', 'builder', 'two-node', 'four-node', 'widgets'].includes(p)) {
+            return p as Page
+        }
+        return 'builder'
+    }
+    const [page, setPage] = useState<Page>(initialPage)
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const navigate = (p: Page) => {
@@ -192,6 +205,8 @@ export function App() {
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                     {page === 'home' && <HomePage onNavigate={navigate} />}
                     {page === 'builder' && <TestBuilderPage />}
+                    {page === 'two-node' && <TwoNodeScenarioPage />}
+                    {page === 'four-node' && <FourNodeConcurrentPage />}
                     {page === 'widgets' && <TestWidgetsPage />}
                 </div>
             </div>

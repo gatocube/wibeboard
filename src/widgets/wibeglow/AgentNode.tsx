@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
+import { AnimatedNumber } from '@/components/AnimatedNumber'
 
 /**
  * AgentNode (wibeglow) — #26 Gradient Border design.
@@ -113,8 +114,9 @@ export function AgentNode({ data }: { data: any }) {
                     display: 'flex', justifyContent: 'space-between',
                 }}>
                     <span>{data.agent || 'Default'}</span>
-                    <span>
-                        {data.execTime || '0s'} · ⚡{data.callsCount ?? 0}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {data.execTime || '0s'} ·{' '}
+                        <AnimatedNumber value={data.callsCount ?? 0} prefix="⚡" />
                     </span>
                 </div>
             </div>
