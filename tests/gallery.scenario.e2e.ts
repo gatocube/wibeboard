@@ -40,26 +40,46 @@ test.describe('Widget Gallery compliance', () => {
         expect(consoleErrors).toEqual([])
     })
 
-    test('knocking activates edge animation', async ({ page }) => {
-        // Click knock In — should set status to waking and show animated edge
+    test('knocking activates animated dashed edge toward node', async ({ page }) => {
+        // Click knock In — should set status to waking and animate edge
         await page.locator('[data-testid="knock-in"]').click()
         await page.waitForTimeout(500)
 
         // Verify waking status is auto-selected
-        const wakingBtn = page.locator('[data-testid="status-waking"]')
-        await expect(wakingBtn).toBeVisible()
+        await expect(page.locator('[data-testid="status-waking"]')).toBeVisible()
 
-        // Check that connection line SVGs are rendered (input side)
-        const svgElements = page.locator('svg')
-        const svgCount = await svgElements.count()
-        expect(svgCount).toBeGreaterThan(0)
+        // Check that animated edges appear (data-testid="edge-animated")
+        const animatedEdges = page.locator('[data-testid="edge-animated"]')
+        await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
+        // Verify there's at least one animated edge with a dashed line
+        const count = await animatedEdges.count()
+        expect(count).toBeGreaterThan(0)
 
-        // Click knock Out
+        // Click knock Out — edge animated on the right side
         await page.locator('[data-testid="knock-out"]').click()
         await page.waitForTimeout(500)
+        await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
 
-        // Reset knock
+        // Reset
         await page.locator('[data-testid="knock-none"]').click()
+    })
+
+    test('communicating animation flows away from node', async ({ page }) => {
+        // Click Comm Emit → (right side)
+        await page.locator('[data-testid="comm-right"]').click()
+        await page.waitForTimeout(500)
+
+        // Should show animated edges (cyan color, dashes flow outward)
+        const animatedEdges = page.locator('[data-testid="edge-animated"]')
+        await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
+
+        // Click Comm ← Emit (left side)
+        await page.locator('[data-testid="comm-left"]').click()
+        await page.waitForTimeout(500)
+        await expect(animatedEdges.first()).toBeVisible({ timeout: 3_000 })
+
+        // Reset
+        await page.locator('[data-testid="comm-none"]').click()
     })
 
     test('compact mode nodes show name below', async ({ page }) => {

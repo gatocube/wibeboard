@@ -31,12 +31,18 @@ import { AgentNode as GhubAgent, ScriptNode as GhubScript } from '@/widgets/ghub
 
 type Status = 'idle' | 'waking' | 'running' | 'done'
 type KnockSide = null | 'in' | 'out'
+type CommSide = null | 'left' | 'right'
 
 const STATUSES: Status[] = ['idle', 'waking', 'running', 'done']
 const KNOCK_OPTIONS: { label: string; value: KnockSide }[] = [
     { label: 'None', value: null },
     { label: '← In', value: 'in' },
     { label: 'Out →', value: 'out' },
+]
+const COMM_OPTIONS: { label: string; value: CommSide }[] = [
+    { label: 'None', value: null },
+    { label: '← Emit', value: 'left' },
+    { label: 'Emit →', value: 'right' },
 ]
 
 // ── Size definitions ────────────────────────────────────────────────────────────
@@ -153,6 +159,7 @@ function WidgetGalleryInner() {
     const [showConnections, setShowConnections] = useState(true)
     const [showAnimations, setShowAnimations] = useState(true)
     const [showThinking, setShowThinking] = useState(false)
+    const [commSide, setCommSide] = useState<CommSide>(null)
 
     const themes = templateRegistry.getAll()
 
@@ -171,12 +178,20 @@ function WidgetGalleryInner() {
             height: '100%', display: 'flex', overflow: 'hidden',
             background: '#0a0a14',
         }}>
-            {/* CSS to hide handles + connection line pulse animation */}
+            {/* CSS to hide handles + connection line animations */}
             <style>{`
                 .hide-handles .react-flow__handle { display: none !important; }
                 @keyframes connPulse {
                     0%, 100% { opacity: 0.5; }
                     50% { opacity: 1; }
+                }
+                @keyframes dashFlowLeft {
+                    from { stroke-dashoffset: 0; }
+                    to { stroke-dashoffset: -20; }
+                }
+                @keyframes dashFlowRight {
+                    from { stroke-dashoffset: 0; }
+                    to { stroke-dashoffset: 20; }
                 }
             `}</style>
             {/* Left: WidgetSelector */}
@@ -256,6 +271,7 @@ function WidgetGalleryInner() {
                                 data-testid={`knock-${k.value || 'none'}`}
                                 onClick={() => {
                                     setKnockSide(k.value)
+                                    setCommSide(null)
                                     if (k.value) setStatus('waking')
                                 }}
                                 style={{
@@ -268,6 +284,32 @@ function WidgetGalleryInner() {
                                 }}
                             >
                                 {k.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Communicate buttons */}
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>Comm</span>
+                        {COMM_OPTIONS.map(c => (
+                            <button
+                                key={c.label}
+                                data-testid={`comm-${c.value || 'none'}`}
+                                onClick={() => {
+                                    setCommSide(c.value)
+                                    setKnockSide(null)
+                                    if (c.value && status === 'idle') setStatus('running')
+                                }}
+                                style={{
+                                    padding: '3px 8px', borderRadius: 4,
+                                    border: 'none', cursor: 'pointer',
+                                    background: commSide === c.value ? 'rgba(6,182,212,0.2)' : 'rgba(255,255,255,0.04)',
+                                    color: commSide === c.value ? '#06b6d4' : '#64748b',
+                                    fontSize: 9, fontWeight: 600,
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                }}
+                            >
+                                {c.label}
                             </button>
                         ))}
                     </div>
@@ -420,9 +462,16 @@ function WidgetGalleryInner() {
                                                             {/* Left connection line (input) */}
                                                             {showConnections && (() => {
                                                                 const isKnockIn = showAnimations && status === 'waking' && knockSide === 'in'
+                                                                const isCommLeft = showAnimations && commSide === 'left'
+                                                                const isActive = isKnockIn || isCommLeft
+                                                                const svgH = Math.max(size.height, 20)
+                                                                const cy = svgH / 2
+                                                                // Knock-in: dashes flow right (toward node). Comm-left: dashes flow left (away from node)
+                                                                const dashAnim = isKnockIn ? 'dashFlowLeft' : isCommLeft ? 'dashFlowRight' : ''
+                                                                const lineColor = isKnockIn ? '#f97316' : isCommLeft ? '#06b6d4' : theme.colors.accent
                                                                 return (
-                                                                    <svg width={connLineLen} height={10} style={{ flexShrink: 0, overflow: 'visible' }}>
-                                                                        {isKnockIn && (
+                                                                    <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
+                                                                        {isActive && (
                                                                             <defs>
                                                                                 <filter id={`glow-in-${size.label}-${theme.name}`}>
                                                                                     <feGaussianBlur stdDeviation="2" result="blur" />
@@ -431,19 +480,18 @@ function WidgetGalleryInner() {
                                                                             </defs>
                                                                         )}
                                                                         <line
-                                                                            x1={0} y1={5} x2={connLineLen} y2={5}
-                                                                            stroke={isKnockIn ? '#f97316' : theme.colors.accent}
-                                                                            strokeWidth={isKnockIn ? 2.5 : 1.5}
-                                                                            strokeDasharray="3 2"
-                                                                            opacity={isKnockIn ? 1 : 0.5}
-                                                                            filter={isKnockIn ? `url(#glow-in-${size.label}-${theme.name})` : undefined}
-                                                                            style={isKnockIn ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                            x1={0} y1={cy} x2={connLineLen} y2={cy}
+                                                                            stroke={lineColor}
+                                                                            strokeWidth={isActive ? 2.5 : 1.5}
+                                                                            strokeDasharray={isActive ? '6 4' : '3 2'}
+                                                                            opacity={isActive ? 1 : 0.5}
+                                                                            filter={isActive ? `url(#glow-in-${size.label}-${theme.name})` : undefined}
+                                                                            style={dashAnim ? { animation: `${dashAnim} 0.4s linear infinite` } : undefined}
                                                                         />
                                                                         <circle
-                                                                            cx={2} cy={5} r={isKnockIn ? 3 : 2}
-                                                                            fill={isKnockIn ? '#f97316' : theme.colors.accent}
-                                                                            opacity={isKnockIn ? 1 : 0.6}
-                                                                            style={isKnockIn ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                            cx={2} cy={cy} r={isActive ? 3 : 2}
+                                                                            fill={lineColor}
+                                                                            opacity={isActive ? 1 : 0.6}
                                                                         />
                                                                     </svg>
                                                                 )
@@ -457,9 +505,16 @@ function WidgetGalleryInner() {
                                                             {/* Right connection line (output) */}
                                                             {showConnections && (() => {
                                                                 const isKnockOut = showAnimations && status === 'waking' && knockSide === 'out'
+                                                                const isCommRight = showAnimations && commSide === 'right'
+                                                                const isActive = isKnockOut || isCommRight
+                                                                const svgH = Math.max(size.height, 20)
+                                                                const cy = svgH / 2
+                                                                // Knock-out: dashes flow left (toward node). Comm-right: dashes flow right (away from node)
+                                                                const dashAnim = isKnockOut ? 'dashFlowRight' : isCommRight ? 'dashFlowLeft' : ''
+                                                                const lineColor = isKnockOut ? '#f97316' : isCommRight ? '#06b6d4' : theme.colors.textMuted
                                                                 return (
-                                                                    <svg width={connLineLen} height={10} style={{ flexShrink: 0, overflow: 'visible' }}>
-                                                                        {isKnockOut && (
+                                                                    <svg data-testid={isActive ? 'edge-animated' : undefined} width={connLineLen} height={svgH} style={{ flexShrink: 0, overflow: 'visible' }}>
+                                                                        {isActive && (
                                                                             <defs>
                                                                                 <filter id={`glow-out-${size.label}-${theme.name}`}>
                                                                                     <feGaussianBlur stdDeviation="2" result="blur" />
@@ -468,18 +523,18 @@ function WidgetGalleryInner() {
                                                                             </defs>
                                                                         )}
                                                                         <line
-                                                                            x1={0} y1={5} x2={connLineLen} y2={5}
-                                                                            stroke={isKnockOut ? '#f97316' : theme.colors.textMuted}
-                                                                            strokeWidth={isKnockOut ? 2.5 : 1.5}
-                                                                            opacity={isKnockOut ? 1 : 0.4}
-                                                                            filter={isKnockOut ? `url(#glow-out-${size.label}-${theme.name})` : undefined}
-                                                                            style={isKnockOut ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                            x1={0} y1={cy} x2={connLineLen} y2={cy}
+                                                                            stroke={lineColor}
+                                                                            strokeWidth={isActive ? 2.5 : 1.5}
+                                                                            strokeDasharray={isActive ? '6 4' : '3 2'}
+                                                                            opacity={isActive ? 1 : 0.4}
+                                                                            filter={isActive ? `url(#glow-out-${size.label}-${theme.name})` : undefined}
+                                                                            style={dashAnim ? { animation: `${dashAnim} 0.4s linear infinite` } : undefined}
                                                                         />
                                                                         <polygon
-                                                                            points={`${connLineLen - 5},${5 - 3} ${connLineLen},5 ${connLineLen - 5},${5 + 3}`}
-                                                                            fill={isKnockOut ? '#f97316' : theme.colors.textMuted}
-                                                                            opacity={isKnockOut ? 1 : 0.5}
-                                                                            style={isKnockOut ? { animation: 'connPulse 0.6s ease-in-out infinite' } : undefined}
+                                                                            points={`${connLineLen - 5},${cy - 3} ${connLineLen},${cy} ${connLineLen - 5},${cy + 3}`}
+                                                                            fill={lineColor}
+                                                                            opacity={isActive ? 1 : 0.5}
                                                                         />
                                                                     </svg>
                                                                 )
