@@ -166,6 +166,71 @@ const WIDGETS: WidgetDefinition[] = [
             },
         ],
     },
+    // ── Note widgets ──
+    {
+        type: 'note-sticker',
+        label: 'Sticker',
+        icon: 'sticky-note',
+        category: 'Note',
+        tags: ['note', 'sticker', 'annotation', 'comment', 'post-it'],
+        description: 'Post-it style note for quick annotations',
+        color: '#fbbf24',
+        minWidth: 60, minHeight: 60,
+        defaultWidth: 160, defaultHeight: 120,
+        templates: [
+            {
+                name: 'Yellow Sticker',
+                description: 'Classic yellow post-it',
+                defaultData: { label: 'Note', content: 'Remember to check this!', variant: 'sticker', color: 'yellow' },
+            },
+            {
+                name: 'Pink Sticker',
+                description: 'Pink post-it note',
+                defaultData: { label: 'Important', content: '', variant: 'sticker', color: 'pink' },
+            },
+        ],
+    },
+    {
+        type: 'note-group',
+        label: 'Group Note',
+        icon: 'sticky-note',
+        category: 'Note',
+        tags: ['note', 'group', 'section', 'background', 'container'],
+        description: 'Background label for grouping nodes',
+        color: '#6366f1',
+        minWidth: 200, minHeight: 120,
+        defaultWidth: 400, defaultHeight: 250,
+        templates: [
+            {
+                name: 'Section',
+                description: 'Label a section of the workflow',
+                defaultData: { label: 'Section', content: 'Group related nodes here', variant: 'group-note', color: '#6366f1' },
+            },
+        ],
+    },
+    {
+        type: 'note-label',
+        label: 'Label',
+        icon: 'sticky-note',
+        category: 'Note',
+        tags: ['note', 'label', 'text', 'markdown', 'heading'],
+        description: 'Text label with optional markdown',
+        color: '#94a3b8',
+        minWidth: 60, minHeight: 40,
+        defaultWidth: 200, defaultHeight: 80,
+        templates: [
+            {
+                name: 'Heading',
+                description: 'Large text heading',
+                defaultData: { label: 'Workflow Title', variant: 'label', color: '#e2e8f0' },
+            },
+            {
+                name: 'Caption',
+                description: 'Small description text',
+                defaultData: { label: 'Step 1', content: 'Initialize the pipeline', variant: 'label', color: '#94a3b8' },
+            },
+        ],
+    },
 ]
 
 // ── Registry API ────────────────────────────────────────────────────────────────
