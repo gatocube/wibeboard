@@ -177,10 +177,10 @@ export function ScriptNode({ data }: { data: any }) {
                     alignItems: 'center', justifyContent: 'center', gap: 4,
                     userSelect: 'none',
                 }}>
-                    <Handle type="target" position={Position.Left} style={{
+                    <Handle type="target" position={Position.Left} id="in" style={{
                         background: langColor, border: `2px solid ${langColor}55`, width: 8, height: 8,
                     }} />
-                    <Handle type="source" position={Position.Right} style={{
+                    <Handle type="source" position={Position.Right} id="out" style={{
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
                     }} />
                     <Settings size={18} style={{ color: `${langColor}88`, animation: 'spin 4s linear infinite' }} />
@@ -215,10 +215,10 @@ export function ScriptNode({ data }: { data: any }) {
                         position: 'relative',
                     }}
                 >
-                    <Handle type="target" position={Position.Left} style={{
+                    <Handle type="target" position={Position.Left} id="in" style={{
                         background: langColor, border: `2px solid ${langColor}55`, width: 6, height: 6,
                     }} />
-                    <Handle type="source" position={Position.Right} style={{
+                    <Handle type="source" position={Position.Right} id="out" style={{
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
                     }} />
                     <div style={{
@@ -259,10 +259,10 @@ export function ScriptNode({ data }: { data: any }) {
             background: `linear-gradient(135deg, ${langColor}, ${accentColor})`,
             boxShadow: `0 4px 16px rgba(0,0,0,0.3)`,
         }}>
-            <Handle type="target" position={Position.Left} style={{
+            <Handle type="target" position={Position.Left} id="in" style={{
                 background: langColor, border: `2px solid ${langColor}55`, width: 8, height: 8,
             }} />
-            <Handle type="source" position={Position.Right} style={{
+            <Handle type="source" position={Position.Right} id="out" style={{
                 background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
             }} />
 

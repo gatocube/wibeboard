@@ -23,7 +23,7 @@ import {
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components
-import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation } from '@/widgets/wibeglow'
+import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
 import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
 import { AgentNode as GhubAgent, ScriptNode as GhubScript, NoteNode as GhubNote } from '@/widgets/ghub'
 
@@ -109,6 +109,7 @@ const THEME_COMPONENTS: ThemeComponents = {
         'note-group': WibeGlowNote,
         'note-label': WibeGlowNote,
         expectation: WibeGlowExpectation,
+        user: WibeGlowUser,
     },
     pixel: {
         agent: PixelAgent,
