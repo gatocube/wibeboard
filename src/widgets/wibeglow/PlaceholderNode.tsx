@@ -116,12 +116,12 @@ export function PlaceholderNode({ data }: { data: any }) {
                         </div>
                         <div style={{
                             fontSize: 11, fontWeight: 600, color: '#8b5cf6',
-                            fontFamily: 'Inter', textAlign: 'center', padding: '0 8px',
+                            fontFamily: "'Caveat', 'Inter', sans-serif", textAlign: 'center', padding: '0 8px',
                         }}>
                             {hoveredWidget.name}
                         </div>
                         <div style={{
-                            fontSize: 8, color: 'rgba(139,92,246,0.6)', fontFamily: 'Inter',
+                            fontSize: 8, color: 'rgba(139,92,246,0.6)', fontFamily: "'Caveat', 'Inter', sans-serif",
                             textAlign: 'center', padding: '0 12px', lineHeight: 1.3,
                             maxHeight: h - 60, overflow: 'hidden',
                         }}>
@@ -146,7 +146,7 @@ export function PlaceholderNode({ data }: { data: any }) {
                         </div>
                         <div style={{
                             fontSize: 8, color: 'rgba(139,92,246,0.4)',
-                            fontFamily: 'Inter', fontWeight: 500,
+                            fontFamily: "'Caveat', 'Inter', sans-serif", fontWeight: 500,
                             letterSpacing: 0.5, textTransform: 'uppercase',
                         }}>
                             {sizing ? 'sizing...' : resizable ? 'drag corner to resize' : 'select widget'}

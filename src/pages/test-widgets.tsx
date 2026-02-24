@@ -24,7 +24,7 @@ import { templateRegistry, type TemplateName } from '@/templates/template-regist
 
 // Theme node components
 import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
-import { AgentNode as PixelAgent, ScriptNode as PixelScript } from '@/widgets/pixel'
+import { AgentNode as PixelAgent, ScriptNode as PixelScript, NoteNode as PixelNote } from '@/widgets/pixel'
 import { AgentNode as GhubAgent, ScriptNode as GhubScript, NoteNode as GhubNote } from '@/widgets/ghub'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
@@ -117,6 +117,9 @@ const THEME_COMPONENTS: ThemeComponents = {
         'script-ts': PixelScript,
         'script-sh': PixelScript,
         'script-py': PixelScript,
+        'note-sticker': PixelNote,
+        'note-group': PixelNote,
+        'note-label': PixelNote,
     },
     ghub: {
         agent: GhubAgent,

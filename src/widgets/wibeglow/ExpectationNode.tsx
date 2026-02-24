@@ -63,7 +63,7 @@ export function ExpectationNode({ data }: { data: any }) {
                     background: cfg.bg,
                     border: `1.5px solid ${cfg.border}`,
                     position: 'relative',
-                    fontFamily: 'Inter',
+                    fontFamily: "'Caveat', 'Inter', sans-serif",
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center',

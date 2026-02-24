@@ -142,10 +142,10 @@ export function AgentNode({ data }: { data: any }) {
                     </motion.div>
                 </motion.div>
                 {/* Node name */}
-                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>{data.label || 'Agent'}</span>
+                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Caveat', 'Inter', sans-serif" }}>{data.label || 'Agent'}</span>
                 {/* Thought text */}
                 {data.thought && (
-                    <span style={{ fontSize: 7, color: '#64748b', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>💭 {data.thought}</span>
+                    <span style={{ fontSize: 7, color: '#64748b', fontStyle: 'italic', marginTop: 2, maxWidth: w + 40, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: "'Caveat', 'Inter', sans-serif" }}>💭 {data.thought}</span>
                 )}
             </div>
         )
@@ -198,7 +198,7 @@ export function AgentNode({ data }: { data: any }) {
                     >
                         <Sparkles size={14} style={{ color }} />
                     </motion.div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: 'Inter', flex: 1 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: "'Caveat', 'Inter', sans-serif", flex: 1 }}>
                         {data.label || 'Agent'}
                     </span>
                     {statusIndicator}
@@ -213,7 +213,7 @@ export function AgentNode({ data }: { data: any }) {
                 {data.task && (
                     <div style={{
                         fontSize: 9, margin: '4px 0 2px',
-                        fontFamily: 'Inter', lineHeight: 1.4,
+                        fontFamily: "'Caveat', 'Inter', sans-serif", lineHeight: 1.4,
                         overflow: 'hidden', textOverflow: 'ellipsis',
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                     }}>
@@ -223,7 +223,7 @@ export function AgentNode({ data }: { data: any }) {
                                 color="#94a3b8"
                                 shimmeringColor="#e2e8f0"
                                 duration={2.5}
-                                style={{ fontSize: 9, fontFamily: 'Inter' }}
+                                style={{ fontSize: 9, fontFamily: "'Caveat', 'Inter', sans-serif" }}
                             />
                         ) : (
                             <span style={{ color: '#94a3b8' }}>{data.task}</span>
@@ -240,7 +240,7 @@ export function AgentNode({ data }: { data: any }) {
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             style={{
-                                fontSize: 8, fontFamily: 'Inter', fontStyle: 'italic',
+                                fontSize: 8, fontFamily: "'Caveat', 'Inter', sans-serif", fontStyle: 'italic',
                                 overflow: 'hidden', marginBottom: 2,
                             }}
                         >

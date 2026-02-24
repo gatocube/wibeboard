@@ -48,8 +48,8 @@ const TEMPLATES: TemplateDefinition[] = [
             'Latest web technologies',
         ],
         fonts: {
-            heading: "'Inter', -apple-system, sans-serif",
-            body: "'Inter', -apple-system, sans-serif",
+            heading: "'Caveat', 'Inter', -apple-system, sans-serif",
+            body: "'Caveat', 'Inter', -apple-system, sans-serif",
             mono: "'JetBrains Mono', 'Fira Code', monospace",
         },
         colors: {

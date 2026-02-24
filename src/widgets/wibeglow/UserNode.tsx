@@ -70,7 +70,7 @@ export function UserNode({ data }: { data: any }) {
                         <User size={16} style={{ color }} />
                     </div>
                 </motion.div>
-                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, textAlign: 'center', fontFamily: 'Inter' }}>{data.label || 'User'}</span>
+                <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, textAlign: 'center', fontFamily: "'Caveat', 'Inter', sans-serif" }}>{data.label || 'User'}</span>
             </div>
         )
     }
@@ -96,7 +96,7 @@ export function UserNode({ data }: { data: any }) {
                         boxShadow: `0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px ${color}11`,
                         backdropFilter: 'blur(16px)',
                         overflow: 'hidden',
-                        fontFamily: 'Inter',
+                        fontFamily: "'Caveat', 'Inter', sans-serif",
                     }}
                 >
                     {/* Header */}
@@ -144,7 +144,7 @@ export function UserNode({ data }: { data: any }) {
                                 border: '1px solid rgba(245,158,11,0.2)',
                                 borderRadius: 6, padding: '5px 10px', fontSize: 10,
                                 fontWeight: 600, cursor: 'pointer',
-                                fontFamily: 'Inter',
+                                fontFamily: "'Caveat', 'Inter', sans-serif",
                             }}
                         >
                             <MessageSquare size={12} /> Comment
@@ -158,7 +158,7 @@ export function UserNode({ data }: { data: any }) {
                                 border: '1px solid rgba(34,197,94,0.25)',
                                 borderRadius: 6, padding: '5px 10px', fontSize: 10,
                                 fontWeight: 600, cursor: 'pointer',
-                                fontFamily: 'Inter',
+                                fontFamily: "'Caveat', 'Inter', sans-serif",
                             }}
                         >
                             <Check size={12} /> Approve
@@ -204,10 +204,10 @@ export function UserNode({ data }: { data: any }) {
                             <User size={13} style={{ color }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: 'Inter' }}>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', fontFamily: "'Caveat', 'Inter', sans-serif" }}>
                                 {data.label || 'User'}
                             </div>
-                            <div style={{ fontSize: 8, color: '#64748b', fontFamily: 'Inter' }}>
+                            <div style={{ fontSize: 8, color: '#64748b', fontFamily: "'Caveat', 'Inter', sans-serif" }}>
                                 {status === 'waiting' ? '⏳ Awaiting review' : status === 'done' ? '✓ Approved' : 'Not yet active'}
                             </div>
                         </div>

@@ -157,7 +157,7 @@ export function ScriptNode({ data }: { data: any }) {
                                     padding: '4px 12px', borderRadius: 5, border: 'none',
                                     background: langColor, color: '#1a1b26',
                                     fontSize: 10, fontWeight: 700, cursor: 'pointer',
-                                    fontFamily: 'Inter',
+                                    fontFamily: "'Caveat', 'Inter', sans-serif",
                                     display: 'flex', alignItems: 'center', gap: 4,
                                 }}
                             >
@@ -184,10 +184,10 @@ export function ScriptNode({ data }: { data: any }) {
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
                     }} />
                     <Settings size={18} style={{ color: `${langColor}88`, animation: 'spin 4s linear infinite' }} />
-                    <div style={{ fontSize: 10, color: langColor, fontWeight: 600, fontFamily: 'Inter' }}>
+                    <div style={{ fontSize: 10, color: langColor, fontWeight: 600, fontFamily: "'Caveat', 'Inter', sans-serif" }}>
                         Configuring...
                     </div>
-                    <div style={{ fontSize: 8, color: `${langColor}66`, fontFamily: 'Inter' }}>
+                    <div style={{ fontSize: 8, color: `${langColor}66`, fontFamily: "'Caveat', 'Inter', sans-serif" }}>
                         Edit code in panel →
                     </div>
                 </div>
@@ -415,7 +415,7 @@ export function ScriptNode({ data }: { data: any }) {
                                     borderBottom: '1px solid rgba(255,255,255,0.04)',
                                 }}>
                                     <Terminal size={8} style={{ color: '#475569' }} />
-                                    <span style={{ fontSize: 8, color: '#475569', fontWeight: 600, fontFamily: 'Inter' }}>
+                                    <span style={{ fontSize: 8, color: '#475569', fontWeight: 600, fontFamily: "'Caveat', 'Inter', sans-serif" }}>
                                         Output
                                     </span>
                                     <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>

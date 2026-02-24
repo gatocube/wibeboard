@@ -146,7 +146,7 @@ function GroupNoteNode({ data, w, h }: { data: any; w: number; h: number }) {
                 fontSize: isCompact ? 7 : 10,
                 fontWeight: 600,
                 color,
-                fontFamily: 'Inter',
+                fontFamily: "'Caveat', 'Inter', sans-serif",
                 whiteSpace: 'nowrap',
             }}>
                 {data.label || 'Group Note'}
@@ -159,7 +159,7 @@ function GroupNoteNode({ data, w, h }: { data: any; w: number; h: number }) {
                     bottom: 8, left: 16, right: 16,
                     fontSize: 9,
                     color: `${color}88`,
-                    fontFamily: 'Inter',
+                    fontFamily: "'Caveat', 'Inter', sans-serif",
                     lineHeight: 1.3,
                 }}>
                     {data.content}
@@ -186,7 +186,7 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 padding: isCompact ? '4px' : '8px 12px',
-                fontFamily: 'Inter',
+                fontFamily: "'Caveat', 'Inter', sans-serif",
             }}
         >
             {/* Title */}

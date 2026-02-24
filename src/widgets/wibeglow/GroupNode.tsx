@@ -41,7 +41,7 @@ export function GroupNode({ data }: { data: any }) {
                 background: `${color}18`,
                 border: `1px solid ${color}33`,
                 fontSize: 10, fontWeight: 600, color,
-                fontFamily: 'Inter',
+                fontFamily: "'Caveat', 'Inter', sans-serif",
             }}>
                 {data.label || 'Group'}
             </div>
