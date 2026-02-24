@@ -53,7 +53,7 @@ function StickerNote({ data, w, h }: { data: any; w: number; h: number }) {
                 border: `1px solid ${palette.border}`,
                 boxShadow: '2px 3px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)',
                 position: 'relative',
-                fontFamily: "'Caveat', 'Patrick Hand', cursive, Inter",
+                fontFamily: "'Architects Daughter', cursive",
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -146,7 +146,7 @@ function GroupNoteNode({ data, w, h }: { data: any; w: number; h: number }) {
                 fontSize: isCompact ? 7 : 10,
                 fontWeight: 600,
                 color,
-                fontFamily: "'Caveat', 'Inter', sans-serif",
+                fontFamily: "'Architects Daughter', cursive",
                 whiteSpace: 'nowrap',
             }}>
                 {data.label || 'Group Note'}
@@ -159,7 +159,7 @@ function GroupNoteNode({ data, w, h }: { data: any; w: number; h: number }) {
                     bottom: 8, left: 16, right: 16,
                     fontSize: 9,
                     color: `${color}88`,
-                    fontFamily: "'Caveat', 'Inter', sans-serif",
+                    fontFamily: "'Architects Daughter', cursive",
                     lineHeight: 1.3,
                 }}>
                     {data.content}
@@ -186,7 +186,7 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 padding: isCompact ? '4px' : '8px 12px',
-                fontFamily: "'Caveat', 'Inter', sans-serif",
+                fontFamily: "'Architects Daughter', cursive",
             }}
         >
             {/* Title */}
