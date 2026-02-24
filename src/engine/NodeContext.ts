@@ -1,19 +1,17 @@
 /**
  * NodeContext — the `ctx` object passed to agent & script node components.
  *
- * Accessed via `data.ctx` inside a ReactFlow node component:
- *   function AgentNode({ data }: { data: any }) {
- *       const ctx = data.ctx as NodeContext | undefined
- *       if (ctx) {
- *           ctx.messenger.getContacts()
- *           ctx.messenger.send('node-b', 'text', 'Hello!')
- *       }
- *   }
+ * Provides both the interface and a React context for accessing ctx
+ * anywhere in the node component tree without prop drilling.
  *
- * The ctx is optional — nodes should still render correctly without it
- * (e.g. in the widget gallery where there is no live flow).
+ * Usage in node components:
+ *   function MyNode({ data }) {
+ *       const ctx = useNodeCtx()  // from React context (set by BaseNode)
+ *       ctx?.messenger.getContacts()
+ *   }
  */
 
+import { createContext, useContext } from 'react'
 import type { AgentMessenger } from './AgentMessenger'
 
 export interface NodeContext {
@@ -22,4 +20,16 @@ export interface NodeContext {
 
     /** Messenger instance — contacts, inbox, knock, system commands */
     messenger: AgentMessenger
+}
+
+// ── React context ───────────────────────────────────────────────────────────
+
+const NodeCtxContext = createContext<NodeContext | undefined>(undefined)
+
+/** Provider component — used by BaseNode to inject ctx */
+export const NodeCtxProvider = NodeCtxContext.Provider
+
+/** Hook to access ctx from anywhere inside a node component tree */
+export function useNodeCtx(): NodeContext | undefined {
+    return useContext(NodeCtxContext)
 }

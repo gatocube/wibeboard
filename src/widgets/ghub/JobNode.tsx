@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { Check, CheckCircle, Circle, Loader2, Terminal } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
+import { BaseNode } from '@/widgets/BaseNode'
 import type { NodeContext } from '@/engine/NodeContext'
 
 /**
@@ -93,8 +94,17 @@ function GhStatusIcon({ status, gh, size = 14 }: { status: string; gh: typeof gh
 // ── JobNode ─────────────────────────────────────────────────────────────────
 
 export function JobNode({ data }: { data: any }) {
-    const ctx = data.ctx as NodeContext | undefined
     const variant: 'agent' | 'script' = data.variant || 'agent'
+    const subtype = data.subtype || variant
+
+    return (
+        <BaseNode data={data} type="job" subtype={subtype}>
+            {(ctx) => <JobNodeInner data={data} ctx={ctx} variant={variant} />}
+        </BaseNode>
+    )
+}
+
+function JobNodeInner({ data, ctx, variant }: { data: any; ctx: NodeContext | undefined; variant: 'agent' | 'script' }) {
     const gh = data.dayMode ? ghLight : ghDark
     const status = data.status || 'idle'
     const w = data.width || (variant === 'agent' ? 240 : 220)
@@ -112,11 +122,6 @@ export function JobNode({ data }: { data: any }) {
             ? { borderRight: `2px solid ${kColor}` }
             : { borderLeft: `2px solid ${kColor}` }
     ) : {}
-
-    // Messenger — react to incoming knocks
-    if (ctx?.messenger) {
-        // ctx.messenger is available for future use
-    }
 
     // ── Compact mode (shared) ──
     if (isCompact) {
@@ -161,7 +166,7 @@ export function JobNode({ data }: { data: any }) {
 
 function AgentVariant({ data, ctx: _ctx, gh, status, w, h, isLarge, logs, knockStyle }: {
     data: any; ctx: NodeContext | undefined; gh: typeof ghDark; status: string
-    w: number; h: number; isLarge: boolean; logs: string[]; knockStyle: Record<string, string>
+    w: number; h: number; isLarge: boolean; logs: string[]; knockStyle: React.CSSProperties
 }) {
     const pct = data.progress ?? 0
     const tasks = [
@@ -309,7 +314,7 @@ function AgentVariant({ data, ctx: _ctx, gh, status, w, h, isLarge, logs, knockS
 
 function ScriptVariant({ data, ctx: _ctx, gh, status, w, h, logs, knockStyle }: {
     data: any; ctx: NodeContext | undefined; gh: typeof ghDark; status: string
-    w: number; h: number; logs: string[]; knockStyle: Record<string, string>
+    w: number; h: number; logs: string[]; knockStyle: React.CSSProperties
 }) {
     const lang = LANG_COLORS[data.language || 'js'] || LANG_COLORS.js
 

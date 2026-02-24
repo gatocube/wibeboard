@@ -6,7 +6,7 @@ import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { PreviewCanvas } from '@/components/PreviewCanvas'
 import { StatusDot } from '@/widgets/StatusDot'
 import { ShimmeringText, SplittingText } from '@/components/animate-ui'
-import type { NodeContext } from '@/engine/NodeContext'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
  * JobNode (wibeglow) — Unified modern dark node for agents and scripts.
@@ -16,6 +16,7 @@ import type { NodeContext } from '@/engine/NodeContext'
  *   'script' → Language-colored gradient border, code editor, terminal logs
  *
  * data.variant — 'agent' | 'script' (default: 'agent')
+ * data.subtype — 'ai' | 'script' | custom (default: variant)
  * data.ctx — NodeContext with messenger
  * data.label — node name
  * data.color — primary accent color
@@ -37,16 +38,17 @@ const LANG_LABELS: Record<string, string> = {
 }
 
 export function JobNode({ data }: { data: any }) {
-    const ctx = data.ctx as NodeContext | undefined
     const variant: 'agent' | 'script' = data.variant || 'agent'
+    const subtype = data.subtype || variant
 
-    // Messenger available for future use
-    if (ctx?.messenger) { /* ready */ }
-
-    if (variant === 'agent') {
-        return <AgentVariant data={data} />
-    }
-    return <ScriptVariant data={data} />
+    return (
+        <BaseNode data={data} type="job" subtype={subtype}>
+            {variant === 'agent'
+                ? <AgentVariant data={data} />
+                : <ScriptVariant data={data} />
+            }
+        </BaseNode>
+    )
 }
 
 // ── Agent variant (rainbow gradient border) ─────────────────────────────────

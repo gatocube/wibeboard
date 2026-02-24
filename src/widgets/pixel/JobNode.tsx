@@ -1,7 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StatusDot } from '@/widgets/StatusDot'
-import type { NodeContext } from '@/engine/NodeContext'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
  * JobNode (pixel) — Unified retro/terminal-style node for agents and scripts.
@@ -11,6 +11,7 @@ import type { NodeContext } from '@/engine/NodeContext'
  *   'script' → Terminal window with monospace output, blinking cursor
  *
  * data.variant — 'agent' | 'script' (default: 'agent')
+ * data.subtype — 'ai' | 'script' | custom (default: variant)
  * data.ctx — NodeContext with messenger
  * data.label — node name
  * data.status — 'idle' | 'waking' | 'running' | 'done' | 'error'
@@ -26,8 +27,17 @@ const LANG_COLORS: Record<string, string> = {
 }
 
 export function JobNode({ data }: { data: any }) {
-    const ctx = data.ctx as NodeContext | undefined
     const variant: 'agent' | 'script' = data.variant || 'agent'
+    const subtype = data.subtype || variant
+
+    return (
+        <BaseNode data={data} type="job" subtype={subtype}>
+            <JobNodeInner data={data} variant={variant} />
+        </BaseNode>
+    )
+}
+
+function JobNodeInner({ data, variant }: { data: any; variant: 'agent' | 'script' }) {
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100
@@ -52,9 +62,6 @@ export function JobNode({ data }: { data: any }) {
     const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
-
-    // Messenger available for future use
-    if (ctx?.messenger) { /* ready */ }
 
     if (variant === 'agent') {
         return <AgentVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} hasKnock={hasKnock} knockAnimation={knockAnimation} knockTransition={knockTransition} />
