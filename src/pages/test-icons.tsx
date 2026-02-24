@@ -9,6 +9,7 @@
 
 import { useState } from 'react'
 import { WidgetIcon, getAllIconEntries, CATEGORY_ICONS, WIDGET_ICON_COLORS, AnimatedIcon, STATUS_ICONS, STATUS_COLORS, type AnimatedIconName } from '@/components/WidgetIcon'
+import { TechIcon, AnimatedTechIcon, ALL_TECH_ICONS, ALL_ANIMATED_TECH_ICONS, TECH_COLORS } from '@/components/TechIcons'
 import {
     // UI icons used across the app
     Play, Pause, SkipBack, SkipForward, RotateCcw,
@@ -199,6 +200,42 @@ export function IconsGalleryPage() {
                 </div>
             </Section>
 
+            {/* ── 6. Tech Logo Icons ── */}
+            <Section title="Tech Logos" subtitle="Custom SVG icons for frameworks, languages, and tools">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                    {ALL_TECH_ICONS.map(name => (
+                        <IconCard
+                            key={name}
+                            name={name}
+                            label={`Tech: ${name}`}
+                            color={TECH_COLORS[name] || '#8b5cf6'}
+                            isHovered={hovered === `tech-${name}`}
+                            onHover={(id) => setHovered(id ? `tech-${name}` : null)}
+                        >
+                            <TechIcon name={name} size={24} />
+                        </IconCard>
+                    ))}
+                </div>
+            </Section>
+
+            {/* ── 7. Animated Tech Icons ── */}
+            <Section title="Animated Tech Icons" subtitle="Dev workflow animations for CI/CD, builds, and git operations">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                    {ALL_ANIMATED_TECH_ICONS.map(icon => (
+                        <IconCard
+                            key={icon.name}
+                            name={icon.name}
+                            label={icon.label}
+                            color={icon.color}
+                            isHovered={hovered === `atech-${icon.name}`}
+                            onHover={(id) => setHovered(id ? `atech-${icon.name}` : null)}
+                        >
+                            <AnimatedTechIcon name={icon.name} size={24} color={icon.color} />
+                        </IconCard>
+                    ))}
+                </div>
+            </Section>
+
             {/* ── Summary ── */}
             <div style={{
                 marginTop: 24, padding: '12px 16px',
@@ -214,8 +251,10 @@ export function IconsGalleryPage() {
                     <strong style={{ color: '#e2e8f0' }}>{categoryEntries.length}</strong> category icons ·{' '}
                     <strong style={{ color: '#e2e8f0' }}>{Object.keys(STATUS_ICONS).length}</strong> status icons ·{' '}
                     <strong style={{ color: '#e2e8f0' }}>{ANIMATED_ICONS.length}</strong> animated icons ·{' '}
+                    <strong style={{ color: '#e2e8f0' }}>{ALL_TECH_ICONS.length}</strong> tech logos ·{' '}
+                    <strong style={{ color: '#e2e8f0' }}>{ALL_ANIMATED_TECH_ICONS.length}</strong> animated tech icons ·{' '}
                     <strong style={{ color: '#e2e8f0' }}>{UI_ICONS.length}</strong> UI icons ·{' '}
-                    All from <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Lucide React</span> + <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Framer Motion</span>
+                    Lucide React + Framer Motion + Custom SVG
                 </div>
             </div>
         </div>
