@@ -29,11 +29,11 @@ import { JobNode as GhubJob, NoteNode as GhubNote } from '@/widgets/ghub'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
 
-type Status = 'idle' | 'waking' | 'running' | 'done'
+type Status = 'idle' | 'waking' | 'running' | 'done' | 'error'
 type KnockSide = null | 'in' | 'out'
 type CommSide = null | 'left' | 'right'
 
-const STATUSES: Status[] = ['idle', 'waking', 'running', 'done']
+const STATUSES: Status[] = ['idle', 'waking', 'running', 'done', 'error']
 const KNOCK_OPTIONS: { label: string; value: KnockSide }[] = [
     { label: 'None', value: null },
     { label: '← In', value: 'in' },
