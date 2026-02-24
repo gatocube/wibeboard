@@ -38,23 +38,70 @@ At compact size, the node displays a **colored status dot** in the **top-right**
 | Status   | Color             | Behavior       |
 |----------|-------------------|----------------|
 | idle     | `#475569` (gray)  | Static         |
-| waking   | `#f59e0b` (orange)| Static         |
+| waking   | `#f59e0b` (orange)| Spinning ring  |
 | running  | `#3b82f6` (blue)  | Blinking       |
 | done     | `#10b981` (green) | Static         |
 | error    | `#ef4444` (red)   | Static         |
 
 The dot must be visible across all themes (WibeGlow, GitHub, Pixel).
 
+## Icons
+
+Each node displays an icon in its header (or centered in compact mode).
+
+| Kind     | Default icon        | Active icon (running/waking) |
+|----------|--------------------|-----------------------------|
+| **AI**   | `sparkle-burst`    | `sparkle-burst` (animated rotation) |
+| **Script** | `terminal`       | `terminal-blink`            |
+
+Icons are rendered via `WidgetIcon` from the [icon gallery](/wibeboard/?page=icons).
+
 ## Compact mode layout
 
 In compact mode, nodes render as a square icon box with:
 
 1. **Status dot** — top-right corner of the box
-2. **Icon** — centered in the box (Sparkles for AI, Terminal for Script)
+2. **Icon** — centered in the box (`sparkle-burst` for AI, `terminal` for Script)
 3. **Name label** — below the box, truncated with ellipsis
 4. **AI thoughts / Script output** — below the name (italic, muted):
    - Agent: shows `data.thought` prefixed with 💭
    - Script: shows last line of `data.logs`
+
+## Non-compact mode layout (M, Default, L)
+
+Non-compact nodes render as a card with these fields:
+
+| Field           | Data key        | AI example        | Script example     |
+|-----------------|-----------------|-------------------|--------------------|
+| **Icon**        | (from subType)  | `sparkle-burst`   | `terminal`         |
+| **Label**       | `data.label`    | "Planner"         | "build.ts"         |
+| **Agent/Lang**  | `data.agent`    | "Claude 3.5"      | "TypeScript"       |
+| **Status**      | `data.status`   | running           | idle               |
+| **Progress**    | `data.progress` | 55%               | 0%                 |
+| **Exec time**   | `data.execTime` | "1.3s"            | "0.6s"             |
+| **Calls/Runs**  | `data.callsCount` | 3               | 1                  |
+
+### Card structure (top → bottom)
+
+```
+┌──────────────────────────────┐
+│ StatusDot  Icon  Label  Agent│  ← Header
+├──────────────────────────────┤
+│ 💭 Thought / Task text       │  ← Content (AI: thought/task, Script: code/output)
+│ Logs / PreviewCanvas         │
+├──────────────────────────────┤
+│ ████████░░░░░░░░░░           │  ← Progress bar
+│ 55%  1.3s  ⚡3               │  ← Stats row
+└──────────────────────────────┘
+```
+
+### Theme-specific progress bar position
+
+| Theme     | Progress bar position |
+|-----------|-----------------------|
+| WibeGlow  | **Bottom** (before stats row) |
+| GitHub    | **Top** (after header) |
+| Pixel     | (theme-dependent)     |
 
 ## Default Theme: WibeGlow
 
