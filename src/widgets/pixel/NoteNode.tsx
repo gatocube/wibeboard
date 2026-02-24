@@ -1,5 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
  * NoteNode (pixel) — Terminal-style sticky note / annotation.
@@ -194,7 +195,7 @@ function LabelNote({ data, w, h }: { data: any; w: number; h: number }) {
 export function NoteNode({ data }: { data: any }) {
     const w = data.width || 160
     const h = data.height || 100
-    const variant = data.variant || 'sticker'
+    const subType = data.subType || 'sticker'
     const hasKnock = !!data.knockSide
     const kColor = data.knockColor || '#f97316'
     const knockAnimation = hasKnock
@@ -207,21 +208,23 @@ export function NoteNode({ data }: { data: any }) {
         : {}
 
     return (
-        <motion.div
-            animate={knockAnimation}
-            transition={knockTransition}
-            style={{ position: 'relative' }}
-        >
-            <Handle type="target" position={Position.Left} id="in" style={{
-                background: '#fbbf24', border: '2px solid #fbbf2455', width: 6, height: 6, borderRadius: 0,
-            }} />
-            <Handle type="source" position={Position.Right} id="out" style={{
-                background: '#666', border: '2px solid #33333355', width: 6, height: 6, borderRadius: 0,
-            }} />
+        <BaseNode data={data} type="note" subType={subType}>
+            <motion.div
+                animate={knockAnimation}
+                transition={knockTransition}
+                style={{ position: 'relative' }}
+            >
+                <Handle type="target" position={Position.Left} id="in" style={{
+                    background: '#fbbf24', border: '2px solid #fbbf2455', width: 6, height: 6, borderRadius: 0,
+                }} />
+                <Handle type="source" position={Position.Right} id="out" style={{
+                    background: '#666', border: '2px solid #33333355', width: 6, height: 6, borderRadius: 0,
+                }} />
 
-            {variant === 'sticker' && <StickerNote data={data} w={w} h={h} />}
-            {variant === 'group-note' && <GroupNote data={data} w={w} h={h} />}
-            {variant === 'label' && <LabelNote data={data} w={w} h={h} />}
-        </motion.div>
+                {subType === 'sticker' && <StickerNote data={data} w={w} h={h} />}
+                {subType === 'group-note' && <GroupNote data={data} w={w} h={h} />}
+                {subType === 'label' && <LabelNote data={data} w={w} h={h} />}
+            </motion.div>
+        </BaseNode>
     )
 }

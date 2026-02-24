@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StickyNote } from 'lucide-react'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
  * NoteNode (wibeglow) — annotation nodes for documentation and visual markers.
@@ -239,20 +240,22 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
 export function NoteNode({ data }: { data: any }) {
     const w = data.width || 160
     const h = data.height || 100
-    const variant = data.variant || 'sticker'
+    const subType = data.subType || 'sticker'
 
     return (
-        <div style={{ position: 'relative' }}>
-            <Handle type="target" position={Position.Left} style={{
-                background: 'transparent', border: 'none', width: 1, height: 1,
-            }} />
-            <Handle type="source" position={Position.Right} style={{
-                background: 'transparent', border: 'none', width: 1, height: 1,
-            }} />
+        <BaseNode data={data} type="note" subType={subType}>
+            <div style={{ position: 'relative' }}>
+                <Handle type="target" position={Position.Left} style={{
+                    background: 'transparent', border: 'none', width: 1, height: 1,
+                }} />
+                <Handle type="source" position={Position.Right} style={{
+                    background: 'transparent', border: 'none', width: 1, height: 1,
+                }} />
 
-            {variant === 'sticker' && <StickerNote data={data} w={w} h={h} />}
-            {variant === 'group-note' && <GroupNoteNode data={data} w={w} h={h} />}
-            {variant === 'label' && <LabelNode data={data} w={w} h={h} />}
-        </div>
+                {subType === 'sticker' && <StickerNote data={data} w={w} h={h} />}
+                {subType === 'group-note' && <GroupNoteNode data={data} w={w} h={h} />}
+                {subType === 'label' && <LabelNode data={data} w={w} h={h} />}
+            </div>
+        </BaseNode>
     )
 }

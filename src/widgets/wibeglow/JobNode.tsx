@@ -15,8 +15,7 @@ import { BaseNode } from '@/widgets/BaseNode'
  *   'agent' → Rainbow gradient border, sparkle icon, progress bar, stats
  *   'script' → Language-colored gradient border, code editor, terminal logs
  *
- * data.variant — 'agent' | 'script' (default: 'agent')
- * data.subtype — 'ai' | 'script' | custom (default: variant)
+ * data.subType — 'ai' | 'script' (default: 'ai')
  * data.ctx — NodeContext with messenger
  * data.label — node name
  * data.color — primary accent color
@@ -38,12 +37,11 @@ const LANG_LABELS: Record<string, string> = {
 }
 
 export function JobNode({ data }: { data: any }) {
-    const variant: 'agent' | 'script' = data.variant || 'agent'
-    const subtype = data.subtype || variant
+    const subType = data.subType || 'ai'
 
     return (
-        <BaseNode data={data} type="job" subtype={subtype}>
-            {variant === 'agent'
+        <BaseNode data={data} type="job" subType={subType}>
+            {subType === 'ai'
                 ? <AgentVariant data={data} />
                 : <ScriptVariant data={data} />
             }

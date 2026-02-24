@@ -1,9 +1,9 @@
 /**
- * ScriptNode (ghub) — thin wrapper around JobNode with variant='script', subtype='script'.
- * @deprecated Use JobNode directly with data.variant='script'
+ * ScriptNode (ghub) — thin wrapper: JobNode with subType='script'.
+ * @deprecated Use JobNode directly with data.subType='script'
  */
 import { JobNode } from './JobNode'
 
 export function ScriptNode({ data }: { data: any }) {
-    return <JobNode data={{ ...data, variant: 'script', subtype: 'script' }} />
+    return <JobNode data={{ ...data, subType: 'script' }} />
 }

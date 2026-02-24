@@ -1,9 +1,10 @@
 import { Handle, Position } from '@xyflow/react'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
  * NoteNode (ghub) — annotation nodes for documentation and visual markers.
  *
- * Supports 3 variants via data.noteType:
+ * Supports 3 sub-types via data.subType:
  *   'sticker' — Release note card with version, changelog, badges
  *   'group'   — Section header with description
  *   'label'   — Small inline label/badge
@@ -213,16 +214,18 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
 // ── Main NoteNode component ─────────────────────────────────────────────────────
 
 export function NoteNode({ data }: { data: any }) {
-    const noteType = data.noteType || 'sticker'
+    const subType = data.subType || 'sticker'
     const w = data.width || 240
     const h = data.height || 160
 
-    switch (noteType) {
-        case 'group':
-            return <GroupNoteNode data={data} w={w} h={h} />
-        case 'label':
-            return <LabelNode data={data} w={w} h={h} />
-        default:
-            return <StickerNote data={data} w={w} h={h} />
-    }
+    return (
+        <BaseNode data={data} type="note" subType={subType}>
+            {subType === 'group'
+                ? <GroupNoteNode data={data} w={w} h={h} />
+                : subType === 'label'
+                    ? <LabelNode data={data} w={w} h={h} />
+                    : <StickerNote data={data} w={w} h={h} />
+            }
+        </BaseNode>
+    )
 }

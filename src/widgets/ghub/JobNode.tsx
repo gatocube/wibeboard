@@ -12,7 +12,7 @@ import type { NodeContext } from '@/engine/NodeContext'
  *   'agent' → GitHub Issue card with rainbow accent, task list, AI badge
  *   'script' → GitHub Actions workflow card with step list, language dot
  *
- * data.variant — 'agent' | 'script' (default: 'agent')
+ * data.subType — 'ai' | 'script' (default: 'ai')
  * data.ctx — NodeContext with messenger
  * data.label — title
  * data.status — 'idle' | 'waking' | 'running' | 'done' | 'error'
@@ -94,21 +94,21 @@ function GhStatusIcon({ status, gh, size = 14 }: { status: string; gh: typeof gh
 // ── JobNode ─────────────────────────────────────────────────────────────────
 
 export function JobNode({ data }: { data: any }) {
-    const variant: 'agent' | 'script' = data.variant || 'agent'
-    const subtype = data.subtype || variant
+    const subType = data.subType || 'ai'
 
     return (
-        <BaseNode data={data} type="job" subtype={subtype}>
-            {(ctx) => <JobNodeInner data={data} ctx={ctx} variant={variant} />}
+        <BaseNode data={data} type="job" subType={subType}>
+            {(ctx) => <JobNodeInner data={data} ctx={ctx} subType={subType} />}
         </BaseNode>
     )
 }
 
-function JobNodeInner({ data, ctx, variant }: { data: any; ctx: NodeContext | undefined; variant: 'agent' | 'script' }) {
+function JobNodeInner({ data, ctx, subType }: { data: any; ctx: NodeContext | undefined; subType: string }) {
+    const isAI = subType === 'ai'
     const gh = data.dayMode ? ghLight : ghDark
     const status = data.status || 'idle'
-    const w = data.width || (variant === 'agent' ? 240 : 220)
-    const h = data.height || (variant === 'agent' ? 160 : 120)
+    const w = data.width || (isAI ? 240 : 220)
+    const h = data.height || (isAI ? 160 : 120)
     const isCompact = w <= 60
     const isLarge = w >= 280
     const logs: string[] = data.logs || []
@@ -142,11 +142,11 @@ function JobNodeInner({ data, ctx, variant }: { data: any; ctx: NodeContext | un
             >
                 <Handle type="target" position={Position.Left} id="in" style={{ background: gh.accent, width: 6, height: 6 }} />
                 <Handle type="source" position={Position.Right} id="out" style={{ background: gh.fgMuted, width: 6, height: 6 }} />
-                {variant === 'agent' && (
+                {isAI && (
                     <Handle type="source" position={Position.Top} id="thinking" style={{ background: '#c084fc', width: 5, height: 5 }} />
                 )}
                 <StatusDot status={status} />
-                {variant === 'script' && (
+                {!isAI && (
                     <span style={{ fontSize: 7, color: gh.fgMuted, fontWeight: 700 }}>
                         {(data.language || 'js').toUpperCase()}
                     </span>
@@ -156,7 +156,7 @@ function JobNodeInner({ data, ctx, variant }: { data: any; ctx: NodeContext | un
     }
 
     // ── Full mode ──
-    if (variant === 'agent') {
+    if (isAI) {
         return <AgentVariant data={data} ctx={ctx} gh={gh} status={status} w={w} h={h} isLarge={isLarge} logs={logs} knockStyle={knockStyle} />
     }
     return <ScriptVariant data={data} ctx={ctx} gh={gh} status={status} w={w} h={h} logs={logs} knockStyle={knockStyle} />

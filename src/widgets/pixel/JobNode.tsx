@@ -27,17 +27,17 @@ const LANG_COLORS: Record<string, string> = {
 }
 
 export function JobNode({ data }: { data: any }) {
-    const variant: 'agent' | 'script' = data.variant || 'agent'
-    const subtype = data.subtype || variant
+    const subType = data.subType || 'ai'
 
     return (
-        <BaseNode data={data} type="job" subtype={subtype}>
-            <JobNodeInner data={data} variant={variant} />
+        <BaseNode data={data} type="job" subType={subType}>
+            <JobNodeInner data={data} subType={subType} />
         </BaseNode>
     )
 }
 
-function JobNodeInner({ data, variant }: { data: any; variant: 'agent' | 'script' }) {
+function JobNodeInner({ data, subType }: { data: any; subType: string }) {
+    const isAI = subType === 'ai'
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100
@@ -63,7 +63,7 @@ function JobNodeInner({ data, variant }: { data: any; variant: 'agent' | 'script
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }
         : {}
 
-    if (variant === 'agent') {
+    if (isAI) {
         return <AgentVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} hasKnock={hasKnock} knockAnimation={knockAnimation} knockTransition={knockTransition} />
     }
     return <ScriptVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} hasKnock={hasKnock} knockAnimation={knockAnimation} knockTransition={knockTransition} />
