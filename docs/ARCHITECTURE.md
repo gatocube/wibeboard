@@ -18,17 +18,22 @@ wibeboard/
 │   │   └── template-registry.ts   # 3 visual themes: pixel, ghub, wibeglow
 │   │
 │   ├── widgets/
+│   │   ├── BaseNode.tsx            # Foundational wrapper (type, subType, ctx via React context)
+│   │   ├── StatusDot.tsx           # Animated status indicator
 │   │   └── wibeglow/              # WibeGlow template components
-│   │       ├── AgentNode.tsx       # AI agent node
-│   │       ├── ScriptNode.tsx      # Code editor + terminal log node
-│   │       ├── GroupNode.tsx        # Container node
-│   │       ├── UserNode.tsx         # Human review / approval node
-│   │       ├── ArtifactNode.tsx     # Artifact display node
-│   │       ├── ExpectationNode.tsx  # Expected-outcome node
-│   │       ├── NoteNode.tsx         # Sticky-note node
-│   │       └── PlaceholderNode.tsx  # Placeholder during widget selection
+│   │       ├── JobNode.tsx         # Unified job node (subType='ai' | 'script')
+│   │       ├── AgentNode.tsx       # Thin wrapper → JobNode subType='ai'
+│   │       ├── ScriptNode.tsx      # Thin wrapper → JobNode subType='script'
+│   │       ├── NoteNode.tsx        # Annotation node (subType='sticker' | 'group' | 'label')
+│   │       ├── GroupNode.tsx       # Container node
+│   │       ├── UserNode.tsx        # Human review / approval node
+│   │       ├── ArtifactNode.tsx    # Artifact display node
+│   │       ├── ExpectationNode.tsx # Expected-outcome node
+│   │       └── PlaceholderNode.tsx # Placeholder during widget selection
 │   │
 │   ├── engine/
+│   │   ├── NodeContext.ts         # NodeContext type + React context (useNodeCtx hook)
+│   │   ├── AgentMessenger.ts      # Contact management + messaging for agent nodes
 │   │   ├── widget-registry.ts     # Widget definitions (type, category, sizes, templates)
 │   │   ├── ConnectorFlow.tsx      # Click-based connection drawing (position → size → pick)
 │   │   ├── automerge-store.ts     # Step-based state store (Automerge CRDT)
@@ -90,9 +95,21 @@ Central registry of all available widgets. Each widget specifies:
 - **Templates** — named presets with default data
 
 ### Node Components
-Each widget type has a React component per template. Currently:
+All node components wrap in `BaseNode` which provides:
+- **type** — node category (`'job'`, `'note'`, `'group'`)
+- **subType** — specialization (`'ai'`, `'script'`, `'sticker'`, `'label'`)
+- **ctx** — `NodeContext` with `AgentMessenger`, available via `useNodeCtx()` hook
+
+Unified components per template:
+- **JobNode** — `type="job"`: `subType="ai"` (agent) or `subType="script"` (code runner)
+- **NoteNode** — `type="note"`: `subType="sticker"`, `"group"`, `"group-note"`, `"label"`
+
+Legacy `AgentNode`/`ScriptNode` are thin wrappers that delegate to `JobNode`.
+
+Each template provides its own visual rendering:
 - `wibeglow/` — modern dark theme with glow effects and framer-motion animations
-- `pixel/` and `ghub/` — planned
+- `pixel/` — retro terminal / pixel-art style
+- `ghub/` — GitHub-style with day/night mode
 
 ### ConnectorFlow
 Click-based node creation pipeline:

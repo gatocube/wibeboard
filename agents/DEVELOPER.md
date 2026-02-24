@@ -11,12 +11,19 @@ wibeboard/
 │   ├── templates/
 │   │   └── template-registry.ts       # 3 visual themes (pixel, ghub, wibeglow)
 │   ├── widgets/
-│   │   ├── widget-registry.ts         # All widget definitions
-│   │   └── wibeglow/                  # WibeGlow template node components
-│   │       ├── AgentNode.tsx
-│   │       ├── ScriptNode.tsx
-│   │       ├── GroupNode.tsx
+│   │   ├── BaseNode.tsx               # Base wrapper (type, subType, ctx context)
+│   │   ├── StatusDot.tsx              # Animated status dot
+│   │   └── wibeglow/                  # WibeGlow template components
+│   │       ├── JobNode.tsx            # Unified job node (subType='ai'|'script')
+│   │       ├── AgentNode.tsx          # Wrapper → JobNode subType='ai'
+│   │       ├── ScriptNode.tsx         # Wrapper → JobNode subType='script'
+│   │       ├── NoteNode.tsx           # Annotation node (sticker|group|label)
+│   │       ├── GroupNode.tsx          # Container node
 │   │       └── PlaceholderNode.tsx
+│   ├── engine/
+│   │   ├── NodeContext.ts             # NodeContext type + useNodeCtx() hook
+│   │   ├── AgentMessenger.ts          # Contact/messaging system
+│   │   └── widget-registry.ts         # All widget definitions
 │   ├── builder/
 │   │   └── WidgetSelector.tsx         # Categorized widget picker
 │   └── pages/
