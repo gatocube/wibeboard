@@ -3,9 +3,16 @@ import { Construction } from 'lucide-react'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { useCallback, useRef } from 'react'
 import { WidgetPicker } from '@/flow-builder'
+import { BaseNode } from '@/widgets/BaseNode'
 
 /**
- * PlaceholderNode — dashed "under construction" node.
+ * PlaceholderNode — "under construction" node used during node creation.
+ *
+ * BaseNode wrapper: type='construction'
+ * subType is derived from data state:
+ *   'positioning' — just placed, cursor tracks position
+ *   'resizing'    — user is dragging to resize (data.sizing === true)
+ *   'configuring' — size confirmed, widget picker shown (data.showSelector)
  *
  * data.width / data.height — node dimensions (pixels)
  * data.gridCols / data.gridRows — grid cell counts for display
@@ -27,6 +34,9 @@ export function PlaceholderNode({ data }: { data: any }) {
     const gridRows = data.gridRows || '?'
     const hoveredWidget = data.hoveredWidget
     const showSelector = data.showSelector
+
+    // Derive construction subType from current phase
+    const subType = sizing ? 'resizing' : showSelector ? 'configuring' : 'positioning'
 
     // ── Resize handle drag ──
     const dragRef = useRef<{ startX: number; startY: number; startW: number; startH: number } | null>(null)
@@ -59,134 +69,136 @@ export function PlaceholderNode({ data }: { data: any }) {
     const showPreview = !!hoveredWidget && !sizing
 
     return (
-        <>
-            {/* NodeToolbar — WidgetSelector that moves with pan/zoom */}
-            <NodeToolbar
-                isVisible={!!showSelector}
-                position={Position.Right}
-                offset={16}
-                align="start"
-                style={{ zIndex: 1000 }}
-            >
-                <WidgetPicker
-                    rectSize={{ width: w, height: h }}
-                    gridSize={{ cols: gridCols, rows: gridRows }}
-                    onSelect={(widget, template) => data.onSelectWidget?.(widget, template)}
-                    onCancel={() => data.onCancelSelector?.()}
-                    onHoverWidget={(widget) => data.onHoverWidget?.(widget)}
-                    embedded
-                />
-            </NodeToolbar>
-
-            <div
-                style={{
-                    width: w,
-                    height: h,
-                    border: `2px dashed ${showPreview ? 'rgba(139,92,246,0.7)' : 'rgba(139,92,246,0.5)'}`,
-                    borderRadius: 10,
-                    background: showPreview
-                        ? 'rgba(139,92,246,0.08)'
-                        : sizing
-                            ? 'rgba(139,92,246,0.04)'
-                            : 'rgba(139,92,246,0.06)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 4,
-                    transition: sizing ? 'none' : 'all 0.15s ease',
-                    userSelect: 'none',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-            >
-                {/* Handles */}
-                <Handle type="target" position={Position.Left} style={{
-                    background: '#8b5cf6', border: '2px solid rgba(139,92,246,0.3)', width: 8, height: 8,
-                }} />
-                <Handle type="source" position={Position.Right} style={{
-                    background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
-                }} />
-
-                {showPreview ? (
-                    /* ── Widget hover preview ── */
-                    <>
-                        <div style={{ fontSize: 24, opacity: 0.7, marginBottom: 2 }}>
-                            <WidgetIcon type={hoveredWidget.type || ''} size={24} />
-                        </div>
-                        <div style={{
-                            fontSize: 11, fontWeight: 600, color: '#8b5cf6',
-                            fontFamily: 'Inter', textAlign: 'center', padding: '0 8px',
-                        }}>
-                            {hoveredWidget.name}
-                        </div>
-                        <div style={{
-                            fontSize: 8, color: 'rgba(139,92,246,0.6)', fontFamily: 'Inter',
-                            textAlign: 'center', padding: '0 12px', lineHeight: 1.3,
-                            maxHeight: h - 60, overflow: 'hidden',
-                        }}>
-                            {hoveredWidget.description}
-                        </div>
-                        <div style={{
-                            fontSize: 8, color: 'rgba(139,92,246,0.4)',
-                            fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, marginTop: 2,
-                        }}>
-                            {gridCols}×{gridRows}
-                        </div>
-                    </>
-                ) : (
-                    /* ── Default placeholder content ── */
-                    <>
-                        <Construction size={sizing ? 16 : 20} style={{ color: 'rgba(139,92,246,0.5)' }} />
-                        <div style={{
-                            fontSize: 10, color: 'rgba(139,92,246,0.7)',
-                            fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
-                        }}>
-                            {gridCols}×{gridRows}
-                        </div>
-                        <div style={{
-                            fontSize: 8, color: 'rgba(139,92,246,0.4)',
-                            fontFamily: 'Inter', fontWeight: 500,
-                            letterSpacing: 0.5, textTransform: 'uppercase',
-                        }}>
-                            {sizing ? 'sizing...' : resizable ? 'drag corner to resize' : 'select widget'}
-                        </div>
-                    </>
-                )}
-
-                {/* Corner markers when sizing */}
-                {sizing && (
-                    <>
-                        {[
-                            { top: 4, left: 4 }, { top: 4, right: 4 },
-                            { bottom: 4, left: 4 }, { bottom: 4, right: 4 },
-                        ].map((pos, i) => (
-                            <div key={i} style={{
-                                position: 'absolute', ...pos, width: 6, height: 6,
-                                borderTop: pos.top !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
-                                borderBottom: pos.bottom !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
-                                borderLeft: pos.left !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
-                                borderRight: pos.right !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
-                            }} />
-                        ))}
-                    </>
-                )}
-
-                {/* Resize handle (bottom-right) */}
-                {resizable && (
-                    <div
-                        className="nodrag nopan"
-                        onMouseDown={onResizeMouseDown}
-                        style={{
-                            position: 'absolute', bottom: -4, right: -4,
-                            width: 12, height: 12, borderRadius: 2,
-                            background: '#8b5cf6', border: '1.5px solid rgba(139,92,246,0.6)',
-                            cursor: 'nwse-resize', zIndex: 10,
-                            boxShadow: '0 0 4px rgba(139,92,246,0.3)',
-                        }}
+        <BaseNode data={data} type="construction" subType={subType}>
+            <>
+                {/* NodeToolbar — WidgetSelector that moves with pan/zoom */}
+                <NodeToolbar
+                    isVisible={!!showSelector}
+                    position={Position.Right}
+                    offset={16}
+                    align="start"
+                    style={{ zIndex: 1000 }}
+                >
+                    <WidgetPicker
+                        rectSize={{ width: w, height: h }}
+                        gridSize={{ cols: gridCols, rows: gridRows }}
+                        onSelect={(widget, template) => data.onSelectWidget?.(widget, template)}
+                        onCancel={() => data.onCancelSelector?.()}
+                        onHoverWidget={(widget) => data.onHoverWidget?.(widget)}
+                        embedded
                     />
-                )}
-            </div>
-        </>
+                </NodeToolbar>
+
+                <div
+                    style={{
+                        width: w,
+                        height: h,
+                        border: `2px dashed ${showPreview ? 'rgba(139,92,246,0.7)' : 'rgba(139,92,246,0.5)'}`,
+                        borderRadius: 10,
+                        background: showPreview
+                            ? 'rgba(139,92,246,0.08)'
+                            : sizing
+                                ? 'rgba(139,92,246,0.04)'
+                                : 'rgba(139,92,246,0.06)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        transition: sizing ? 'none' : 'all 0.15s ease',
+                        userSelect: 'none',
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {/* Handles */}
+                    <Handle type="target" position={Position.Left} style={{
+                        background: '#8b5cf6', border: '2px solid rgba(139,92,246,0.3)', width: 8, height: 8,
+                    }} />
+                    <Handle type="source" position={Position.Right} style={{
+                        background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
+                    }} />
+
+                    {showPreview ? (
+                        /* ── Widget hover preview ── */
+                        <>
+                            <div style={{ fontSize: 24, opacity: 0.7, marginBottom: 2 }}>
+                                <WidgetIcon type={hoveredWidget.type || ''} size={24} />
+                            </div>
+                            <div style={{
+                                fontSize: 11, fontWeight: 600, color: '#8b5cf6',
+                                fontFamily: 'Inter', textAlign: 'center', padding: '0 8px',
+                            }}>
+                                {hoveredWidget.name}
+                            </div>
+                            <div style={{
+                                fontSize: 8, color: 'rgba(139,92,246,0.6)', fontFamily: 'Inter',
+                                textAlign: 'center', padding: '0 12px', lineHeight: 1.3,
+                                maxHeight: h - 60, overflow: 'hidden',
+                            }}>
+                                {hoveredWidget.description}
+                            </div>
+                            <div style={{
+                                fontSize: 8, color: 'rgba(139,92,246,0.4)',
+                                fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, marginTop: 2,
+                            }}>
+                                {gridCols}×{gridRows}
+                            </div>
+                        </>
+                    ) : (
+                        /* ── Default placeholder content ── */
+                        <>
+                            <Construction size={sizing ? 16 : 20} style={{ color: 'rgba(139,92,246,0.5)' }} />
+                            <div style={{
+                                fontSize: 10, color: 'rgba(139,92,246,0.7)',
+                                fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+                            }}>
+                                {gridCols}×{gridRows}
+                            </div>
+                            <div style={{
+                                fontSize: 8, color: 'rgba(139,92,246,0.4)',
+                                fontFamily: 'Inter', fontWeight: 500,
+                                letterSpacing: 0.5, textTransform: 'uppercase',
+                            }}>
+                                {sizing ? 'sizing...' : resizable ? 'drag corner to resize' : 'select widget'}
+                            </div>
+                        </>
+                    )}
+
+                    {/* Corner markers when sizing */}
+                    {sizing && (
+                        <>
+                            {[
+                                { top: 4, left: 4 }, { top: 4, right: 4 },
+                                { bottom: 4, left: 4 }, { bottom: 4, right: 4 },
+                            ].map((pos, i) => (
+                                <div key={i} style={{
+                                    position: 'absolute', ...pos, width: 6, height: 6,
+                                    borderTop: pos.top !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                                    borderBottom: pos.bottom !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                                    borderLeft: pos.left !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                                    borderRight: pos.right !== undefined ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                                }} />
+                            ))}
+                        </>
+                    )}
+
+                    {/* Resize handle (bottom-right) */}
+                    {resizable && (
+                        <div
+                            className="nodrag nopan"
+                            onMouseDown={onResizeMouseDown}
+                            style={{
+                                position: 'absolute', bottom: -4, right: -4,
+                                width: 12, height: 12, borderRadius: 2,
+                                background: '#8b5cf6', border: '1.5px solid rgba(139,92,246,0.6)',
+                                cursor: 'nwse-resize', zIndex: 10,
+                                boxShadow: '0 0 4px rgba(139,92,246,0.3)',
+                            }}
+                        />
+                    )}
+                </div>
+            </>
+        </BaseNode>
     )
 }
