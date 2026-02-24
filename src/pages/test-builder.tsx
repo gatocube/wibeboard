@@ -66,6 +66,7 @@ function BuilderInner() {
     const [nodes, setNodes] = useState<Node[]>(initialNodes)
     const [edges, setEdges] = useState<Edge[]>(initialEdges)
     const isDragging = useRef(false)
+    const [editMode, setEditMode] = useState(true)
 
     // ── Workflow persistence ──
     const [workflows, setWorkflows] = useState<WorkflowMeta[]>([])
@@ -397,18 +398,19 @@ function BuilderInner() {
 
     // ── Inject callbacks into existing script nodes (memoized to avoid blinking) ──
     const nodesWithCallbacks = useMemo(() => nodes.map(n => {
+        const base = { ...n, data: { ...n.data, editMode } }
         if (n.type?.startsWith('script-')) {
             return {
-                ...n,
+                ...base,
                 data: {
-                    ...n.data,
+                    ...base.data,
                     onRunScript: () => handleRunScript(n.id),
                     onSaveScript: (code: string) => updateNodeData(n.id, { code, configured: true }),
                 },
             }
         }
-        return n
-    }), [nodes, handleRunScript, updateNodeData])
+        return base
+    }), [nodes, editMode, handleRunScript, updateNodeData])
 
     // ── Memoize combined arrays to prevent React Flow edge blinking ──
     const combinedNodes = useMemo(
@@ -521,6 +523,22 @@ function BuilderInner() {
                                 🗑
                             </button>
                         )}
+
+                        {/* Edit mode toggle */}
+                        <button
+                            data-testid="edit-mode-toggle"
+                            onClick={() => setEditMode(m => !m)}
+                            style={{
+                                background: editMode ? 'rgba(59,130,246,0.2)' : 'rgba(30,30,58,0.9)',
+                                color: editMode ? '#3b82f6' : '#64748b',
+                                border: editMode ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            {editMode ? '✏️ Edit' : '👁 View'}
+                        </button>
 
                         {activeWorkflowId && (
                             <span style={{ fontSize: 9, color: '#475569', marginLeft: 4 }}>

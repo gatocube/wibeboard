@@ -43,6 +43,9 @@ export function AgentNode({ data }: { data: any }) {
     const hasKnock = !!(data.knockSide)
     const staticMode = !!data.staticMode
     const logs: string[] = data.logs || []
+    // Handle visibility: only show handles that have connections (or all in edit mode)
+    const editMode = !!data.editMode
+    const connectedHandles: string[] = data.connectedHandles || ['in', 'out', 'thinking']
     const knockColor = data.knockColor || '#f97316' // use provided color or fallback to orange
 
     const statusColors: Record<string, string> = {
@@ -114,15 +117,15 @@ export function AgentNode({ data }: { data: any }) {
                         position: 'relative',
                     }}
                 >
-                    <Handle type="target" position={Position.Left} id="in" style={{
+                    {(editMode || connectedHandles.includes('in')) && <Handle type="target" position={Position.Left} id="in" style={{
                         background: color, border: `2px solid ${color}55`, width: 6, height: 6,
-                    }} />
-                    <Handle type="source" position={Position.Right} id="out" style={{
+                    }} />}
+                    {(editMode || connectedHandles.includes('out')) && <Handle type="source" position={Position.Right} id="out" style={{
                         background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 6, height: 6,
-                    }} />
-                    <Handle type="source" position={Position.Top} id="thinking" style={{
+                    }} />}
+                    {(editMode || connectedHandles.includes('thinking')) && <Handle type="source" position={Position.Top} id="thinking" style={{
                         background: '#c084fc', border: '2px solid rgba(192,132,252,0.3)', width: 5, height: 5,
-                    }} />
+                    }} />}
                     <motion.div
                         animate={knockBoxShadow ? { boxShadow: knockBoxShadow } : {}}
                         transition={knockTransition}
@@ -163,15 +166,15 @@ export function AgentNode({ data }: { data: any }) {
                     : `0 4px 16px rgba(0,0,0,0.3)`,
             }}
         >
-            <Handle type="target" position={Position.Left} id="in" style={{
+            {(editMode || connectedHandles.includes('in')) && <Handle type="target" position={Position.Left} id="in" style={{
                 background: color, border: `2px solid ${color}55`, width: 8, height: 8,
-            }} />
-            <Handle type="source" position={Position.Right} id="out" style={{
+            }} />}
+            {(editMode || connectedHandles.includes('out')) && <Handle type="source" position={Position.Right} id="out" style={{
                 background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
-            }} />
-            <Handle type="source" position={Position.Top} id="thinking" style={{
+            }} />}
+            {(editMode || connectedHandles.includes('thinking')) && <Handle type="source" position={Position.Top} id="thinking" style={{
                 background: '#c084fc', border: '2px solid rgba(192,132,252,0.3)', width: 6, height: 6,
-            }} />
+            }} />}
 
             {/* Inner content div — knock animation lives here so inset shadow is visible */}
             <motion.div
@@ -201,8 +204,8 @@ export function AgentNode({ data }: { data: any }) {
                     {statusIndicator}
                 </div>
 
-                {/* PreviewCanvas — terminal output for large nodes */}
-                {isLarge && logs.length > 0 && (
+                {/* PreviewCanvas — always shown in large mode */}
+                {isLarge && (
                     <PreviewCanvas type="terminal" lines={logs} />
                 )}
 

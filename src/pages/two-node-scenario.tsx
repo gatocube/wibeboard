@@ -213,6 +213,14 @@ export function TwoNodeScenarioPage() {
         ? 'Estimating…'
         : state.nodes['a']?.status === 'running' ? 'Analyzing authentication patterns...' : undefined
 
+    // Artifact entries (needed for handle visibility)
+    const artifactEntries = Object.values(state.artifacts || {})
+
+    // Determine which handles have connections (smart visibility)
+    const hasArtifacts = artifactEntries.length > 0
+    const aHandles = hasArtifacts ? ['out', 'thinking'] : ['out'] // A→B via out, A→artifact via thinking
+    const bHandles = ['in']                                       // B receives from A via in
+
     const nodes: Node[] = [
         {
             id: 'a', type: 'agent', position: { x: 50, y: 80 },
@@ -228,6 +236,7 @@ export function TwoNodeScenarioPage() {
                 callsCount: state.nodes['a']?.logs.filter(l => l.includes('tool_call')).length || 0,
                 logs: state.nodes['a']?.logs || [],
                 width: sz.w, height: sz.h,
+                connectedHandles: aHandles,
             },
         },
         {
@@ -244,12 +253,12 @@ export function TwoNodeScenarioPage() {
                 callsCount: state.nodes['b']?.logs.filter(l => l.includes('tool_call')).length || 0,
                 logs: state.nodes['b']?.logs || [],
                 width: sz.w, height: sz.h,
+                connectedHandles: bHandles,
             },
         },
     ]
 
     // Add artifact nodes from FlowState
-    const artifactEntries = Object.values(state.artifacts || {})
     for (const art of artifactEntries) {
         nodes.push({
             id: `art-${art.id}`, type: 'artifact',
