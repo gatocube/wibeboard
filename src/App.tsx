@@ -5,10 +5,11 @@ import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
 import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
 import { IconsGalleryPage } from '@/pages/test-icons'
 import { AIScriptScenarioPage } from '@/pages/ai-script-scenario'
+import { IntegrationsPage } from '@/pages/integrations'
 import { FpsMeter } from '@/components/FpsMeter'
-import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow } from 'lucide-react'
+import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons'
+type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations'
 
 interface NavItem {
     id: Page
@@ -23,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'two-node', label: 'Two-Node Scenario', icon: <GitBranch size={14} />, description: 'Tool calling + artifact publishing' },
     { id: 'four-node', label: 'Four-Node Concurrent', icon: <Network size={14} />, description: 'Parallel workers with aggregation' },
     { id: 'ai-script', label: 'AI + Script', icon: <Workflow size={14} />, description: 'Agent → Tests → Review → Deploy' },
+    { id: 'integrations', label: 'Integrations', icon: <Key size={14} />, description: 'API keys for AI & external services' },
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
     { id: 'icons', label: 'Icon Reference', icon: <Palette size={14} />, description: 'All icons used in wibeboard' },
 ]
@@ -32,7 +34,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons'].includes(p)) {
+        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -56,7 +58,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons'].includes(p)) {
+            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -237,6 +239,7 @@ export function App() {
                     {page === 'ai-script' && <AIScriptScenarioPage />}
                     {page === 'widgets' && <TestWidgetsPage />}
                     {page === 'icons' && <IconsGalleryPage />}
+                    {page === 'integrations' && <IntegrationsPage />}
                 </div>
             </div>
         </div>
