@@ -28,6 +28,13 @@ import { AgentNode as GHubAgent } from '@/widgets/ghub/AgentNode'
 // ── Theme configs ────────────────────────────────────────────────────────────
 
 type ThemeKey = 'wibeglow' | 'pixel' | 'ghub'
+type NodeSize = 'S' | 'M' | 'L'
+
+const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
+    S: { w: 50, h: 50, gap: 120 },
+    M: { w: 160, h: 100, gap: 250 },
+    L: { w: 260, h: 180, gap: 400 },
+}
 
 const THEME_NODE_TYPES: Record<ThemeKey, NodeTypes> = {
     wibeglow: { agent: WibeGlowAgent },
@@ -119,7 +126,9 @@ export function TwoNodeScenarioPage() {
     const store = useMemo(() => new StepStore(['a', 'b'], makeSteps()), [])
     const [state, setState] = useState(store.getState())
     const [theme, setTheme] = useState<ThemeKey>('wibeglow')
+    const [nodeSize, setNodeSize] = useState<NodeSize>('L')
     const [showJson, setShowJson] = useState(false)
+    const sz = SIZE_PRESETS[nodeSize]
 
     useEffect(() => store.subscribe(() => setState(store.getState())), [store])
 
@@ -150,11 +159,11 @@ export function TwoNodeScenarioPage() {
                 execTime: state.nodes['a']?.status === 'done' ? '12.3s' : '—',
                 callsCount: state.nodes['a']?.logs.filter(l => l.includes('tool_call')).length || 0,
                 logs: state.nodes['a']?.logs || [],
-                width: 260, height: 180,
+                width: sz.w, height: sz.h,
             },
         },
         {
-            id: 'b', type: 'agent', position: { x: 420, y: 80 },
+            id: 'b', type: 'agent', position: { x: 50 + sz.w + sz.gap, y: 80 },
             data: {
                 label: 'Executor (B)', agent: 'Claude 3.5', color: '#06b6d4',
                 status: state.nodes['b']?.status || 'idle',
@@ -166,7 +175,7 @@ export function TwoNodeScenarioPage() {
                 execTime: state.nodes['b']?.status === 'done' ? '18.7s' : '—',
                 callsCount: state.nodes['b']?.logs.filter(l => l.includes('tool_call')).length || 0,
                 logs: state.nodes['b']?.logs || [],
-                width: 260, height: 180,
+                width: sz.w, height: sz.h,
             },
         },
     ]
@@ -243,6 +252,31 @@ export function TwoNodeScenarioPage() {
                                 >
                                     {'{}'}
                                 </button>
+                            </div>
+                            {/* Size switcher */}
+                            <div style={{
+                                display: 'flex', gap: 2, padding: '4px 6px',
+                                background: 'rgba(15,15,26,0.9)',
+                                borderRadius: 8, marginTop: 4,
+                                border: '1px solid rgba(255,255,255,0.06)',
+                            }}>
+                                {(['S', 'M', 'L'] as NodeSize[]).map(sz => (
+                                    <button
+                                        key={sz}
+                                        data-testid={`size-${sz}`}
+                                        onClick={() => setNodeSize(sz)}
+                                        style={{
+                                            padding: '3px 10px', borderRadius: 5,
+                                            border: 'none', cursor: 'pointer',
+                                            background: nodeSize === sz ? 'rgba(59,130,246,0.2)' : 'transparent',
+                                            color: nodeSize === sz ? '#3b82f6' : '#64748b',
+                                            fontSize: 10, fontWeight: 700, fontFamily: 'Inter',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                    >
+                                        {sz}
+                                    </button>
+                                ))}
                             </div>
                         </Panel>
                     </ReactFlow>

@@ -42,11 +42,14 @@ export function ScriptNode({ data }: { data: any }) {
     }
     const st = statusConfig[status] || statusConfig.idle
 
-    // Knocking animation — triggers on knockSide, uses knockColor
+    // Knock animation: directional border — 'out' → RIGHT, 'in' → LEFT
     const kColor = data.knockColor || '#f97316'
-    const knockAnimation = hasKnock ? {
-        borderColor: ['#1a1a1a', kColor, '#1a1a1a'],
-    } : {}
+    const knockOut = data.knockSide === 'out'
+    const knockAnimation = hasKnock ? (
+        knockOut
+            ? { borderRightColor: ['#1a1a1a', kColor, '#1a1a1a'] }
+            : { borderLeftColor: ['#1a1a1a', kColor, '#1a1a1a'] }
+    ) : {}
 
     const knockTransition = hasKnock
         ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' as const, times: [0, 0.7, 1] }

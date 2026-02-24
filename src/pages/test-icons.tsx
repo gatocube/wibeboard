@@ -63,6 +63,18 @@ const ANIMATED_ICONS: { name: AnimatedIconName; label: string; color: string }[]
     { name: 'processing', label: 'Processing data', color: '#06b6d4' },
     { name: 'success', label: 'Success check-in', color: '#22c55e' },
     { name: 'error-shake', label: 'Error shake', color: '#ef4444' },
+    { name: 'radar', label: 'Radar scanning', color: '#06b6d4' },
+    { name: 'data-stream', label: 'Data stream bars', color: '#8b5cf6' },
+    { name: 'heartbeat', label: 'Heartbeat pulse', color: '#ef4444' },
+    { name: 'orbit', label: 'Orbiting dots', color: '#f59e0b' },
+    { name: 'wave', label: 'Audio wave', color: '#22c55e' },
+    { name: 'typing', label: 'Typing indicator', color: '#94a3b8' },
+    { name: 'sync', label: 'Sync rotation', color: '#06b6d4' },
+    { name: 'download', label: 'Download bounce', color: '#22c55e' },
+    { name: 'signal', label: 'Signal broadcast', color: '#8b5cf6' },
+    { name: 'hourglass', label: 'Hourglass flip', color: '#f59e0b' },
+    { name: 'ripple', label: 'Ripple effect', color: '#3b82f6' },
+    { name: 'scan-line', label: 'Scan line', color: '#22c55e' },
 ]
 
 // ── Component ────────────────────────────────────────────────────────────────────
