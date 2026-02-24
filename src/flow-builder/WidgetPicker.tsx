@@ -399,7 +399,17 @@ export function WidgetPicker({
                                                 (e.currentTarget as HTMLElement).style.background = 'transparent'
                                             }}
                                         >
-                                            <WidgetIcon type={widget.type} size={16} />
+                                            {/* Icon button */}
+                                            <div style={{
+                                                width: 28, height: 28,
+                                                borderRadius: 8,
+                                                background: `${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}15`,
+                                                border: `1.5px solid ${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}33`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                flexShrink: 0,
+                                            }}>
+                                                <WidgetIcon type={widget.type} size={14} />
+                                            </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
                                                     {widget.label}
