@@ -334,6 +334,7 @@ export function AIScriptScenarioPage() {
                 nodesConnectable={false}
                 currentSize={nodeSize}
                 onSizeChange={setNodeSize}
+                editMode
             >
                 <StepPlayer store={store} />
 

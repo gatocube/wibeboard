@@ -25,11 +25,11 @@ const GHOST_EDGE_ID = '__connector-preview__'
 export type ConnectorPhase =
     | { type: 'idle' }
     | { type: 'positioning'; sourceId: string; sourcePos: XYPosition; cursorPos: XYPosition }
-    | { type: 'sizing'; placeholderId: string; sourceId: string; anchor: XYPosition }
-    | { type: 'placed'; placeholderId: string; sourceId: string; anchor: XYPosition; gridCols: number; gridRows: number }
+    | { type: 'sizing'; placeholderId: string; sourceId: string | null; anchor: XYPosition }
+    | { type: 'placed'; placeholderId: string; sourceId: string | null; anchor: XYPosition; gridCols: number; gridRows: number }
 
 export interface ConnectorFlowCallbacks {
-    onCreatePlaceholder: (sourceId: string, position: XYPosition) => string
+    onCreatePlaceholder: (sourceId: string | null, position: XYPosition) => string
     onResizePlaceholder: (placeholderId: string, rect: { x: number; y: number; width: number; height: number }) => void
     onSizingFinalized: (placeholderId: string) => void
     onFinalize: (placeholderId: string, widgetType: string, template: WidgetTemplate, gridCols: number, gridRows: number) => void
@@ -237,6 +237,22 @@ export function useConnectorFlow(callbacks: ConnectorFlowCallbacks) {
         setPhase({ type: 'idle' })
     }, [])
 
+    /** Start sizing mode from a drop position (no source edge) */
+    const startSizingAt = useCallback((anchor: XYPosition) => {
+        const p = phaseRef.current
+        if (p.type !== 'idle') return
+
+        gridRef.current = { cols: MIN_GRID * 4, rows: MIN_GRID * 2 }
+        const placeholderId = callbacksRef.current.onCreatePlaceholder(null, anchor)
+
+        setPhase({
+            type: 'sizing',
+            placeholderId,
+            sourceId: null,
+            anchor,
+        })
+    }, [])
+
     // ── Ghost node + edge for positioning preview (rendered by React Flow) ──
     const ghostNode: Node | null = useMemo(() => {
         if (phase.type !== 'positioning') return null
@@ -268,6 +284,7 @@ export function useConnectorFlow(callbacks: ConnectorFlowCallbacks) {
         attachHandleInterceptor,
         selectWidget,
         cancel,
+        startSizingAt,
         currentGrid: phase.type === 'placed'
             ? { cols: phase.gridCols, rows: phase.gridRows }
             : gridRef.current,

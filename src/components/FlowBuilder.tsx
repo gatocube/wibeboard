@@ -10,7 +10,6 @@ import { ReactFlow, Background, Panel, useStore, useReactFlow, type Node, type E
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
 import { WidgetSelector } from '@/components/WidgetSelector'
-import type { WidgetTemplate } from '@/engine/widget-registry'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,8 +47,8 @@ export interface FlowBuilderProps {
     gridGap?: number
     /** Show widget selector and editing handles */
     editMode?: boolean
-    /** Called when a widget is dropped from the selector onto the canvas */
-    onNodeAdd?: (widgetType: string, template: WidgetTemplate, position: { x: number; y: number }) => void
+    /** Called when a widget is dropped from the selector onto the canvas (position in flow coords) */
+    onWidgetDrop?: (position: { x: number; y: number }) => void
 }
 
 // ── Theme backgrounds ────────────────────────────────────────────────────────
@@ -259,7 +258,7 @@ export function FlowBuilder({
     bgColor,
     gridGap = 20,
     editMode = false,
-    onNodeAdd,
+    onWidgetDrop,
 }: FlowBuilderProps) {
     const [theme, setTheme] = useState<ThemeKey>(currentTheme)
     const [mode, setMode] = useState<ThemeMode>('dark')
@@ -312,14 +311,14 @@ export function FlowBuilder({
                     onDrop={editMode ? (e) => {
                         e.preventDefault()
                         const raw = e.dataTransfer.getData('application/flowbuilder-widget')
-                        if (!raw || !onNodeAdd) return
+                        if (!raw || !onWidgetDrop) return
                         try {
-                            const { type, template } = JSON.parse(raw)
+                            JSON.parse(raw) // validate it's our data
                             const converter = screenToFlowRef.current
                             const position = converter
                                 ? converter({ x: e.clientX, y: e.clientY })
                                 : { x: e.clientX, y: e.clientY }
-                            onNodeAdd(type, template, position)
+                            onWidgetDrop(position)
                         } catch { /* ignore */ }
                     } : undefined}
                     onDragOver={editMode ? (e) => {
@@ -369,10 +368,10 @@ export function FlowBuilder({
                 }}>
                     <WidgetSelector
                         rectSize={{ width: 200, height: 120 }}
-                        onSelect={(widget, template) => {
+                        onSelect={() => {
                             // When user clicks a widget in the selector,
-                            // just notify through onNodeAdd with center position
-                            onNodeAdd?.(widget.type, template, { x: 200, y: 200 })
+                            // start sizing at canvas center
+                            onWidgetDrop?.({ x: 200, y: 200 })
                         }}
                         onCancel={() => { }}
                         embedded

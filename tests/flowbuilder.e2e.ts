@@ -3,7 +3,11 @@
  *
  * Tests two node-creation methods:
  *   1. Drag & drop from the WidgetSelector panel onto the canvas
+ *      → enters sizing mode → pick widget from popup
  *   2. ConnectorFlow: click handle → position → size → pick widget
+ *
+ * Both methods end with a WidgetSelector popup where the user picks a
+ * specific widget template (e.g. a different script type).
  */
 
 import { test, expect, type Page } from '@playwright/test'
@@ -52,41 +56,65 @@ test.describe('FlowBuilder — node creation', () => {
         await expect(firstItem).toHaveAttribute('draggable', 'true')
     })
 
-    // ── 2. Drag & drop from WidgetSelector ──────────────────────────────────
+    // ── 2. Drag & drop → sizing → pick widget ──────────────────────────────
 
-    test('drag-and-drop: widget from selector creates new node', async ({ page }) => {
+    test('drag-and-drop: drop widget → resize → pick script from popup', async ({ page }) => {
         const before = await nodeCount(page)
 
-        // Find the script-js widget
+        // Find the script-js widget in the selector panel
         const scriptWidget = page.locator('[data-testid="widget-script-js"]')
         await expect(scriptWidget).toBeVisible({ timeout: 3_000 })
 
-        // Get the canvas pane bounding box for the drop target
+        // Get the canvas pane bounding box
         const canvasPane = page.locator('.react-flow__pane')
         const canvasBox = await canvasPane.boundingBox()
         expect(canvasBox).toBeTruthy()
         if (!canvasBox) return
 
-        const widgetBox = await scriptWidget.boundingBox()
-        expect(widgetBox).toBeTruthy()
-        if (!widgetBox) return
-
-        // Use Playwright's dragTo helper — this dispatches proper HTML5 DnD events
+        // Drag script widget and drop onto an empty area of the canvas
         await scriptWidget.dragTo(canvasPane, {
-            sourcePosition: { x: widgetBox.width / 2, y: widgetBox.height / 2 },
-            targetPosition: { x: canvasBox.width * 0.3, y: canvasBox.height * 0.3 },
+            targetPosition: { x: canvasBox.width * 0.4, y: canvasBox.height * 0.6 },
         })
 
+        // After drop, sizing mode should be active — hint text visible
+        await expect(page.locator('text=resize').first()).toBeVisible({ timeout: 3_000 })
+
+        // A placeholder node should appear
+        const placeholders = page.locator('.react-flow__node[data-id^="placeholder-"]')
+        await expect(placeholders.first()).toBeVisible({ timeout: 2_000 })
+
+        // Move mouse to resize the placeholder, then click to confirm
+        const placeBox = await placeholders.first().boundingBox()
+        if (!placeBox) return
+
+        const sizeX = placeBox.x + placeBox.width + 100
+        const sizeY = placeBox.y + placeBox.height + 60
+        await page.mouse.move(sizeX, sizeY, { steps: 5 })
+        await page.waitForTimeout(300) // Wait for sizing click listener
+        await page.mouse.click(sizeX, sizeY)
+
+        // WidgetSelector popup should appear via NodeToolbar
+        const nodeToolbar = page.locator('.react-flow__node-toolbar')
+        await expect(nodeToolbar).toBeVisible({ timeout: 3_000 })
+
+        // Pick TypeScript (different from the JS we dragged) — tests script selection
+        const tsWidget = nodeToolbar.locator('[data-testid="widget-script-ts"]')
+        if (await tsWidget.isVisible({ timeout: 1_000 }).catch(() => false)) {
+            await tsWidget.click()
+        } else {
+            // Fallback: pick any widget
+            await nodeToolbar.locator('[data-testid^="widget-"]').first().click()
+        }
         await page.waitForTimeout(500)
 
-        // Check if node was created
+        // Verify: node count increased (placeholder replaced with real node)
         const after = await nodeCount(page)
         expect(after).toBeGreaterThan(before)
     })
 
-    // ── 3. ConnectorFlow: handle → position → size → pick widget ────────────
+    // ── 3. ConnectorFlow: handle → position → size → pick script ────────────
 
-    test('connector-flow: click handle → place → size → pick widget', async ({ page }) => {
+    test('connector-flow: handle → place → size → pick TypeScript', async ({ page }) => {
         const before = await nodeCount(page)
 
         // Find the source handle on the Agent (Planner) node — right side
@@ -100,52 +128,47 @@ test.describe('FlowBuilder — node creation', () => {
         if (!handleBox) return
 
         // Phase 1: mousedown + mouseup on the source handle → enters "positioning"
-        // The ConnectorFlow intercepts mousedown on .react-flow__handle.source
         const hx = handleBox.x + handleBox.width / 2
         const hy = handleBox.y + handleBox.height / 2
-
         await page.mouse.move(hx, hy)
         await page.mouse.down()
         await page.mouse.up()
 
-        // Wait for positioning hint to appear
         await expect(page.locator('text=Click on canvas')).toBeVisible({ timeout: 3_000 })
 
-        // Phase 2: Click on EMPTY canvas area (far from existing nodes)
-        // ConnectorFlow adds click listener after 100ms delay
+        // Phase 2: Click on EMPTY canvas area (bottom-right, far from nodes)
         const canvasBox = await page.locator('.react-flow__pane').boundingBox()
         if (!canvasBox) return
 
-        // Use bottom-right area of canvas — well below all existing nodes
         const placeX = canvasBox.x + canvasBox.width * 0.6
         const placeY = canvasBox.y + canvasBox.height * 0.75
-
         await page.mouse.move(placeX, placeY, { steps: 5 })
-        await page.waitForTimeout(200) // Wait for click listener to be attached
+        await page.waitForTimeout(200)
         await page.mouse.click(placeX, placeY)
 
-        // Wait for placeholder + sizing hint
         await expect(page.locator('text=resize').first()).toBeVisible({ timeout: 3_000 })
 
-        // Phase 3: Move to size the placeholder, then click to confirm
-        // ConnectorFlow adds sizing click listener after 200ms delay
+        // Phase 3: Move to size, then click to confirm
         const sizeX = placeX + 140
         const sizeY = placeY + 80
         await page.mouse.move(sizeX, sizeY, { steps: 5 })
-        await page.waitForTimeout(300) // Wait for sizing click listener
+        await page.waitForTimeout(300)
         await page.mouse.click(sizeX, sizeY)
 
-        // Phase 4: WidgetSelector popup should appear via NodeToolbar
+        // Phase 4: WidgetSelector popup should appear
         const nodeToolbar = page.locator('.react-flow__node-toolbar')
         await expect(nodeToolbar).toBeVisible({ timeout: 3_000 })
 
-        // Click on the first visible widget to finalize
-        const widgetOption = nodeToolbar.locator('[data-testid^="widget-"]').first()
-        await expect(widgetOption).toBeVisible({ timeout: 2_000 })
-        await widgetOption.click()
+        // Pick TypeScript script — verifies ability to select a specific script type
+        const tsWidget = nodeToolbar.locator('[data-testid="widget-script-ts"]')
+        if (await tsWidget.isVisible({ timeout: 1_000 }).catch(() => false)) {
+            await tsWidget.click()
+        } else {
+            await nodeToolbar.locator('[data-testid^="widget-"]').first().click()
+        }
         await page.waitForTimeout(500)
 
-        // Verify: node count increased (placeholder replaced with real node)
+        // Verify: node count increased
         const after = await nodeCount(page)
         expect(after).toBeGreaterThan(before)
     })

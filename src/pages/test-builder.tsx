@@ -293,13 +293,16 @@ function BuilderInner() {
                 },
             }])
 
-            setEdges(eds => [...eds, {
-                id: `edge-${sourceId}-${placeholderId}`,
-                source: sourceId,
-                target: placeholderId,
-                animated: true,
-                style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
-            }])
+            setEdges(eds => {
+                if (!sourceId) return eds // DnD drop — no source edge
+                return [...eds, {
+                    id: `edge-${sourceId}-${placeholderId}`,
+                    source: sourceId,
+                    target: placeholderId,
+                    animated: true,
+                    style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+                }]
+            })
 
             return placeholderId
         },
@@ -435,31 +438,8 @@ function BuilderInner() {
                 wrapperRef={connector.attachHandleInterceptor}
                 gridGap={GRID_SIZE}
                 editMode={editMode}
-                onNodeAdd={(widgetType, template, position) => {
-                    const nodeId = `node-${Date.now()}`
-                    const def = widgetRegistry.getByType(widgetType)
-                    const w = def?.defaultWidth || 160
-                    const h = def?.defaultHeight || 100
-                    const nodeData: Record<string, any> = {
-                        label: template.defaultData?.label || template.name,
-                        ...template.defaultData,
-                        width: w, height: h,
-                    }
-                    if (widgetType.startsWith('script-')) {
-                        nodeData.configured = false
-                        nodeData.logs = []
-                        nodeData.status = 'idle'
-                        nodeData.onSaveScript = (code: string) => updateNodeData(nodeId, { code, configured: true })
-                        nodeData.onRunScript = () => handleRunScript(nodeId)
-                    }
-                    setNodes(prev => [...prev, {
-                        id: nodeId,
-                        type: widgetType,
-                        position,
-                        data: nodeData,
-                        style: { width: w, height: h },
-                    }])
-                    widgetRegistry.markUsed(widgetType)
+                onWidgetDrop={(position) => {
+                    connector.startSizingAt(position)
                 }}
                 onSizeChange={(size) => {
                     const presets: Record<string, { w: number; h: number }> = {
