@@ -1,9 +1,9 @@
 /**
  * ExtendedNodeButtonsMenu — enhanced version with sub-menus.
  *
- * When the user clicks Before/After, a fan of widget-type buttons
+ * When the user hovers Before/After, a fan of widget-type buttons
  * appears on the corresponding side: AI, Script, User.
- * When Configure is clicked, sub-options fan out above: Rename, Delete, Duplicate.
+ * When Configure is hovered, sub-options fan out above: Rename, Delete, Duplicate.
  *
  * Layout:
  *   Top:    Configure → fan: Rename | Delete | Duplicate
@@ -72,20 +72,6 @@ function btnStyle(color: string, size = 48): React.CSSProperties {
     }
 }
 
-function hoverProps(color: string) {
-    return {
-        onPointerEnter: (e: React.PointerEvent) => {
-            const el = e.currentTarget as HTMLElement
-            el.style.borderColor = `${color}88`
-            el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
-        },
-        onPointerLeave: (e: React.PointerEvent) => {
-            const el = e.currentTarget as HTMLElement
-            el.style.borderColor = `${color}44`
-            el.style.boxShadow = `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${color}11`
-        },
-    }
-}
 
 // ── Component ───────────────────────────────────────────────────────────────────
 
@@ -166,6 +152,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0}
                     active={expanded === 'config'}
                     onClick={() => setExpanded(prev => prev === 'config' ? null : 'config')}
+                    onHover={() => setExpanded('config')}
                 />
 
                 {/* Config sub-buttons: fan above */}
@@ -173,11 +160,10 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`cfg-${sub.key}`}
                         testId={`ext-cfg-${sub.key}`}
-                        pos={{ x: positions.top.x + (i - 1) * 52, y: positions.top.y - 56 }}
+                        pos={{ x: positions.top.x + (i - 1) * 56, y: positions.top.y - 58 }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
-                        size={40}
                         delay={i * 0.03}
                         onClick={() => {
                             if (sub.key === 'rename') {
@@ -202,6 +188,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0.04}
                     active={expanded === 'after'}
                     onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
+                    onHover={() => setExpanded('after')}
                 />
 
                 {/* After sub-buttons: fan right */}
@@ -209,11 +196,10 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`after-${sub.key}`}
                         testId={`ext-after-${sub.key}`}
-                        pos={{ x: positions.right.x + 56, y: positions.right.y + (i - 1) * 52 }}
+                        pos={{ x: positions.right.x + 58, y: positions.right.y + (i - 1) * 56 }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
-                        size={40}
                         delay={i * 0.03}
                         onClick={() => { onAddAfter(nodeId, sub.key); setExpanded(null) }}
                     />
@@ -242,6 +228,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0.12}
                     active={expanded === 'before'}
                     onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
+                    onHover={() => setExpanded('before')}
                 />
 
                 {/* Before sub-buttons: fan left */}
@@ -249,11 +236,10 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`before-${sub.key}`}
                         testId={`ext-before-${sub.key}`}
-                        pos={{ x: positions.left.x - 56, y: positions.left.y + (i - 1) * 52 }}
+                        pos={{ x: positions.left.x - 58, y: positions.left.y + (i - 1) * 56 }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
-                        size={40}
                         delay={i * 0.03}
                         onClick={() => { onAddBefore(nodeId, sub.key); setExpanded(null) }}
                     />
@@ -312,7 +298,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
 
 // ── MotionButton ────────────────────────────────────────────────────────────────
 
-function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, onClick }: {
+function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, onClick, onHover }: {
     testId: string
     pos: { x: number; y: number }
     icon: typeof Plus
@@ -322,6 +308,7 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
     size?: number
     active?: boolean
     onClick: () => void
+    onHover?: () => void
 }) {
     const half = size / 2
     return (
@@ -334,6 +321,22 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
             onClick={(e) => { e.stopPropagation(); onClick() }}
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
+            onPointerEnter={onHover ? (e) => {
+                e.stopPropagation()
+                const el = e.currentTarget as HTMLElement
+                el.style.borderColor = `${color}88`
+                el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
+                onHover()
+            } : (e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.borderColor = `${color}88`
+                el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
+            }}
+            onPointerLeave={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.borderColor = `${color}44`
+                el.style.boxShadow = `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${color}11`
+            }}
             style={{
                 position: 'fixed',
                 left: pos.x - half,
@@ -342,7 +345,6 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
                 ...btnStyle(color, size),
                 ...(active ? { borderColor: `${color}aa`, boxShadow: `0 4px 20px rgba(0,0,0,0.5), 0 0 16px ${color}44` } : {}),
             }}
-            {...hoverProps(color)}
         >
             <Icon size={size <= 40 ? 14 : 18} strokeWidth={2} />
             <span style={{
