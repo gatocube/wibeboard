@@ -42,7 +42,7 @@ export interface Message {
 export interface Contact {
     id: ContactId
     name: string
-    direction: 'in' | 'out' | 'system'
+    direction: 'in' | 'out' | 'internal' | 'system'
     online: boolean
 }
 
@@ -103,6 +103,11 @@ export class AgentMessenger {
     /** Get contacts connected to the "out" handle (outgoing) */
     getOutContacts(): Contact[] {
         return this.getContacts().filter(c => c.direction === 'out')
+    }
+
+    /** Get internal contacts (subagents used as tools) */
+    getInternalContacts(): Contact[] {
+        return this.getContacts().filter(c => c.direction === 'internal')
     }
 
     /** Set a contact's online status */
