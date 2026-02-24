@@ -19,6 +19,16 @@ export interface NodeState {
     artifacts: string[]
     progress: number
     knockSide?: 'in' | 'out' | null
+    estimating?: boolean  // show "Estimating..." spinner instead of progress bar
+}
+
+export interface ArtifactState {
+    id: string
+    name: string        // e.g. "todolist.json"
+    type: string        // e.g. "json", "md", "ts"
+    ready: boolean      // false = building (dashed, transparent), true = complete (solid)
+    linesAdded: number  // +N green diff count
+    linesRemoved: number // -N red diff count
 }
 
 export interface FlowState {
@@ -26,6 +36,7 @@ export interface FlowState {
     stepIndex: number
     stepLabel: string
     nodes: { [id: string]: NodeState }
+    artifacts: { [id: string]: ArtifactState }
     completed: boolean
 }
 
@@ -56,6 +67,7 @@ export class StepStore {
             stepIndex: -1,
             stepLabel: 'Click ▶ to start',
             nodes,
+            artifacts: {},
             completed: false,
         })
         this.history = [this.doc]

@@ -38,27 +38,37 @@ test.describe('Two-node scenario with Automerge player', () => {
         // Step 1: Node A waking up
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(300)
-        // Step 2: Node A is working
-        await page.locator('[data-testid="btn-next"]').click()
-        await page.waitForTimeout(300)
-        // Step 3: Node A calling tool: search
+        // Step 2: Node A estimating
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(300)
 
-        // Verify tool call is visible in step label
-        await expect(page.locator('[data-testid="step-label"]')).toContainText('calling tool', { timeout: 3_000 })
+        // Verify "Estimating" shows in step label
+        await expect(page.locator('[data-testid="step-label"]')).toContainText('estimating', { timeout: 3_000 })
+
+        // Step 3: Progress 1/3 — searching
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(300)
 
         // Verify tool call appears in log panel
         await expect(page.getByText('tool_call: search', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
 
-        // ── Step through to waking phase (step 8: A wakes B) ──
-        // Steps 4-7: continue through tool calls and artifact publishing
-        for (let i = 0; i < 5; i++) {
-            await page.locator('[data-testid="btn-next"]').click()
-            await page.waitForTimeout(200)
-        }
+        // Step 4: Progress 2/3 — artifact created (dashed, building)
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(500)
 
-        // Step 9: Node A waking Node B
+        // Verify artifact node appeared
+        await expect(page.getByText('todolist.json', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+        // Should show "building..." indicator
+        await expect(page.getByText('building', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+
+        // Step 5: Progress 3/3 — artifact ready (solid)
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(500)
+
+        // Should show "ready" indicator
+        await expect(page.getByText('ready', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+
+        // Step 6: Node A waking Node B
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(300)
         await expect(page.locator('[data-testid="step-label"]')).toContainText('waking', { timeout: 3_000 })
@@ -70,19 +80,19 @@ test.describe('Two-node scenario with Automerge player', () => {
         await expect(page.locator('[data-testid="step-label"]')).toContainText('Both nodes done', { timeout: 15_000 })
 
         // ── Verify artifacts created ──
-        await expect(page.getByText('auth-plan.md', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+        await expect(page.getByText('todolist.json', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
         await expect(page.getByText('auth-module.ts', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
 
-        // Verify step counter (now 18 steps)
-        await expect(page.getByText('18/18')).toBeVisible({ timeout: 3_000 })
+        // Verify step counter (now 14 steps)
+        await expect(page.getByText('14/14')).toBeVisible({ timeout: 3_000 })
 
         // ── Undo/redo test ──
         for (let i = 0; i < 3; i++) {
             await page.locator('[data-testid="btn-prev"]').click()
             await page.waitForTimeout(400)
         }
-        // Should NOT show 18/18 anymore
-        await expect(page.getByText('18/18')).not.toBeVisible({ timeout: 3_000 })
+        // Should NOT show 14/14 anymore
+        await expect(page.getByText('14/14')).not.toBeVisible({ timeout: 3_000 })
 
         // Reset
         await page.locator('[data-testid="btn-reset"]').click()
@@ -136,15 +146,15 @@ test.describe('Two-node scenario with Automerge player', () => {
             }
         }
 
-        // ── Phase 1: Waking (step 9: A sends 'out' to B, B receives 'in') ──
-        for (let i = 0; i < 9; i++) {
+        // ── Phase 1: Waking (step 6: A sends 'out' to B, B receives 'in') ──
+        for (let i = 0; i < 6; i++) {
             await page.locator('[data-testid="btn-next"]').click()
             await page.waitForTimeout(200)
         }
         await page.waitForTimeout(500) // let animation settle
         await checkWibeGlowBorders('waking')
 
-        // ── Phase 2: A responding (step 11: A.knockSide='out', B.knockSide='in') ──
+        // ── Phase 2: A responding (step 8: A.knockSide='out', B.knockSide='in') ──
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(200)
         await page.locator('[data-testid="btn-next"]').click()
@@ -231,10 +241,11 @@ test.describe('Two-node scenario with Automerge player', () => {
         await page.goto('/?page=two-node')
         await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
 
-        // Advance to running state (step 2: Node A is working — has thought)
-        await page.locator('[data-testid="btn-next"]').click()
-        await page.waitForTimeout(200)
-        await page.locator('[data-testid="btn-next"]').click()
+        // Advance to running state (step 3: Node A progress 1/3 — has thought "Analyzing...")
+        for (let i = 0; i < 3; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
         await page.waitForTimeout(300)
 
         // In L mode, thought may be inside the node (above the node box)

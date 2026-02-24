@@ -22,6 +22,7 @@ import {
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
 import { AgentNode as WibeGlowAgent } from '@/widgets/wibeglow/AgentNode'
+import { ArtifactNode as WibeGlowArtifact } from '@/widgets/wibeglow/ArtifactNode'
 import { AgentNode as PixelAgent } from '@/widgets/pixel/AgentNode'
 import { AgentNode as GHubAgent } from '@/widgets/ghub/AgentNode'
 
@@ -37,9 +38,9 @@ const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
 }
 
 const THEME_NODE_TYPES: Record<ThemeKey, NodeTypes> = {
-    wibeglow: { agent: WibeGlowAgent },
-    pixel: { agent: PixelAgent },
-    ghub: { agent: GHubAgent },
+    wibeglow: { agent: WibeGlowAgent, artifact: WibeGlowArtifact },
+    pixel: { agent: PixelAgent, artifact: WibeGlowArtifact },
+    ghub: { agent: GHubAgent, artifact: WibeGlowArtifact },
 }
 
 const THEME_BG: Record<ThemeKey, { color: string; bg: string }> = {
@@ -58,20 +59,66 @@ const THEME_LABELS: Record<ThemeKey, string> = {
 
 function makeSteps(): StepDef[] {
     return [
-        // ── Phase 1: A works solo (no edge activity) ──
-        { label: 'Node A waking up', apply: (s: FlowState) => { s.nodes['a'].status = 'waking'; s.nodes['a'].logs.push('Initializing...') } },
-        { label: 'Node A is working', apply: (s: FlowState) => { s.nodes['a'].status = 'running'; s.nodes['a'].progress = 10; s.nodes['a'].logs.push('Starting planner...') } },
-        { label: 'Node A calling tool: search', apply: (s: FlowState) => { s.nodes['a'].progress = 25; s.nodes['a'].logs.push('⚡ tool_call: search("auth patterns")') } },
-        { label: 'Tool result received', apply: (s: FlowState) => { s.nodes['a'].progress = 40; s.nodes['a'].logs.push('← result: 5 patterns found') } },
-        { label: 'Node A calling tool: analyze', apply: (s: FlowState) => { s.nodes['a'].progress = 55; s.nodes['a'].logs.push('⚡ tool_call: analyze(patterns)') } },
-        { label: 'Analysis complete', apply: (s: FlowState) => { s.nodes['a'].progress = 70; s.nodes['a'].logs.push('← result: OAuth2 + JWT recommended') } },
-        { label: 'Node A publishing artifact', apply: (s: FlowState) => { s.nodes['a'].progress = 80; s.nodes['a'].logs.push('📦 publish: auth-plan.md'); s.nodes['a'].artifacts.push('auth-plan.md') } },
-        { label: 'Node A creating TODO', apply: (s: FlowState) => { s.nodes['a'].progress = 88; s.nodes['a'].logs.push('📋 publish: todo-auth.md'); s.nodes['a'].artifacts.push('todo-auth.md') } },
-
-        // ── Phase 2: A wakes B (orange animated edge A→B) ──
+        // ── Phase 1: A wakes up (2s visual pause) ──
         {
-            label: 'Node A waking Node B', apply: (s: FlowState) => {
-                s.nodes['a'].progress = 90
+            label: 'Node A waking up',
+            apply: (s: FlowState) => {
+                s.nodes['a'].status = 'waking'
+                s.nodes['a'].logs.push('Initializing...')
+            }
+        },
+        {
+            label: 'Node A estimating work',
+            apply: (s: FlowState) => {
+                s.nodes['a'].status = 'running'
+                s.nodes['a'].estimating = true
+                s.nodes['a'].logs.push('Estimating task complexity...')
+            }
+        },
+
+        // ── Phase 2: A works in 3 progress steps ──
+        {
+            label: 'Node A progress 1/3 — searching',
+            apply: (s: FlowState) => {
+                s.nodes['a'].estimating = false
+                s.nodes['a'].progress = 33
+                s.nodes['a'].logs.push('⚡ tool_call: search("auth patterns")')
+                s.nodes['a'].logs.push('← result: 5 patterns found')
+            }
+        },
+        {
+            label: 'Node A progress 2/3 — artifact created',
+            apply: (s: FlowState) => {
+                s.nodes['a'].progress = 66
+                s.nodes['a'].logs.push('📦 Creating todolist.json...')
+                // Artifact appears — building (dashed, transparent)
+                s.artifacts['todolist'] = {
+                    id: 'todolist',
+                    name: 'todolist.json',
+                    type: 'json',
+                    ready: false,
+                    linesAdded: 12,
+                    linesRemoved: 0,
+                }
+            }
+        },
+        {
+            label: 'Node A progress 3/3 — artifact ready',
+            apply: (s: FlowState) => {
+                s.nodes['a'].progress = 100
+                s.nodes['a'].logs.push('✓ todolist.json complete')
+                s.nodes['a'].artifacts.push('todolist.json')
+                // Artifact ready — solid border, full opacity
+                s.artifacts['todolist'].ready = true
+                s.artifacts['todolist'].linesAdded = 42
+                s.artifacts['todolist'].linesRemoved = 3
+            }
+        },
+
+        // ── Phase 3: A wakes B (orange animated edge A→B) ──
+        {
+            label: 'Node A waking Node B',
+            apply: (s: FlowState) => {
                 s.nodes['a'].knockSide = 'out'
                 s.nodes['a'].logs.push('🔔 Waking Executor B...')
                 s.nodes['b'].status = 'waking'
@@ -80,9 +127,10 @@ function makeSteps(): StepDef[] {
             }
         },
 
-        // ── Phase 3: B asks follow-up questions (green animated edge) ──
+        // ── Phase 4: B asks follow-up, A responds ──
         {
-            label: 'Node B asking follow-up', apply: (s: FlowState) => {
+            label: 'Node B asking follow-up',
+            apply: (s: FlowState) => {
                 s.nodes['b'].status = 'running'
                 s.nodes['b'].knockSide = 'out'
                 s.nodes['a'].knockSide = 'in'
@@ -92,7 +140,8 @@ function makeSteps(): StepDef[] {
             }
         },
         {
-            label: 'Node A responding', apply: (s: FlowState) => {
+            label: 'Node A responding',
+            apply: (s: FlowState) => {
                 s.nodes['a'].knockSide = 'out'
                 s.nodes['b'].knockSide = 'in'
                 s.nodes['a'].logs.push('✓ Use 1h access, 7d refresh tokens')
@@ -100,22 +149,21 @@ function makeSteps(): StepDef[] {
             }
         },
         {
-            label: 'Node B confirms — all clear', apply: (s: FlowState) => {
+            label: 'Node B confirms — all clear',
+            apply: (s: FlowState) => {
                 s.nodes['b'].knockSide = null
                 s.nodes['a'].knockSide = null
                 s.nodes['a'].status = 'done'
-                s.nodes['a'].progress = 100
                 s.nodes['a'].logs.push('✓ Planner complete — handed off to B')
-                s.nodes['b'].logs.push('✓ Got it, everything is clear. Starting work.')
+                s.nodes['b'].logs.push('✓ Got it, starting implementation.')
             }
         },
 
-        // ── Phase 4: B works solo (connection inactive) ──
-        { label: 'Node B reading artifact', apply: (s: FlowState) => { s.nodes['b'].progress = 15; s.nodes['b'].logs.push('📥 read: auth-plan.md') } },
+        // ── Phase 5: B works solo ──
         { label: 'Node B implementing auth', apply: (s: FlowState) => { s.nodes['b'].progress = 35; s.nodes['b'].logs.push('Implementing OAuth2 flow...') } },
         { label: 'Node B writing tests', apply: (s: FlowState) => { s.nodes['b'].progress = 60; s.nodes['b'].logs.push('Writing unit tests...') } },
         { label: 'Node B running tests', apply: (s: FlowState) => { s.nodes['b'].progress = 80; s.nodes['b'].logs.push('⚡ tool_call: run_tests()'); s.nodes['b'].logs.push('← 12/12 tests pass ✓') } },
-        { label: 'Node B publishing artifact', apply: (s: FlowState) => { s.nodes['b'].progress = 95; s.nodes['b'].logs.push('📦 publish: auth-module.ts'); s.nodes['b'].artifacts.push('auth-module.ts') } },
+        { label: 'Node B publishing', apply: (s: FlowState) => { s.nodes['b'].progress = 95; s.nodes['b'].logs.push('📦 publish: auth-module.ts'); s.nodes['b'].artifacts.push('auth-module.ts') } },
         { label: 'Both nodes done', apply: (s: FlowState) => { s.nodes['b'].status = 'done'; s.nodes['b'].progress = 100; s.nodes['b'].logs.push('✓ Executor complete') } },
     ]
 }
@@ -145,6 +193,11 @@ export function TwoNodeScenarioPage() {
     const edgeColor = isWakingPhase ? '#f97316' : '#22c55e'
     const knockColor = hasKnock ? edgeColor : undefined // borders match edge color
 
+    // Dynamic thought text — shows "Estimating..." during estimation phase
+    const aThought = state.nodes['a']?.estimating
+        ? 'Estimating…'
+        : state.nodes['a']?.status === 'running' ? 'Analyzing authentication patterns...' : undefined
+
     const nodes: Node[] = [
         {
             id: 'a', type: 'agent', position: { x: 50, y: 80 },
@@ -154,8 +207,8 @@ export function TwoNodeScenarioPage() {
                 knockSide: state.nodes['a']?.knockSide || null,
                 knockColor,
                 task: 'Search patterns, analyze, publish plan',
-                thought: state.nodes['a']?.status === 'running' ? 'Analyzing authentication patterns...' : undefined,
-                progress: state.nodes['a']?.progress || 0,
+                thought: aThought,
+                progress: state.nodes['a']?.estimating ? 0 : (state.nodes['a']?.progress || 0),
                 execTime: state.nodes['a']?.status === 'done' ? '12.3s' : '—',
                 callsCount: state.nodes['a']?.logs.filter(l => l.includes('tool_call')).length || 0,
                 logs: state.nodes['a']?.logs || [],
@@ -180,8 +233,27 @@ export function TwoNodeScenarioPage() {
         },
     ]
 
-    const edges: Edge[] = hasKnock ? [
-        {
+    // Add artifact nodes from FlowState
+    const artifactEntries = Object.values(state.artifacts || {})
+    for (const art of artifactEntries) {
+        nodes.push({
+            id: `art-${art.id}`, type: 'artifact',
+            position: { x: 50, y: 80 - (sz.h > 100 ? 120 : 90) }, // above agent A
+            data: {
+                label: art.name, type: art.type,
+                ready: art.ready,
+                linesAdded: art.linesAdded,
+                linesRemoved: art.linesRemoved,
+                width: 180, height: 80,
+            },
+        })
+    }
+
+    const edges: Edge[] = []
+
+    // Agent-to-agent edge
+    if (hasKnock) {
+        edges.push({
             id: 'a-b', source: 'a', target: 'b',
             animated: true,
             style: {
@@ -189,14 +261,27 @@ export function TwoNodeScenarioPage() {
                 strokeWidth: 2,
                 filter: `drop-shadow(0 0 4px ${edgeColor})`,
             },
-        },
-    ] : [
-        {
+        })
+    } else {
+        edges.push({
             id: 'a-b', source: 'a', target: 'b',
             animated: false,
             style: { stroke: '#8b5cf622', strokeDasharray: '6 3' },
-        },
-    ]
+        })
+    }
+
+    // Artifact edges — A publishes to artifact
+    for (const art of artifactEntries) {
+        edges.push({
+            id: `a-art-${art.id}`, source: 'a', target: `art-${art.id}`,
+            animated: !art.ready,
+            style: {
+                stroke: art.ready ? '#22c55e55' : '#f59e0b44',
+                strokeWidth: 1,
+                strokeDasharray: art.ready ? undefined : '4 2',
+            },
+        })
+    }
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: themeBg.bg }}>
@@ -318,6 +403,7 @@ export function TwoNodeScenarioPage() {
                                         status: n.status,
                                         progress: n.progress,
                                         knockSide: n.knockSide,
+                                        estimating: n.estimating,
                                         artifacts: n.artifacts,
                                         logCount: n.logs.length,
                                     }])
