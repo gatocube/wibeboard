@@ -44,7 +44,7 @@ test.describe('Builder full scenario', () => {
         await page.locator('button[title="Edit"]').click()
         await expect(page.locator('text=Configuring')).toBeVisible({ timeout: 3_000 })
 
-        const saveButton = page.locator('button:has-text("Save")')
+        const saveButton = page.locator('button:has-text("Save"):not([data-testid="workflow-save"])')
         await expect(saveButton).toBeVisible({ timeout: 3_000 })
 
         const textarea = page.locator('textarea')
@@ -54,7 +54,7 @@ test.describe('Builder full scenario', () => {
 
         // Step 4: Save
         await page.waitForTimeout(300)
-        await page.locator('button:has-text("Save")').click()
+        await page.locator('button:has-text("Save"):not([data-testid="workflow-save"])').click()
         await expect(page.locator('button[title="Run"]')).toBeVisible({ timeout: 5_000 })
 
         // Step 5: Re-run

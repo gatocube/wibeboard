@@ -6,11 +6,12 @@
  */
 
 import { ReactFlow, ReactFlowProvider, Background, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { useConnectorFlow, ConnectorFlowOverlay, anchorMouseToGridRect } from '@/engine/ConnectorFlow'
 import { GRID_CELL, widgetRegistry } from '@/engine/widget-registry'
 import { TimelineDots } from '@/components/TimelineDots'
+import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
 
 // ── Node types ──
 const nodeTypes = {
@@ -65,6 +66,113 @@ function BuilderInner() {
     const [nodes, setNodes] = useState<Node[]>(initialNodes)
     const [edges, setEdges] = useState<Edge[]>(initialEdges)
     const isDragging = useRef(false)
+
+    // ── Workflow persistence ──
+    const [workflows, setWorkflows] = useState<WorkflowMeta[]>([])
+    const [activeWorkflowId, setActiveWorkflowId] = useState<string | null>(null)
+    const [workflowName, setWorkflowName] = useState('Untitled')
+    const [dirty, setDirty] = useState(false)
+    const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const skipDirty = useRef(false) // suppress dirty flag during load
+
+    // Load workflow list on mount
+    useEffect(() => {
+        getWorkflowStore().then(store => store.list()).then(setWorkflows)
+    }, [])
+
+    // Mark dirty on node/edge change (unless we're loading)
+    useEffect(() => {
+        if (skipDirty.current) { skipDirty.current = false; return }
+        if (activeWorkflowId) setDirty(true)
+    }, [nodes, edges]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Auto-save debounced
+    useEffect(() => {
+        if (!dirty || !activeWorkflowId) return
+        if (saveTimer.current) clearTimeout(saveTimer.current)
+        saveTimer.current = setTimeout(async () => {
+            const store = await getWorkflowStore()
+            const plainNodes = nodes.filter(n => n.type !== 'placeholder').map(n => ({
+                id: n.id, type: n.type || 'agent',
+                position: n.position,
+                data: { ...n.data, onRunScript: undefined, onSaveScript: undefined, onResize: undefined, onSelectWidget: undefined, onCancelSelector: undefined, onHoverWidget: undefined },
+                width: n.width, height: n.height,
+            }))
+            const plainEdges = edges.map(e => ({
+                id: e.id, source: e.source, target: e.target,
+                animated: e.animated, style: e.style as Record<string, unknown> | undefined,
+            }))
+            await store.save({
+                id: activeWorkflowId, name: workflowName,
+                nodes: plainNodes as any, edges: plainEdges as any,
+                createdAt: Date.now(), updatedAt: Date.now(),
+            })
+            setDirty(false)
+            // Refresh list to update node counts
+            setWorkflows(await store.list())
+        }, 1500)
+        return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
+    }, [dirty, activeWorkflowId, nodes, edges, workflowName])
+
+    const handleNewWorkflow = useCallback(async () => {
+        const name = prompt('Workflow name:', `Workflow ${workflows.length + 1}`)
+        if (!name) return
+        const store = await getWorkflowStore()
+        const doc = await store.create(name)
+        skipDirty.current = true
+        setNodes([])
+        setEdges([])
+        setActiveWorkflowId(doc.id)
+        setWorkflowName(doc.name)
+        setDirty(false)
+        setWorkflows(await store.list())
+    }, [workflows.length])
+
+    const handleLoadWorkflow = useCallback(async (id: string) => {
+        const store = await getWorkflowStore()
+        const doc = await store.load(id)
+        if (!doc) return
+        skipDirty.current = true
+        const loaded: Node[] = doc.nodes.map(n => ({
+            id: n.id, type: n.type, position: n.position,
+            data: { ...n.data, width: n.width || (n.data as any).width, height: n.height || (n.data as any).height },
+            width: n.width, height: n.height,
+        }))
+        const loadedEdges: Edge[] = doc.edges.map(e => ({
+            id: e.id, source: e.source, target: e.target,
+            animated: e.animated, style: e.style as any,
+        }))
+        setNodes(loaded)
+        setEdges(loadedEdges)
+        setActiveWorkflowId(doc.id)
+        setWorkflowName(doc.name)
+        setDirty(false)
+    }, [])
+
+    const handleDeleteWorkflow = useCallback(async () => {
+        if (!activeWorkflowId) return
+        if (!confirm(`Delete "${workflowName}"?`)) return
+        const store = await getWorkflowStore()
+        await store.delete(activeWorkflowId)
+        skipDirty.current = true
+        setNodes(initialNodes)
+        setEdges(initialEdges)
+        setActiveWorkflowId(null)
+        setWorkflowName('Untitled')
+        setDirty(false)
+        setWorkflows(await store.list())
+    }, [activeWorkflowId, workflowName])
+
+    const handleSaveNow = useCallback(async () => {
+        if (!activeWorkflowId) {
+            // Create a new workflow to save into
+            await handleNewWorkflow()
+            return
+        }
+        // Clear debounce and save immediately
+        if (saveTimer.current) clearTimeout(saveTimer.current)
+        setDirty(true) // triggers the auto-save effect
+    }, [activeWorkflowId, handleNewWorkflow])
 
     // ── Grid snap ──
     const snapToGrid = useCallback((pos: { x: number; y: number }) => ({
@@ -333,6 +441,84 @@ function BuilderInner() {
                 style={{ background: 'transparent' }}
             >
                 <Background color="#1e1e3a" gap={GRID_SIZE} size={1} />
+
+                {/* ── Workflow selector ── */}
+                <Panel position="top-center">
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '6px 10px', borderRadius: 8,
+                        background: 'rgba(15,15,26,0.92)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        backdropFilter: 'blur(8px)',
+                        fontFamily: 'Inter',
+                    }}>
+                        <select
+                            data-testid="workflow-select"
+                            value={activeWorkflowId || ''}
+                            onChange={e => { if (e.target.value) handleLoadWorkflow(e.target.value) }}
+                            style={{
+                                background: 'rgba(30,30,58,0.9)',
+                                color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: 6, padding: '4px 8px', fontSize: 11,
+                                fontFamily: 'Inter', minWidth: 160, cursor: 'pointer',
+                                outline: 'none',
+                            }}
+                        >
+                            <option value="" disabled>Select workflow…</option>
+                            {workflows.map(w => (
+                                <option key={w.id} value={w.id}>{w.name} ({w.nodeCount})</option>
+                            ))}
+                        </select>
+
+                        <button
+                            data-testid="workflow-new"
+                            onClick={handleNewWorkflow}
+                            style={{
+                                background: '#8b5cf6', color: '#fff', border: 'none',
+                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                            }}
+                        >
+                            + New
+                        </button>
+
+                        <button
+                            data-testid="workflow-save"
+                            onClick={handleSaveNow}
+                            style={{
+                                background: dirty ? '#22c55e' : 'rgba(30,30,58,0.9)',
+                                color: dirty ? '#fff' : '#64748b',
+                                border: dirty ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            {dirty ? '● Save' : '✓ Saved'}
+                        </button>
+
+                        {activeWorkflowId && (
+                            <button
+                                data-testid="workflow-delete"
+                                onClick={handleDeleteWorkflow}
+                                style={{
+                                    background: 'rgba(239,68,68,0.15)', color: '#ef4444',
+                                    border: '1px solid rgba(239,68,68,0.2)',
+                                    borderRadius: 5, padding: '4px 8px', fontSize: 10,
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                }}
+                            >
+                                🗑
+                            </button>
+                        )}
+
+                        {activeWorkflowId && (
+                            <span style={{ fontSize: 9, color: '#475569', marginLeft: 4 }}>
+                                {workflowName}
+                            </span>
+                        )}
+                    </div>
+                </Panel>
 
                 <Panel position="top-left">
                     <div style={{
