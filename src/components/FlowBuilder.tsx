@@ -229,40 +229,14 @@ function SettingsPanel({
     )
 }
 
-// ── Drop handler (needs ReactFlow context) ───────────────────────────────────
+// ── Screen→Flow coordinate bridge (renders nothing, just exposes converter via ref) ──
 
-function DropTarget({ onNodeAdd }: {
-    onNodeAdd?: (widgetType: string, template: WidgetTemplate, position: { x: number; y: number }) => void
+function ScreenToFlowBridge({ converterRef }: {
+    converterRef: React.MutableRefObject<((pos: { x: number; y: number }) => { x: number; y: number }) | null>
 }) {
     const { screenToFlowPosition } = useReactFlow()
-
-    const onDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault()
-        e.dataTransfer.dropEffect = 'move'
-    }, [])
-
-    const onDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault()
-        const raw = e.dataTransfer.getData('application/flowbuilder-widget')
-        if (!raw || !onNodeAdd) return
-
-        try {
-            const { type, template } = JSON.parse(raw)
-            const position = screenToFlowPosition({ x: e.clientX, y: e.clientY })
-            onNodeAdd(type, template, position)
-        } catch { /* ignore bad data */ }
-    }, [onNodeAdd, screenToFlowPosition])
-
-    return (
-        <div
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            style={{
-                position: 'absolute', inset: 0,
-                pointerEvents: 'none',
-            }}
-        />
-    )
+    converterRef.current = screenToFlowPosition
+    return null
 }
 
 // ── FlowBuilder ──────────────────────────────────────────────────────────────
@@ -306,13 +280,8 @@ export function FlowBuilder({
     const canvasBg = bgColor || THEME_CANVAS[theme]
     const gridColor = THEME_BG[theme]
 
-    // ── Drop handler for the ReactFlow pane ──
-    const onDragOver = useCallback((e: React.DragEvent) => {
-        if (e.dataTransfer.types.includes('application/flowbuilder-widget')) {
-            e.preventDefault()
-            e.dataTransfer.dropEffect = 'move'
-        }
-    }, [])
+    // Ref for screen→flow coordinate conversion (filled by ScreenToFlowBridge)
+    const screenToFlowRef = useRef<((pos: { x: number; y: number }) => { x: number; y: number }) | null>(null)
 
     return (
         <div
@@ -326,7 +295,7 @@ export function FlowBuilder({
             }}
         >
             {/* Canvas area */}
-            <div style={{ flex: 1, position: 'relative', height: '100%' }} onDragOver={onDragOver}>
+            <div style={{ flex: 1, position: 'relative', height: '100%' }}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -340,17 +309,36 @@ export function FlowBuilder({
                     defaultViewport={defaultViewport}
                     proOptions={{ hideAttribution: true }}
                     style={{ background: 'transparent' }}
+                    onDrop={editMode ? (e) => {
+                        e.preventDefault()
+                        const raw = e.dataTransfer.getData('application/flowbuilder-widget')
+                        if (!raw || !onNodeAdd) return
+                        try {
+                            const { type, template } = JSON.parse(raw)
+                            const converter = screenToFlowRef.current
+                            const position = converter
+                                ? converter({ x: e.clientX, y: e.clientY })
+                                : { x: e.clientX, y: e.clientY }
+                            onNodeAdd(type, template, position)
+                        } catch { /* ignore */ }
+                    } : undefined}
+                    onDragOver={editMode ? (e) => {
+                        if (e.dataTransfer.types.includes('application/flowbuilder-widget')) {
+                            e.preventDefault()
+                            e.dataTransfer.dropEffect = 'move'
+                        }
+                    } : undefined}
                 >
                     <Background color={gridColor} gap={gridGap} size={1} />
+
+                    {/* Bridge: exposes screenToFlowPosition via ref */}
+                    <ScreenToFlowBridge converterRef={screenToFlowRef} />
 
                     {/* Zoom autosize watcher */}
                     <ZoomAutosizeWatcher
                         enabled={zoomAutosize}
                         onSizeChange={handleSizeChange}
                     />
-
-                    {/* Drop target inside ReactFlow for screen→flow coordinate conversion */}
-                    {editMode && <DropTarget onNodeAdd={onNodeAdd} />}
 
                     {/* Settings gear — top-right */}
                     <Panel position="top-right">
