@@ -21,7 +21,8 @@ import {
     Activity, BarChart3, PieChart, Gauge, Hourglass, Radar, Scan,
     Target, Crosshair, Mic, Volume2,
     AlertTriangle, CheckCircle, Circle, CircleDot, Loader2, Timer, XCircle,
-    type LucideProps,
+    Search, Clock, Magnet, Telescope, Satellite,
+    Rewind, type LucideProps,
 } from 'lucide-react'
 
 // ── Icon mapping ────────────────────────────────────────────────────────────────
@@ -111,6 +112,15 @@ export type AnimatedIconName =
     | 'spinner' | 'pulse' | 'thinking' | 'loading-dots' | 'processing' | 'success' | 'error-shake'
     | 'radar' | 'data-stream' | 'heartbeat' | 'orbit' | 'wave' | 'typing'
     | 'sync' | 'download' | 'signal' | 'hourglass' | 'ripple' | 'scan-line'
+    // ── New: 30 additional animated icons ──
+    | 'progress-ring' | 'progress-bar' | 'loading-wave' | 'bounce'
+    | 'gear-spin' | 'upload-pulse' | 'search-scan' | 'clock-tick'
+    | 'alert-flash' | 'check-bounce' | 'crossfade' | 'dna-helix'
+    | 'fire-flicker' | 'lightning-bolt' | 'magnet-pull' | 'matrix-rain'
+    | 'morse-code' | 'pendulum' | 'ping-pong' | 'pixel-load'
+    | 'progress-dots' | 'radio-wave' | 'rewind' | 'satellite'
+    | 'sparkle-burst' | 'stack-build' | 'telescope' | 'terminal-blink'
+    | 'traffic-light' | 'waveform'
 
 interface AnimatedIconProps {
     name: AnimatedIconName; size?: number; color?: string; style?: React.CSSProperties
@@ -215,6 +225,194 @@ export function AnimatedIcon({ name, size = 16, color = '#8b5cf6', style }: Anim
                     <motion.div animate={{ y: [0, size, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 2, background: color, boxShadow: `0 0 6px ${color}` }} />
                 </div>
             )
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // ── NEW: 30 additional animated icons ────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // ── Progress & Loading ──────────────────────────────────────────────
+
+        case 'progress-ring':
+            return (
+                <div style={{ position: 'relative', width: size, height: size, display: 'inline-flex', ...style }}>
+                    <svg width={size} height={size} viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15.5" fill="none" stroke={`${color}22`} strokeWidth="3" />
+                        <motion.circle cx="18" cy="18" r="15.5" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
+                            strokeDasharray="97.4" initial={{ strokeDashoffset: 97.4 }}
+                            animate={{ strokeDashoffset: [97.4, 0, 97.4] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                            style={{ transformOrigin: 'center', transform: 'rotate(-90deg)' }} />
+                    </svg>
+                </div>
+            )
+
+        case 'progress-bar':
+            return (
+                <div style={{ width: size * 1.5, height: size * 0.25, borderRadius: size * 0.125, background: `${color}22`, overflow: 'hidden', ...style }}>
+                    <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                        style={{ width: '40%', height: '100%', borderRadius: size * 0.125, background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+                </div>
+            )
+
+        case 'loading-wave':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.06, alignItems: 'center', height: size, ...style }}>
+                    {[0, 1, 2, 3, 4, 5, 6].map(i => <motion.div key={i} animate={{ scaleY: [0.2, 1, 0.2], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.1, ease: 'easeInOut' }} style={{ width: size * 0.08, height: size * 0.6, borderRadius: size * 0.04, background: color, transformOrigin: 'center' }} />)}
+                </div>
+            )
+
+        case 'bounce':
+            return <motion.div animate={{ y: [0, -(size * 0.5), 0] }} transition={{ duration: 0.6, repeat: Infinity, ease: [0.36, 0, 0.66, -0.56] }} style={s}><Circle size={size * 0.5} color={color} fill={color} /></motion.div>
+
+        case 'progress-dots':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.3, alignItems: 'center', ...style }}>
+                    {[0, 1, 2, 3, 4].map(i => <motion.div key={i} animate={{ opacity: [0.15, 1, 0.15] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.4, ease: 'easeInOut' }} style={{ width: size * 0.18, height: size * 0.18, borderRadius: '50%', background: color }} />)}
+                </div>
+            )
+
+        case 'pixel-load':
+            return (
+                <div style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: size * 0.08, width: size, height: size, ...style }}>
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => <motion.div key={i} animate={{ opacity: [0.1, 1, 0.1] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }} style={{ borderRadius: size * 0.04, background: color }} />)}
+                </div>
+            )
+
+        // ── Status & Feedback ────────────────────────────────────────────────
+
+        case 'alert-flash':
+            return <motion.div animate={{ opacity: [1, 0.2, 1], scale: [1, 1.1, 1] }} transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }} style={s}><AlertTriangle size={size} color={color} /></motion.div>
+
+        case 'check-bounce':
+            return <motion.div animate={{ y: [0, -4, 0], scale: [1, 1.15, 1] }} transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1.5, ease: 'easeOut' }} style={s}><CheckCircle size={size} color={color} /></motion.div>
+
+        case 'traffic-light':
+            return (
+                <div style={{ display: 'inline-flex', flexDirection: 'column', gap: size * 0.12, alignItems: 'center', ...style }}>
+                    {['#ff5f57', '#febc2e', '#28c840'].map((c, i) => <motion.div key={i} animate={{ opacity: [0.2, 0.2, 1, 0.2] }} transition={{ duration: 3, repeat: Infinity, delay: i * 1, ease: 'easeInOut' }} style={{ width: size * 0.3, height: size * 0.3, borderRadius: '50%', background: c }} />)}
+                </div>
+            )
+
+        // ── Tool/Action ──────────────────────────────────────────────────────
+
+        case 'gear-spin':
+            return <motion.div animate={{ rotate: [0, 120, 240, 360] }} transition={{ duration: 3, repeat: Infinity, ease: [0.4, 0, 0.2, 1], times: [0, 0.33, 0.66, 1] }} style={s}><Cpu size={size} color={color} /></motion.div>
+
+        case 'upload-pulse':
+            return <motion.div animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }} style={s}><Upload size={size} color={color} /></motion.div>
+
+        case 'search-scan':
+            return <motion.div animate={{ x: [-2, 2, -2], rotate: [0, 5, -5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }} style={s}><Search size={size} color={color} /></motion.div>
+
+        case 'clock-tick':
+            return <motion.div animate={{ rotate: [0, 0, 6, 0] }} transition={{ duration: 1, repeat: Infinity, ease: 'easeOut', times: [0, 0.85, 0.9, 1] }} style={s}><Clock size={size} color={color} /></motion.div>
+
+        case 'terminal-blink':
+            return (
+                <div style={{ position: 'relative', display: 'inline-flex', ...style }}>
+                    <Terminal size={size} color={color} />
+                    <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        style={{ position: 'absolute', bottom: size * 0.2, right: size * 0.2, width: size * 0.15, height: size * 0.35, background: color }} />
+                </div>
+            )
+
+        case 'rewind':
+            return <motion.div animate={{ rotate: [0, -360] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }} style={s}><Rewind size={size} color={color} /></motion.div>
+
+        // ── Data & Visualization ─────────────────────────────────────────────
+
+        case 'waveform':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.06, alignItems: 'center', height: size, ...style }}>
+                    {[0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+                        const h = [0.3, 0.6, 0.9, 0.5, 0.7, 1.0, 0.4, 0.8][i]
+                        return <motion.div key={i} animate={{ scaleY: [h, 1 - h + 0.2, h] }} transition={{ duration: 0.8 + i * 0.1, repeat: Infinity, ease: 'easeInOut' }} style={{ width: size * 0.07, height: size * 0.7, borderRadius: size * 0.035, background: color, transformOrigin: 'center' }} />
+                    })}
+                </div>
+            )
+
+        case 'radio-wave':
+            return (
+                <div style={{ position: 'relative', width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }}>
+                    <Radio size={size * 0.35} color={color} style={{ position: 'relative', zIndex: 1 }} />
+                    {[0, 1, 2, 3].map(i => <motion.div key={i} animate={{ scale: [0.3, 2], opacity: [0.8, 0], borderWidth: [2, 0.5] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.5, ease: 'easeOut' }} style={{ position: 'absolute', width: size * 0.5, height: size * 0.5, borderRadius: '50%', border: `2px solid ${color}` }} />)}
+                </div>
+            )
+
+        case 'matrix-rain':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.08, alignItems: 'flex-start', height: size, overflow: 'hidden', ...style }}>
+                    {[0, 1, 2, 3, 4].map(i => <motion.div key={i} animate={{ y: [-(size * 0.5), size] }} transition={{ duration: 1 + i * 0.2, repeat: Infinity, delay: i * 0.3, ease: 'linear' }} style={{ width: size * 0.12, height: size * 0.3, borderRadius: size * 0.06, background: `linear-gradient(180deg, transparent, ${color})`, opacity: 0.8 }} />)}
+                </div>
+            )
+
+        case 'stack-build':
+            return (
+                <div style={{ display: 'inline-flex', flexDirection: 'column-reverse', gap: size * 0.06, alignItems: 'center', ...style }}>
+                    {[0, 1, 2, 3].map(i => <motion.div key={i} initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: [0, 1, 1, 0], opacity: [0, 1, 1, 0] }} transition={{ duration: 3, repeat: Infinity, delay: i * 0.5, ease: 'easeInOut' }} style={{ width: size * (0.5 + i * 0.12), height: size * 0.15, borderRadius: size * 0.04, background: color }} />)}
+                </div>
+            )
+
+        // ── Effects & Decorative ─────────────────────────────────────────────
+
+        case 'crossfade':
+            return (
+                <div style={{ position: 'relative', width: size, height: size, display: 'inline-flex', ...style }}>
+                    <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ position: 'absolute' }}><Circle size={size} color={color} fill={`${color}33`} /></motion.div>
+                    <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ position: 'absolute' }}><CircleDot size={size} color={color} /></motion.div>
+                </div>
+            )
+
+        case 'dna-helix':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.04, alignItems: 'center', height: size, ...style }}>
+                    {[0, 1, 2, 3, 4, 5].map(i => <motion.div key={i} animate={{ y: [-(size * 0.2), size * 0.2, -(size * 0.2)] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }} style={{ width: size * 0.1, height: size * 0.1, borderRadius: '50%', background: i % 2 === 0 ? color : `${color}66` }} />)}
+                </div>
+            )
+
+        case 'fire-flicker':
+            return <motion.div animate={{ y: [0, -2, 0, -1, 0], scale: [1, 1.1, 0.95, 1.05, 1], opacity: [0.8, 1, 0.85, 1, 0.8] }} transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }} style={s}><Flame size={size} color={color} /></motion.div>
+
+        case 'lightning-bolt':
+            return <motion.div animate={{ opacity: [0.3, 1, 0.3, 1, 0.3], scale: [0.95, 1.1, 0.95, 1.05, 0.95] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.1, 0.2, 0.25, 1] }} style={s}><Zap size={size} color={color} /></motion.div>
+
+        case 'magnet-pull':
+            return <motion.div animate={{ rotate: [0, 10, -10, 5, -5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={s}><Magnet size={size} color={color} /></motion.div>
+
+        case 'sparkle-burst':
+            return (
+                <div style={{ position: 'relative', width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }}>
+                    <motion.div animate={{ scale: [0.8, 1.2, 0.8], rotate: [0, 180, 360] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}><Sparkles size={size * 0.6} color={color} /></motion.div>
+                    {[0, 1, 2, 3].map(i => <motion.div key={i} animate={{ scale: [0, 1, 0], opacity: [0, 0.8, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.375, ease: 'easeOut' }} style={{ position: 'absolute', width: size * 0.12, height: size * 0.12, borderRadius: '50%', background: color, top: `${20 + 20 * Math.sin(i * Math.PI / 2)}%`, left: `${20 + 20 * Math.cos(i * Math.PI / 2)}%` }} />)}
+                </div>
+            )
+
+        case 'morse-code':
+            return (
+                <div style={{ display: 'inline-flex', gap: size * 0.1, alignItems: 'center', ...style }}>
+                    {[0.15, 0.4, 0.15, 0.15, 0.4].map((w, i) => <motion.div key={i} animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 1.5, delay: i * 0.2, ease: 'linear' }} style={{ width: size * w, height: size * 0.15, borderRadius: size * 0.075, background: color }} />)}
+                </div>
+            )
+
+        case 'pendulum':
+            return <motion.div animate={{ rotate: [-30, 30, -30] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }} style={{ ...s, transformOrigin: 'top center' }}><Activity size={size} color={color} /></motion.div>
+
+        case 'ping-pong':
+            return <motion.div animate={{ x: [-(size * 0.3), size * 0.3, -(size * 0.3)] }} transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }} style={s}><div style={{ width: size * 0.25, height: size * 0.25, borderRadius: '50%', background: color }} /></motion.div>
+
+        case 'satellite':
+            return (
+                <div style={{ position: 'relative', width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }}>
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}>
+                        <Satellite size={size * 0.6} color={color} />
+                    </motion.div>
+                    <motion.div animate={{ opacity: [0, 0.6, 0], scale: [0.5, 1.2] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                        style={{ position: 'absolute', width: size * 0.8, height: size * 0.8, borderRadius: '50%', border: `1px solid ${color}` }} />
+                </div>
+            )
+
+        case 'telescope':
+            return <motion.div animate={{ rotate: [0, -5, 5, 0], y: [0, -2, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} style={s}><Telescope size={size} color={color} /></motion.div>
 
         default:
             return <Cpu size={size} color={color} style={style} />

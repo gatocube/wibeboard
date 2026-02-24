@@ -55,8 +55,8 @@ const UI_ICONS: IconItem[] = [
     { name: 'Cpu', component: Cpu, color: '#8b5cf6', usage: 'Fallback icon for unknown types' },
 ]
 
-// All animated icon variants
 const ANIMATED_ICONS: { name: AnimatedIconName; label: string; color: string }[] = [
+    // Original 19
     { name: 'spinner', label: 'Loading spinner', color: '#3b82f6' },
     { name: 'pulse', label: 'Active/alive pulse', color: '#22c55e' },
     { name: 'thinking', label: 'AI thinking', color: '#8b5cf6' },
@@ -76,6 +76,41 @@ const ANIMATED_ICONS: { name: AnimatedIconName; label: string; color: string }[]
     { name: 'hourglass', label: 'Hourglass flip', color: '#f59e0b' },
     { name: 'ripple', label: 'Ripple effect', color: '#3b82f6' },
     { name: 'scan-line', label: 'Scan line', color: '#22c55e' },
+    // New: Progress & Loading
+    { name: 'progress-ring', label: 'Progress ring', color: '#3b82f6' },
+    { name: 'progress-bar', label: 'Progress bar', color: '#8b5cf6' },
+    { name: 'loading-wave', label: 'Loading wave', color: '#06b6d4' },
+    { name: 'bounce', label: 'Bouncing ball', color: '#f59e0b' },
+    { name: 'progress-dots', label: 'Progress dots', color: '#22c55e' },
+    { name: 'pixel-load', label: 'Pixel grid loader', color: '#8b5cf6' },
+    // New: Status & Feedback
+    { name: 'alert-flash', label: 'Alert flash', color: '#ef4444' },
+    { name: 'check-bounce', label: 'Check bounce', color: '#22c55e' },
+    { name: 'traffic-light', label: 'Traffic light', color: '#f59e0b' },
+    // New: Tool/Action
+    { name: 'gear-spin', label: 'Gear spin', color: '#64748b' },
+    { name: 'upload-pulse', label: 'Upload pulse', color: '#3b82f6' },
+    { name: 'search-scan', label: 'Search scan', color: '#f59e0b' },
+    { name: 'clock-tick', label: 'Clock tick', color: '#94a3b8' },
+    { name: 'terminal-blink', label: 'Terminal cursor', color: '#22c55e' },
+    { name: 'rewind', label: 'Rewind spin', color: '#8b5cf6' },
+    // New: Data & Visualization
+    { name: 'waveform', label: 'Waveform', color: '#06b6d4' },
+    { name: 'radio-wave', label: 'Radio wave', color: '#8b5cf6' },
+    { name: 'matrix-rain', label: 'Matrix rain', color: '#22c55e' },
+    { name: 'stack-build', label: 'Stack build', color: '#f59e0b' },
+    // New: Effects & Decorative
+    { name: 'crossfade', label: 'Crossfade', color: '#3b82f6' },
+    { name: 'dna-helix', label: 'DNA helix', color: '#8b5cf6' },
+    { name: 'fire-flicker', label: 'Fire flicker', color: '#f97316' },
+    { name: 'lightning-bolt', label: 'Lightning bolt', color: '#fbbf24' },
+    { name: 'magnet-pull', label: 'Magnet pull', color: '#ef4444' },
+    { name: 'sparkle-burst', label: 'Sparkle burst', color: '#c084fc' },
+    { name: 'morse-code', label: 'Morse code', color: '#22c55e' },
+    { name: 'pendulum', label: 'Pendulum', color: '#f59e0b' },
+    { name: 'ping-pong', label: 'Ping pong', color: '#3b82f6' },
+    { name: 'satellite', label: 'Satellite orbit', color: '#06b6d4' },
+    { name: 'telescope', label: 'Telescope scan', color: '#8b5cf6' },
 ]
 
 // ── Component ────────────────────────────────────────────────────────────────────
