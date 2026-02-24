@@ -41,7 +41,7 @@ test.describe('Builder Demo', () => {
 
     test('script Run button executes code and shows logs', async ({ page }) => {
         await page.locator('button[title="Run"]').click()
-        await expect(page.locator('text=Processing')).toBeVisible({ timeout: 5_000 })
+        await expect(page.locator('text=Processing process.js')).toBeVisible({ timeout: 5_000 })
         await expect(page.locator('text=validate input')).toBeVisible()
         await expect(page.locator('text=transform data')).toBeVisible()
         await expect(page.locator('text=6 lines')).toBeVisible({ timeout: 2_000 })

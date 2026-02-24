@@ -9,7 +9,8 @@
 import { ReactFlow, Background, Panel, useStore, useReactFlow, type Node, type Edge, type NodeTypes, type OnNodesChange, type Viewport } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
-import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/engine/widget-registry'
+import { WidgetSelector } from '@/components/WidgetSelector'
+import type { WidgetTemplate } from '@/engine/widget-registry'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -228,107 +229,6 @@ function SettingsPanel({
     )
 }
 
-// ── Widget Selector Panel ────────────────────────────────────────────────────
-
-const CATEGORY_COLORS: Record<string, string> = {
-    AI: '#8b5cf6',
-    Script: '#22c55e',
-    Layout: '#6366f1',
-    Note: '#f59e0b',
-    Expectation: '#ef4444',
-}
-
-function WidgetSelectorPanel({ onDragStart }: {
-    onDragStart?: (widget: WidgetDefinition, template: WidgetTemplate) => void
-}) {
-    const allWidgets = widgetRegistry.getAll()
-        .filter(w => !['note-sticker', 'note-group', 'note-label', 'expectation'].includes(w.type))
-
-    // Group by category
-    const grouped = allWidgets.reduce((acc, w) => {
-        const cat = w.category || 'Other'
-        if (!acc[cat]) acc[cat] = []
-        acc[cat].push(w)
-        return acc
-    }, {} as Record<string, WidgetDefinition[]>)
-
-    return (
-        <div
-            data-testid="widget-selector-panel"
-            style={{
-                width: 180, flexShrink: 0,
-                borderLeft: '1px solid rgba(255,255,255,0.06)',
-                background: 'rgba(10,10,20,0.95)',
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden',
-                fontFamily: 'Inter',
-            }}
-        >
-            <div style={{
-                padding: '10px 12px 6px', fontSize: 10, fontWeight: 700,
-                color: '#64748b', textTransform: 'uppercase', letterSpacing: 1,
-            }}>
-                Widgets
-            </div>
-
-            <div style={{
-                flex: 1, overflowY: 'auto', padding: '0 6px 8px',
-                display: 'flex', flexDirection: 'column', gap: 2,
-            }}>
-                {Object.entries(grouped).map(([category, widgets]) => (
-                    <div key={category}>
-                        <div style={{
-                            fontSize: 9, fontWeight: 600,
-                            color: CATEGORY_COLORS[category] || '#475569',
-                            padding: '8px 6px 3px',
-                            textTransform: 'uppercase', letterSpacing: 0.8,
-                        }}>
-                            {category}
-                        </div>
-                        {widgets.map(widget => (
-                            widget.templates.map((template, i) => (
-                                <button
-                                    key={`${widget.type}-${i}`}
-                                    data-testid={`ws-${widget.type}-${i}`}
-                                    draggable
-                                    onDragStart={e => {
-                                        e.dataTransfer.setData(
-                                            'application/flowbuilder-widget',
-                                            JSON.stringify({ type: widget.type, template }),
-                                        )
-                                        e.dataTransfer.effectAllowed = 'move'
-                                        onDragStart?.(widget, template)
-                                    }}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: 6,
-                                        width: '100%',
-                                        background: 'transparent', color: '#94a3b8',
-                                        border: '1px solid transparent',
-                                        borderRadius: 6, padding: '5px 8px', fontSize: 10,
-                                        fontWeight: 500, cursor: 'grab', textAlign: 'left',
-                                        fontFamily: 'Inter',
-                                        transition: 'background 0.15s',
-                                    }}
-                                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                                >
-                                    <div style={{
-                                        width: 6, height: 6, borderRadius: 2,
-                                        background: widget.color, flexShrink: 0,
-                                    }} />
-                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {template.name || widget.label}
-                                    </span>
-                                </button>
-                            ))
-                        ))}
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
-
 // ── Drop handler (needs ReactFlow context) ───────────────────────────────────
 
 function DropTarget({ onNodeAdd }: {
@@ -471,8 +371,26 @@ export function FlowBuilder({
                 </ReactFlow>
             </div>
 
-            {/* Widget selector panel — right side, 100% height */}
-            {editMode && <WidgetSelectorPanel />}
+            {/* Widget selector — right side, 100% height, using existing WidgetSelector */}
+            {editMode && (
+                <div style={{
+                    width: 260, flexShrink: 0,
+                    borderLeft: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex', flexDirection: 'column',
+                    overflow: 'hidden',
+                }}>
+                    <WidgetSelector
+                        rectSize={{ width: 200, height: 120 }}
+                        onSelect={(widget, template) => {
+                            // When user clicks a widget in the selector,
+                            // just notify through onNodeAdd with center position
+                            onNodeAdd?.(widget.type, template, { x: 200, y: 200 })
+                        }}
+                        onCancel={() => { }}
+                        embedded
+                    />
+                </div>
+            )}
         </div>
     )
 }

@@ -36,7 +36,7 @@ test.describe('Builder full scenario', () => {
 
         // Step 2: Run script
         await page.locator('button[title="Run"]').click()
-        await expect(page.locator('text=Processing')).toBeVisible({ timeout: 5_000 })
+        await expect(page.locator('text=Processing process.js')).toBeVisible({ timeout: 5_000 })
         await expect(page.locator('text=validate input')).toBeVisible()
         await expect(page.locator('text=6 lines')).toBeVisible({ timeout: 2_000 })
         await page.waitForTimeout(500)
@@ -60,7 +60,7 @@ test.describe('Builder full scenario', () => {
 
         // Step 5: Re-run
         await page.locator('button[title="Run"]').click()
-        await expect(page.locator('text=Processing')).toBeVisible({ timeout: 5_000 })
+        await expect(page.locator('text=Processing process.js')).toBeVisible({ timeout: 5_000 })
 
         // No errors
         if (consoleErrors.length > 0) {

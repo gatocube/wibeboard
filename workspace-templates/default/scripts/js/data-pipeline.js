@@ -1,7 +1,11 @@
 /**
- * Data Pipeline — validates, transforms, and outputs structured data.
+ * @file data-pipeline.js
+ * @description 3-stage ETL pipeline — validates input, transforms records,
+ *   and writes output with progress logging at each stage.
  *
- * Simulates a 3-stage ETL pipeline with progress logging.
+ * @param {Object} ctx - Execution context
+ * @param {Object} ctx.node - The current node (id, name, data)
+ * @param {Object} [ctx.node.data.input] - Input data with a `records` count
  */
 export function activate(ctx) {
     console.log('Pipeline started:', ctx.node.name);

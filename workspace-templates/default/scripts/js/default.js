@@ -1,9 +1,10 @@
 /**
- * Default "Hello" script — minimal starter template.
+ * @file default.js
+ * @description Hello World — minimal starter script that logs the node name and ID.
+ *   Use this as a starting point for new script nodes.
  *
- * ctx.node  — the current node (id, name, data)
- * ctx.log   — append a log line
- * ctx.done  — signal completion
+ * @param {Object} ctx - Execution context
+ * @param {Object} ctx.node - The current node (id, name, data)
  */
 export function activate(ctx) {
     console.log('Hello from', ctx.node.name);

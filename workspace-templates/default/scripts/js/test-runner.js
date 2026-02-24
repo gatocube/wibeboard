@@ -1,7 +1,10 @@
 /**
- * Test Runner — runs a set of assertions and reports results.
+ * @file test-runner.js
+ * @description Lightweight test suite — runs assertions against the node
+ *   context and reports pass/fail results with a summary.
  *
- * Simulates a lightweight test suite with pass/fail reporting.
+ * @param {Object} ctx - Execution context
+ * @param {Object} ctx.node - The current node (id, name, data)
  */
 export function activate(ctx) {
     console.log(`Running tests for: ${ctx.node.name}`);

@@ -1,7 +1,11 @@
 /**
- * HTTP Fetch — simulates fetching data from an API endpoint.
+ * @file http-fetch.js
+ * @description Simulated HTTP fetch — demonstrates async API calls with
+ *   request/response logging and error handling.
  *
- * Demonstrates async operations, error handling, and response parsing.
+ * @param {Object} ctx - Execution context
+ * @param {Object} ctx.node - The current node (id, name, data)
+ * @param {string} [ctx.node.data.url] - API endpoint URL (default: example.com)
  */
 export async function activate(ctx) {
     const url = ctx.node.data?.url || 'https://api.example.com/data';

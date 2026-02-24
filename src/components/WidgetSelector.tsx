@@ -204,6 +204,13 @@ export function WidgetSelector({
                                     key={widget.type}
                                     data-testid={`recent-${widget.type}`}
                                     title={widget.label}
+                                    draggable
+                                    onDragStart={e => {
+                                        e.dataTransfer.setData('application/flowbuilder-widget', JSON.stringify({
+                                            type: widget.type, template: widget.templates[0],
+                                        }))
+                                        e.dataTransfer.effectAllowed = 'move'
+                                    }}
                                     onClick={() => handleWidgetClick(widget)}
                                     onMouseEnter={() => onHoverWidget?.(widget)}
                                     onMouseLeave={() => onHoverWidget?.(null)}
@@ -366,9 +373,16 @@ export function WidgetSelector({
                                         {/* Widget row */}
                                         <div
                                             data-testid={`widget-${widget.type}`}
+                                            draggable
+                                            onDragStart={e => {
+                                                e.dataTransfer.setData('application/flowbuilder-widget', JSON.stringify({
+                                                    type: widget.type, template: widget.templates[0],
+                                                }))
+                                                e.dataTransfer.effectAllowed = 'move'
+                                            }}
                                             style={{
                                                 padding: '6px 12px',
-                                                cursor: 'pointer',
+                                                cursor: 'grab',
                                                 display: 'flex', alignItems: 'center', gap: 8,
                                                 transition: 'background 0.1s',
                                             }}
