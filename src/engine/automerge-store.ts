@@ -14,7 +14,7 @@ import * as Automerge from '@automerge/automerge'
 
 export interface NodeState {
     id: string
-    status: 'idle' | 'waking' | 'running' | 'done' | 'error'
+    status: 'idle' | 'waking' | 'running' | 'done' | 'error' | 'waiting'
     logs: string[]
     artifacts: string[]
     progress: number
