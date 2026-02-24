@@ -1,5 +1,6 @@
 export { AgentNode } from './AgentNode'
 export { ScriptNode } from './ScriptNode'
+export { JobNode } from './JobNode'
 export { GroupNode } from './GroupNode'
 export { NoteNode } from './NoteNode'
 export { ExpectationNode } from './ExpectationNode'
