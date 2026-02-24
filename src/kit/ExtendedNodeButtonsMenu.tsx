@@ -7,14 +7,14 @@
  *
  * Layout:
  *   Top:    Configure → fan: Rename | Delete | Duplicate
- *   Right:  After (+) → fan: AI | Script | User
+ *   Right:  After (+) → fan: AI | Script → (js, sh, py) | User
  *   Bottom: Rename
- *   Left:   Before (+) → fan: AI | Script | User
+ *   Left:   Before (+) → fan: AI | Script → (js, sh, py) | User
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Pencil, Cpu, Code, UserCircle, Trash2, Copy } from 'lucide-react'
+import { Plus, Settings, Pencil, Cpu, Code, UserCircle, Trash2, Copy, FileCode, Terminal, FileType } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -35,6 +35,12 @@ const CONFIG_ACTIONS: SubButton[] = [
     { key: 'rename', label: 'Rename', icon: Pencil, color: '#f59e0b' },
     { key: 'duplicate', label: 'Duplicate', icon: Copy, color: '#06b6d4' },
     { key: 'delete', label: 'Delete', icon: Trash2, color: '#ef4444' },
+]
+
+const SCRIPT_TYPES: SubButton[] = [
+    { key: 'js', label: 'JS', icon: FileCode, color: '#f7df1e' },
+    { key: 'sh', label: 'SH', icon: Terminal, color: '#4ade80' },
+    { key: 'py', label: 'PY', icon: FileType, color: '#3b82f6' },
 ]
 
 // ── Props ───────────────────────────────────────────────────────────────────────
@@ -78,6 +84,7 @@ function btnStyle(color: string, size = 48): React.CSSProperties {
 export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
     const { nodeId, currentLabel, onAddBefore, onAddAfter, onConfigure, onRename } = props
     const [expanded, setExpanded] = useState<null | 'before' | 'after' | 'config'>(null)
+    const [scriptExpanded, setScriptExpanded] = useState<null | 'after' | 'before'>(null)
     const [renaming, setRenaming] = useState(false)
     const [renameValue, setRenameValue] = useState(currentLabel)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -201,7 +208,23 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        onClick={() => { onAddAfter(nodeId, sub.key); setExpanded(null) }}
+                        active={sub.key === 'script' && scriptExpanded === 'after'}
+                        onClick={() => { onAddAfter(nodeId, sub.key); setExpanded(null); setScriptExpanded(null) }}
+                        onHover={sub.key === 'script' ? () => setScriptExpanded('after') : () => setScriptExpanded(null)}
+                    />
+                ))}
+
+                {/* After → Script sub-types: fan further right */}
+                {expanded === 'after' && scriptExpanded === 'after' && SCRIPT_TYPES.map((st, i) => (
+                    <MotionButton
+                        key={`after-script-${st.key}`}
+                        testId={`ext-after-script-${st.key}`}
+                        pos={{ x: positions.right.x + 58 + 58, y: positions.right.y + (i - 1) * 56 }}
+                        icon={st.icon}
+                        label={st.label}
+                        color={st.color}
+                        delay={i * 0.03}
+                        onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null) }}
                     />
                 ))}
 
@@ -241,7 +264,23 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        onClick={() => { onAddBefore(nodeId, sub.key); setExpanded(null) }}
+                        active={sub.key === 'script' && scriptExpanded === 'before'}
+                        onClick={() => { onAddBefore(nodeId, sub.key); setExpanded(null); setScriptExpanded(null) }}
+                        onHover={sub.key === 'script' ? () => setScriptExpanded('before') : () => setScriptExpanded(null)}
+                    />
+                ))}
+
+                {/* Before → Script sub-types: fan further left */}
+                {expanded === 'before' && scriptExpanded === 'before' && SCRIPT_TYPES.map((st, i) => (
+                    <MotionButton
+                        key={`before-script-${st.key}`}
+                        testId={`ext-before-script-${st.key}`}
+                        pos={{ x: positions.left.x - 58 - 58, y: positions.left.y + (i - 1) * 56 }}
+                        icon={st.icon}
+                        label={st.label}
+                        color={st.color}
+                        delay={i * 0.03}
+                        onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null) }}
                     />
                 ))}
             </AnimatePresence>
