@@ -6,7 +6,7 @@
  */
 
 import { ReactFlow, ReactFlowProvider, Background, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { useConnectorFlow, ConnectorFlowOverlay, anchorMouseToGridRect } from '@/engine/ConnectorFlow'
 import { GRID_CELL, widgetRegistry } from '@/engine/widget-registry'
@@ -395,8 +395,8 @@ function BuilderInner() {
         },
     })
 
-    // ── Inject callbacks into existing script nodes ──
-    const nodesWithCallbacks = nodes.map(n => {
+    // ── Inject callbacks into existing script nodes (memoized to avoid blinking) ──
+    const nodesWithCallbacks = useMemo(() => nodes.map(n => {
         if (n.type?.startsWith('script-')) {
             return {
                 ...n,
@@ -408,7 +408,17 @@ function BuilderInner() {
             }
         }
         return n
-    })
+    }), [nodes, handleRunScript, updateNodeData])
+
+    // ── Memoize combined arrays to prevent React Flow edge blinking ──
+    const combinedNodes = useMemo(
+        () => [...nodesWithCallbacks, ...connector.previewNodes],
+        [nodesWithCallbacks, connector.previewNodes]
+    )
+    const combinedEdges = useMemo(
+        () => [...edges, ...connector.previewEdges],
+        [edges, connector.previewEdges]
+    )
 
     return (
         <div
@@ -431,8 +441,8 @@ function BuilderInner() {
             `}</style>
 
             <ReactFlow
-                nodes={[...nodesWithCallbacks, ...connector.previewNodes]}
-                edges={[...edges, ...connector.previewEdges]}
+                nodes={combinedNodes}
+                edges={combinedEdges}
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 nodesDraggable
