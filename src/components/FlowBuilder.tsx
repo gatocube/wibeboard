@@ -6,7 +6,7 @@
  * and optional zoom-autosize (node size follows zoom level).
  */
 
-import { ReactFlow, Background, Panel, useViewport, type Node, type Edge, type NodeTypes, type OnNodesChange, type Viewport } from '@xyflow/react'
+import { ReactFlow, Background, Panel, useStore, type Node, type Edge, type NodeTypes, type OnNodesChange, type Viewport } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
 
@@ -68,33 +68,33 @@ function zoomToSize(zoom: number): NodeSize {
     return 'L'
 }
 
+/**
+ * Selector that derives NodeSize from the store's zoom level.
+ * Returns a *stable string* — React Flow's useStore uses Object.is equality,
+ * so the subscribing component re-renders ONLY when the size bucket changes
+ * (e.g. M→L), not on every 0.001 zoom tick.
+ */
+const zoomToSizeSelector = (state: { transform: [number, number, number] }): NodeSize =>
+    zoomToSize(state.transform[2])
+
 // ── Zoom autosize inner component (needs ReactFlow context) ──────────────────
 
-function ZoomAutosizeWatcher({ enabled, onSizeChange, currentSize }: {
+function ZoomAutosizeWatcher({ enabled, onSizeChange }: {
     enabled: boolean
     onSizeChange?: (size: NodeSize) => void
-    currentSize?: NodeSize
 }) {
-    const viewport = useViewport()
-    const lastSize = useRef(currentSize || 'M')
-    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    // useStore with selector: only re-renders when the computed size string changes
+    const derivedSize = useStore(zoomToSizeSelector)
+    const lastEmitted = useRef<NodeSize | null>(null)
 
     useEffect(() => {
         if (!enabled || !onSizeChange) return
-        if (debounceTimer.current) clearTimeout(debounceTimer.current)
-
-        debounceTimer.current = setTimeout(() => {
-            const newSize = zoomToSize(viewport.zoom)
-            if (newSize !== lastSize.current) {
-                lastSize.current = newSize
-                onSizeChange(newSize)
-            }
-        }, 100)
-
-        return () => {
-            if (debounceTimer.current) clearTimeout(debounceTimer.current)
+        // Only call back when the size actually transitions
+        if (derivedSize !== lastEmitted.current) {
+            lastEmitted.current = derivedSize
+            onSizeChange(derivedSize)
         }
-    }, [viewport.zoom, enabled, onSizeChange])
+    }, [derivedSize, enabled, onSizeChange])
 
     return null
 }
@@ -292,7 +292,6 @@ export function FlowBuilder({
                 <ZoomAutosizeWatcher
                     enabled={zoomAutosize}
                     onSizeChange={handleSizeChange}
-                    currentSize={currentSize}
                 />
 
                 {/* Settings gear — top-right */}
