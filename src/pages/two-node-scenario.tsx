@@ -34,7 +34,7 @@ type NodeSize = 'S' | 'M' | 'L'
 const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
     S: { w: 50, h: 50, gap: 120 },
     M: { w: 160, h: 100, gap: 250 },
-    L: { w: 260, h: 180, gap: 400 },
+    L: { w: 300, h: 200, gap: 420 },
 }
 
 const THEME_NODE_TYPES: Record<ThemeKey, NodeTypes> = {
@@ -255,7 +255,7 @@ export function TwoNodeScenarioPage() {
     // Agent-to-agent edge
     if (hasKnock) {
         edges.push({
-            id: 'a-b', source: 'a', target: 'b',
+            id: 'a-b', source: 'a', sourceHandle: 'out', target: 'b', targetHandle: 'in',
             animated: true,
             style: {
                 stroke: edgeColor,
@@ -265,7 +265,7 @@ export function TwoNodeScenarioPage() {
         })
     } else {
         edges.push({
-            id: 'a-b', source: 'a', target: 'b',
+            id: 'a-b', source: 'a', sourceHandle: 'out', target: 'b', targetHandle: 'in',
             animated: false,
             style: { stroke: '#8b5cf622', strokeDasharray: '6 3' },
         })

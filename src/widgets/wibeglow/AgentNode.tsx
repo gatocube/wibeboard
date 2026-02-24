@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
+import { PreviewCanvas } from '@/components/PreviewCanvas'
 import { StatusDot } from '@/widgets/StatusDot'
 import { ShimmeringText, SplittingText } from '@/components/animate-ui'
 
@@ -198,49 +199,9 @@ export function AgentNode({ data }: { data: any }) {
                     {statusIndicator}
                 </div>
 
-                {/* PreviewCanvas — terminal output for large nodes (right after name) */}
+                {/* PreviewCanvas — terminal output for large nodes */}
                 {isLarge && logs.length > 0 && (
-                    <div style={{
-                        flex: 1, minHeight: 0, marginTop: 4,
-                        background: 'rgba(0,0,0,0.4)',
-                        borderRadius: 6,
-                        border: '1px solid rgba(255,255,255,0.04)',
-                        padding: '4px 8px',
-                        overflow: 'hidden',
-                        display: 'flex', flexDirection: 'column',
-                    }}>
-                        {/* Terminal header */}
-                        <div style={{
-                            display: 'flex', alignItems: 'center', gap: 4,
-                            marginBottom: 3,
-                        }}>
-                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff5f57' }} />
-                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#febc2e' }} />
-                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#28c840' }} />
-                            <span style={{ fontSize: 7, color: '#475569', marginLeft: 4, fontFamily: "'JetBrains Mono', monospace" }}>
-                                output
-                            </span>
-                        </div>
-                        {/* Log lines */}
-                        <div style={{
-                            flex: 1, overflow: 'hidden',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: 8, lineHeight: '13px',
-                        }}>
-                            {logs.slice(-5).map((line, i) => (
-                                <div key={i} style={{
-                                    color: line.startsWith('⚡') ? '#fbbf24'
-                                        : line.startsWith('📦') ? '#22c55e'
-                                            : line.startsWith('←') ? '#94a3b8'
-                                                : line.startsWith('ERROR') ? '#ff5f57'
-                                                    : '#64748b',
-                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                                }}>
-                                    {line}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <PreviewCanvas type="terminal" lines={logs} />
                 )}
 
                 {/* Task description — shimmer when running */}

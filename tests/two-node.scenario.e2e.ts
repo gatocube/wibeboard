@@ -345,4 +345,53 @@ test.describe('Two-node scenario with Automerge player', () => {
         const borderReady = await box.evaluate(el => window.getComputedStyle(el).borderStyle)
         expect(borderReady).toContain('solid')
     })
+
+    test('all large job nodes have PreviewCanvas with terminal output', async ({ page }) => {
+        await page.goto('/?page=two-node')
+        await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
+
+        // Ensure L size is selected (default)
+        await page.locator('[data-testid="size-L"]').click()
+        await page.waitForTimeout(300)
+
+        // Advance to step 3 so both nodes have log entries (A has logs)
+        for (let i = 0; i < 3; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
+        await page.waitForTimeout(500)
+
+        // Node A should have a PreviewCanvas
+        const previewCanvases = page.locator('[data-testid="preview-canvas"]')
+        const count = await previewCanvases.count()
+        expect(count).toBeGreaterThanOrEqual(1)
+
+        // Verify terminal header ("output" label) is visible
+        await expect(page.getByText('output', { exact: true }).first()).toBeVisible({ timeout: 3_000 })
+
+        // Advance to step 10 so both A and B have logs
+        for (let i = 0; i < 7; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
+        await page.waitForTimeout(500)
+
+        // Both agent nodes should have PreviewCanvas
+        const countBoth = await previewCanvases.count()
+        expect(countBoth).toBe(2)
+
+        // Switch to M size — PreviewCanvas should NOT be visible
+        await page.locator('[data-testid="size-M"]').click()
+        await page.waitForTimeout(500)
+
+        const countMedium = await previewCanvases.count()
+        expect(countMedium).toBe(0)
+
+        // Switch back to L — PreviewCanvas should reappear
+        await page.locator('[data-testid="size-L"]').click()
+        await page.waitForTimeout(500)
+
+        const countBack = await previewCanvases.count()
+        expect(countBack).toBe(2)
+    })
 })
