@@ -26,6 +26,7 @@ import { templateRegistry, type TemplateName } from '@/templates/template-regist
 import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
 import { JobNode as PixelJob, NoteNode as PixelNote } from '@/widgets/pixel'
 import { JobNode as GhubJob, NoteNode as GhubNote } from '@/widgets/ghub'
+import { RawNode } from '@/widgets/RawNode'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
 
@@ -226,6 +227,7 @@ function WidgetGalleryInner() {
     const [wibeglowStatic, setWibeglowStatic] = useState(false) // WibeGlow: animated/static
     const [pixelTui, setPixelTui] = useState(false)     // Pixel: pixel/TUI
     const [activeSubType, setActiveSubType] = useState<string | undefined>('ai')
+    const [showRaw, setShowRaw] = useState(false)
 
     const themes = templateRegistry.getAll()
 
@@ -271,6 +273,28 @@ function WidgetGalleryInner() {
                     onCancel={() => { }}
                     embedded
                 />
+
+                {/* RawNode debug panel — always visible below picker */}
+                {selectedWidget && selectedTemplate && (
+                    <div style={{
+                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                        padding: 8,
+                        flexShrink: 0,
+                    }}>
+                        <div style={{
+                            fontSize: 8, fontWeight: 700, color: '#475569',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            marginBottom: 4, textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                        }}>Raw State</div>
+                        <RawNode data={buildData(
+                            selectedWidget, selectedTemplate,
+                            status, knockSide,
+                            240, 180,
+                            progress, activeSubType,
+                        )} />
+                    </div>
+                )}
             </div>
 
             {/* Right: Preview area */}
@@ -424,6 +448,7 @@ function WidgetGalleryInner() {
                     {[{ label: 'Connections', value: showConnections, set: setShowConnections },
                     { label: 'Animations', value: showAnimations, set: setShowAnimations },
                     { label: 'Thinking', value: showThinking, set: setShowThinking },
+                    { label: 'Raw', value: showRaw, set: setShowRaw },
                     ].map(toggle => (
                         <button
                             key={toggle.label}
@@ -543,7 +568,7 @@ function WidgetGalleryInner() {
                                     </div>
 
                                     {/* Size variants */}
-                                    {Component ? (
+                                    {(Component && !showRaw) ? (
                                         <div style={{
                                             padding: 16, display: 'flex', flexDirection: 'column',
                                             gap: 24, alignItems: 'center',
@@ -692,25 +717,36 @@ function WidgetGalleryInner() {
                                             })}
                                         </div>
                                     ) : (
-                                        /* Fallback: widget not available in this theme */
+                                        /* Fallback: RawNode with JSON state */
                                         <div style={{
-                                            flex: 1, display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', justifyContent: 'center',
-                                            gap: 8, padding: 24,
+                                            padding: 16, display: 'flex', flexDirection: 'column',
+                                            gap: 24, alignItems: 'center',
                                         }}>
-                                            <span style={{ fontSize: 32, opacity: 0.3 }}>🚧</span>
-                                            <span style={{
-                                                fontSize: 10, color: theme.colors.textMuted,
-                                                fontFamily: theme.fonts.body, textAlign: 'center',
-                                            }}>
-                                                {selectedWidget.label} not yet available in {theme.label} theme
-                                            </span>
-                                            <span style={{
-                                                fontSize: 8, color: `${theme.colors.textMuted}88`,
-                                                fontFamily: theme.fonts.mono,
-                                            }}>
-                                                Only AgentNode is implemented across all themes
-                                            </span>
+                                            {sizes.map(size => {
+                                                const data = buildData(
+                                                    selectedWidget, selectedTemplate,
+                                                    showAnimations ? status : (status === 'waking' ? 'idle' : status),
+                                                    showAnimations ? knockSide : null,
+                                                    size.width, size.height,
+                                                    progress, activeSubType,
+                                                )
+                                                return (
+                                                    <div key={size.label} style={{
+                                                        display: 'flex', flexDirection: 'column',
+                                                        alignItems: 'center', gap: 6,
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: 7, fontWeight: 700,
+                                                            color: theme.colors.textMuted,
+                                                            fontFamily: theme.fonts.mono,
+                                                            opacity: 0.5, textAlign: 'center',
+                                                        }}>
+                                                            {size.label} · {size.gridLabel}
+                                                        </div>
+                                                        <RawNode data={data} />
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
                                     )}
                                 </div>

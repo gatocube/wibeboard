@@ -89,7 +89,7 @@ Non-compact nodes render as a card with these fields:
 ├──────────────────────────────┤
 │ Agent name                 ⚡3|<- Agent name (AI) like: Reviewer: Claude 3.5 or Lang (Script) like: TS: hello-world.ts
 │ Current task                 |<- Current task (AI) or Code last Output line
-│ 1.3s  ████████░░░░░░░░░░ 55% │<- Total running time and Progress bar
+│ ████████░░░░░░░░░░  55% 1.3s │<- Total running time and Progress bar
 └──────────────────────────────┘
   Some AI thoughts or script output line here
 ```
