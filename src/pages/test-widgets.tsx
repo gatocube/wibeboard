@@ -22,10 +22,10 @@ import {
 } from '@/widgets/widget-registry'
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
-// Theme node components
-import { AgentNode as WibeGlowAgent, ScriptNode as WibeGlowScript, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
-import { AgentNode as PixelAgent, ScriptNode as PixelScript, NoteNode as PixelNote } from '@/widgets/pixel'
-import { AgentNode as GhubAgent, ScriptNode as GhubScript, NoteNode as GhubNote } from '@/widgets/ghub'
+// Theme node components — use unified JobNode/NoteNode directly
+import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
+import { JobNode as PixelJob, NoteNode as PixelNote } from '@/widgets/pixel'
+import { JobNode as GhubJob, NoteNode as GhubNote } from '@/widgets/ghub'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
 
@@ -99,37 +99,19 @@ type ThemeComponents = Record<TemplateName, Record<string, React.ComponentType<a
 
 const THEME_COMPONENTS: ThemeComponents = {
     wibeglow: {
-        agent: WibeGlowAgent,
-        'script-js': WibeGlowScript,
-        'script-ts': WibeGlowScript,
-        'script-sh': WibeGlowScript,
-        'script-py': WibeGlowScript,
+        job: WibeGlowJob,
         group: WibeGlowGroup,
-        'note-sticker': WibeGlowNote,
-        'note-group': WibeGlowNote,
-        'note-label': WibeGlowNote,
+        note: WibeGlowNote,
         expectation: WibeGlowExpectation,
         user: WibeGlowUser,
     },
     pixel: {
-        agent: PixelAgent,
-        'script-js': PixelScript,
-        'script-ts': PixelScript,
-        'script-sh': PixelScript,
-        'script-py': PixelScript,
-        'note-sticker': PixelNote,
-        'note-group': PixelNote,
-        'note-label': PixelNote,
+        job: PixelJob,
+        note: PixelNote,
     },
     ghub: {
-        agent: GhubAgent,
-        'script-js': GhubScript,
-        'script-ts': GhubScript,
-        'script-sh': GhubScript,
-        'script-py': GhubScript,
-        'note-sticker': GhubNote,
-        'note-group': GhubNote,
-        'note-label': GhubNote,
+        job: GhubJob,
+        note: GhubNote,
     },
 }
 
@@ -147,18 +129,24 @@ function buildData(
     width: number,
     height: number,
     progress: number,
+    activeSubType?: string,
 ): Record<string, any> {
+    const subType = activeSubType || template.defaultData.subType
+    const isAI = subType === 'ai'
+    const isScript = ['js', 'ts', 'sh', 'py'].includes(subType || '')
+
     const base: Record<string, any> = {
         ...template.defaultData,
         label: template.defaultData.label || template.name,
+        subType,
         status,
         width,
         height,
         knockSide,
     }
 
-    // Agent-specific
-    if (widget.type === 'agent') {
+    // Job: AI agent
+    if (widget.type === 'job' && isAI) {
         base.agent = template.defaultData.agent || 'Claude 3.5'
         base.color = template.defaultData.color || widget.color
         base.task = status !== 'idle' ? 'Processing authentication module...' : undefined
@@ -173,8 +161,9 @@ function buildData(
                 : []
     }
 
-    // Script-specific
-    if (widget.type.startsWith('script-')) {
+    // Job: script
+    if (widget.type === 'job' && isScript) {
+        base.language = subType
         base.configured = true
         base.code = template.defaultData.code || '// empty'
         base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : []
@@ -190,17 +179,16 @@ function buildData(
     }
 
     // Note-specific
-    if (widget.type.startsWith('note-')) {
-        base.variant = template.defaultData.variant || 'sticker'
+    if (widget.type === 'note') {
+        base.subType = subType || 'sticker'
         base.color = template.defaultData.color || widget.color
         base.content = template.defaultData.content || ''
     }
 
     // Expectation-specific
     if (widget.type === 'expectation') {
-        base.variant = template.defaultData.variant || 'artifact'
+        base.subType = subType || 'artifact'
         base.target = template.defaultData.target || ''
-        // Map gallery status to expectation status
         base.status = status === 'done' ? 'pass' : status === 'running' ? 'pending' : status === 'waking' ? 'fail' : 'pending'
     }
 
@@ -218,9 +206,9 @@ export function TestWidgetsPage() {
 }
 
 function WidgetGalleryInner() {
-    const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('agent') ?? null)
+    const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('job') ?? null)
     const [selectedTemplate, setSelectedTemplate] = useState<WidgetTemplate | null>(
-        widgetRegistry.get('agent')?.templates[0] ?? null
+        widgetRegistry.get('job')?.templates[0] ?? null
     )
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)
@@ -232,6 +220,7 @@ function WidgetGalleryInner() {
     const [ghubDay, setGhubDay] = useState(false)      // GHub: day/night (dark default)
     const [wibeglowStatic, setWibeglowStatic] = useState(false) // WibeGlow: animated/static
     const [pixelTui, setPixelTui] = useState(false)     // Pixel: pixel/TUI
+    const [activeSubType, setActiveSubType] = useState<string | undefined>('ai')
 
     const themes = templateRegistry.getAll()
 
@@ -241,6 +230,8 @@ function WidgetGalleryInner() {
         setStatus('idle')
         setKnockSide(null)
         setProgress(0)
+        // Set first subType if available
+        setActiveSubType(widget.subTypes?.[0]?.value ?? template.defaultData.subType)
     }, [])
 
     const sizes = selectedWidget ? getSizes(selectedWidget) : []
@@ -303,6 +294,31 @@ function WidgetGalleryInner() {
                             </>
                         )}
                     </div>
+
+                    {/* SubType selector */}
+                    {selectedWidget?.subTypes && selectedWidget.subTypes.length > 1 && (
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                            <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>SubType</span>
+                            {selectedWidget.subTypes.map(st => (
+                                <button
+                                    key={st.value}
+                                    data-testid={`subtype-${st.value}`}
+                                    onClick={() => setActiveSubType(st.value)}
+                                    style={{
+                                        padding: '3px 8px', borderRadius: 4,
+                                        border: 'none', cursor: 'pointer',
+                                        background: activeSubType === st.value ? `${st.color || '#8b5cf6'}33` : 'rgba(255,255,255,0.04)',
+                                        color: activeSubType === st.value ? (st.color || '#8b5cf6') : '#64748b',
+                                        fontSize: 9, fontWeight: 600,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        textTransform: 'uppercase',
+                                    }}
+                                >
+                                    {st.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Status buttons */}
                     <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -534,12 +550,13 @@ function WidgetGalleryInner() {
                                                     showAnimations ? knockSide : null,
                                                     size.width, size.height,
                                                     progress,
+                                                    activeSubType,
                                                 )
                                                 // Add thought/log data when thinking toggle is on
                                                 if (showThinking) {
-                                                    if (selectedWidget.type === 'agent') {
+                                                    if (activeSubType === 'ai') {
                                                         data.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
-                                                    } else if (selectedWidget.type.startsWith('script-')) {
+                                                    } else if (['js', 'ts', 'sh', 'py'].includes(activeSubType || '')) {
                                                         data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
                                                     }
                                                 }

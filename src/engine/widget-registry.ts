@@ -4,7 +4,8 @@
  * Each widget has: type, label, icon, category, description, templates.
  * Templates define default data for creating new nodes.
  *
- * Ported from magnetic-filament's widget-registry.ts (scoped to wibeboard types).
+ * The `subTypes` array lists the available sub-type specializations.
+ * For widgets with subTypes, templates carry `subType` in defaultData.
  */
 
 export const GRID_CELL = 20  // px per grid cell
@@ -16,7 +17,7 @@ export interface WidgetTemplate {
     defaultData: Record<string, any>
 }
 
-export type WidgetCategory = 'AI' | 'Script' | 'Layout' | 'Note' | 'Expectation'
+export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Note' | 'Expectation'
 
 export interface WidgetDefinition {
     type: string
@@ -32,115 +33,79 @@ export interface WidgetDefinition {
     defaultHeight: number
     templates: WidgetTemplate[]
     disabled?: boolean
+    /** Available sub-types for this widget */
+    subTypes?: { value: string; label: string; color?: string }[]
 }
 
 // ── Widget Definitions ─────────────────────────────────────────────────────────
 
 const WIDGETS: WidgetDefinition[] = [
     {
-        type: 'agent',
-        label: 'Agent',
+        type: 'job',
+        label: 'Job',
         icon: 'sparkles',
-        category: 'AI',
-        tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute'],
-        description: 'AI agent that executes tasks with tool calls',
+        category: 'Job',
+        tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
+        description: 'AI agent or code script that executes tasks',
         color: '#8b5cf6',
-        minWidth: 160, minHeight: 100,
+        minWidth: 60, minHeight: 60,
         defaultWidth: 200, defaultHeight: 120,
+        subTypes: [
+            { value: 'ai', label: 'AI Agent', color: '#8b5cf6' },
+            { value: 'js', label: 'JavaScript', color: '#f7df1e' },
+            { value: 'ts', label: 'TypeScript', color: '#3178c6' },
+            { value: 'sh', label: 'Shell', color: '#4caf50' },
+            { value: 'py', label: 'Python', color: '#3776ab' },
+        ],
         templates: [
             {
                 name: 'Planner',
                 description: 'Strategic planning agent',
-                defaultData: { label: 'Planner', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Planner', subType: 'ai', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Worker',
                 description: 'Task execution agent',
-                defaultData: { label: 'Worker', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Worker', subType: 'ai', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Reviewer',
-                description: 'Code review and validation agent',
-                defaultData: { label: 'Reviewer', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
+                description: 'Code review agent',
+                defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
+            },
+            {
+                name: 'JS Script',
+                description: 'JavaScript with activate() entry',
+                defaultData: {
+                    label: 'script.js', subType: 'js', language: 'js',
+                    code: `export function activate(ctx) {\n   console.log('Hello from', ctx.node.name);\n}`,
+                },
+            },
+            {
+                name: 'TS Script',
+                description: 'TypeScript with type-safe activate()',
+                defaultData: {
+                    label: 'script.ts', subType: 'ts', language: 'ts',
+                    code: `export function activate(ctx: Context) {\n   console.log('Hello from', ctx.node.name);\n}`,
+                },
+            },
+            {
+                name: 'Shell Script',
+                description: 'Shell script for system commands',
+                defaultData: {
+                    label: 'script.sh', subType: 'sh', language: 'sh',
+                    code: `#!/bin/bash\necho "Hello from $NODE_NAME"`,
+                },
+            },
+            {
+                name: 'Python Script',
+                description: 'Python for data processing and ML',
+                defaultData: {
+                    label: 'script.py', subType: 'py', language: 'py',
+                    code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
+                },
             },
         ],
-    },
-    // ── Script widgets ──
-    {
-        type: 'script-js',
-        label: 'JavaScript',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'javascript', 'js', 'code', 'function'],
-        description: 'JavaScript script with activate() entry point',
-        color: '#f7df1e',
-        minWidth: 200, minHeight: 160,
-        defaultWidth: 280, defaultHeight: 200,
-        templates: [{
-            name: 'Script',
-            description: 'JavaScript with activate() entry',
-            defaultData: {
-                label: 'script.js', language: 'js',
-                code: `export function activate(ctx) {\n   console.log('Hello from', ctx.node.name);\n}`,
-            },
-        }],
-    },
-    {
-        type: 'script-ts',
-        label: 'TypeScript',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'typescript', 'ts', 'code', 'typed'],
-        description: 'TypeScript script with type-safe activate() entry point',
-        color: '#3178c6',
-        minWidth: 200, minHeight: 160,
-        defaultWidth: 280, defaultHeight: 200,
-        templates: [{
-            name: 'Script',
-            description: 'TypeScript with activate() entry',
-            defaultData: {
-                label: 'script.ts', language: 'ts',
-                code: `export function activate(ctx: Context) {\n   console.log('Hello from', ctx.node.name);\n}`,
-            },
-        }],
-    },
-    {
-        type: 'script-sh',
-        label: 'Shell',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'shell', 'bash', 'sh', 'command'],
-        description: 'Shell script for system commands',
-        color: '#4caf50',
-        minWidth: 200, minHeight: 160,
-        defaultWidth: 280, defaultHeight: 200,
-        templates: [{
-            name: 'Script',
-            description: 'Shell script',
-            defaultData: {
-                label: 'script.sh', language: 'sh',
-                code: `#!/bin/bash\necho "Hello from $NODE_NAME"`,
-            },
-        }],
-    },
-    {
-        type: 'script-py',
-        label: 'Python',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'python', 'py', 'code', 'ml'],
-        description: 'Python script for data processing and ML',
-        color: '#3776ab',
-        minWidth: 200, minHeight: 160,
-        defaultWidth: 280, defaultHeight: 200,
-        templates: [{
-            name: 'Script',
-            description: 'Python with activate() entry',
-            defaultData: {
-                label: 'script.py', language: 'py',
-                code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
-            },
-        }],
     },
     // ── Layout ──
     {
@@ -171,7 +136,7 @@ const WIDGETS: WidgetDefinition[] = [
         type: 'user',
         label: 'User',
         icon: 'user',
-        category: 'AI',
+        category: 'Job',
         tags: ['user', 'human', 'review', 'approval', 'gate', 'interaction'],
         description: 'Human interaction node for reviews, approvals, and manual gates',
         color: '#f59e0b',
@@ -190,68 +155,48 @@ const WIDGETS: WidgetDefinition[] = [
             },
         ],
     },
-    // ── Note widgets ──
+    // ── Note ──
     {
-        type: 'note-sticker',
-        label: 'Sticker',
+        type: 'note',
+        label: 'Note',
         icon: 'sticky-note',
         category: 'Note',
-        tags: ['note', 'sticker', 'annotation', 'comment', 'post-it'],
-        description: 'Post-it style note that can be placed anywhere',
+        tags: ['note', 'sticker', 'annotation', 'comment', 'post-it', 'label', 'group', 'section'],
+        description: 'Annotation notes, stickers, and labels',
         color: '#fbbf24',
-        minWidth: 60, minHeight: 60,
+        minWidth: 60, minHeight: 40,
         defaultWidth: 160, defaultHeight: 120,
+        subTypes: [
+            { value: 'sticker', label: 'Sticker', color: '#fbbf24' },
+            { value: 'group', label: 'Group Note', color: '#6366f1' },
+            { value: 'group-note', label: 'Section', color: '#10b981' },
+            { value: 'label', label: 'Label', color: '#94a3b8' },
+        ],
         templates: [
             {
                 name: 'Sticker',
                 description: 'Yellow post-it note',
-                defaultData: { label: 'Note', content: 'Remember to check this!', variant: 'sticker', color: 'yellow' },
+                defaultData: { label: 'Note', content: 'Remember to check this!', subType: 'sticker', color: 'yellow' },
             },
             {
                 name: 'Pink Sticker',
                 description: 'Pink post-it note',
-                defaultData: { label: 'Important', content: '', variant: 'sticker', color: 'pink' },
+                defaultData: { label: 'Important', content: '', subType: 'sticker', color: 'pink' },
             },
-        ],
-    },
-    {
-        type: 'note-group',
-        label: 'Group Note',
-        icon: 'sticky-note',
-        category: 'Note',
-        tags: ['note', 'group', 'background', 'section', 'container'],
-        description: 'Background label for grouping nodes together',
-        color: '#6366f1',
-        minWidth: 200, minHeight: 120,
-        defaultWidth: 400, defaultHeight: 250,
-        templates: [
             {
                 name: 'Section',
                 description: 'Label a section of the workflow',
-                defaultData: { label: 'Section', content: 'Group related nodes here', variant: 'group-note', color: '#6366f1' },
+                defaultData: { label: 'Section', content: 'Group related nodes here', subType: 'group-note', color: '#6366f1' },
             },
-        ],
-    },
-    {
-        type: 'note-label',
-        label: 'Label',
-        icon: 'sticky-note',
-        category: 'Note',
-        tags: ['note', 'label', 'text', 'markdown', 'heading', 'image'],
-        description: 'Text label with optional markdown and images',
-        color: '#94a3b8',
-        minWidth: 60, minHeight: 40,
-        defaultWidth: 200, defaultHeight: 80,
-        templates: [
             {
                 name: 'Heading',
                 description: 'Large text heading',
-                defaultData: { label: 'Workflow Title', variant: 'label', color: '#e2e8f0' },
+                defaultData: { label: 'Workflow Title', subType: 'label', color: '#e2e8f0' },
             },
             {
                 name: 'Caption',
                 description: 'Small description text',
-                defaultData: { label: 'Step 1', content: 'Initialize the pipeline and fetch data', variant: 'label', color: '#94a3b8' },
+                defaultData: { label: 'Step 1', content: 'Initialize the pipeline and fetch data', subType: 'label', color: '#94a3b8' },
             },
         ],
     },
@@ -266,25 +211,39 @@ const WIDGETS: WidgetDefinition[] = [
         color: '#10b981',
         minWidth: 60, minHeight: 40,
         defaultWidth: 160, defaultHeight: 60,
+        subTypes: [
+            { value: 'artifact', label: 'Artifact', color: '#10b981' },
+            { value: 'tool-call', label: 'Tool Call', color: '#06b6d4' },
+        ],
         templates: [
             {
                 name: 'Artifact',
                 description: 'Expects agent to generate an artifact',
-                defaultData: { label: 'Creates README.md', variant: 'artifact', target: 'README.md', status: 'pending' },
+                defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', status: 'pending' },
             },
             {
                 name: 'Tool Call',
                 description: 'Expects agent to call a specific tool',
-                defaultData: { label: 'Calls deploy()', variant: 'tool-call', target: 'deploy()', status: 'pending' },
+                defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', status: 'pending' },
             },
             {
                 name: 'Pull Request',
                 description: 'Expects agent to create a pull request',
-                defaultData: { label: 'Creates PR', variant: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+                defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'pending' },
             },
         ],
     },
 ]
+
+// ── Backward compatibility helpers ─────────────────────────────────────────────
+
+/** Map old compound types → { type, subType } */
+function resolveType(typeStr: string): { type: string; subType?: string } {
+    if (typeStr === 'agent') return { type: 'job', subType: 'ai' }
+    if (typeStr.startsWith('script-')) return { type: 'job', subType: typeStr.replace('script-', '') }
+    if (typeStr.startsWith('note-')) return { type: 'note', subType: typeStr.replace('note-', '') }
+    return { type: typeStr }
+}
 
 // ── Registry API ───────────────────────────────────────────────────────────────
 
@@ -296,8 +255,17 @@ class WidgetRegistry {
         return this.widgets
     }
 
+    get(type: string): WidgetDefinition | undefined {
+        // Direct match first
+        const direct = this.widgets.find(w => w.type === type)
+        if (direct) return direct
+        // Try resolving old compound type
+        const { type: resolved } = resolveType(type)
+        return this.widgets.find(w => w.type === resolved)
+    }
+
     getByType(type: string): WidgetDefinition | undefined {
-        return this.widgets.find(w => w.type === type)
+        return this.get(type)
     }
 
     getCategories(): WidgetCategory[] {

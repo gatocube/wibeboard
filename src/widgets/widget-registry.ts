@@ -3,6 +3,8 @@
  *
  * Each widget has templates for all 3 visual themes (pixel, ghub, wibeglow).
  * This is the core registry that the WidgetSelector and builder use.
+ *
+ * Widgets with `subTypes` can be switched between specializations (e.g. ai, js, ts).
  */
 
 import type { TemplateName } from '@/templates/template-registry'
@@ -18,7 +20,13 @@ export interface WidgetTemplate {
     defaultData: Record<string, any>
 }
 
-export type WidgetCategory = 'AI' | 'Script' | 'Expectation' | 'Assertion' | 'Note'
+export type WidgetCategory = 'Job' | 'Script' | 'Expectation' | 'Assertion' | 'Note' | 'AI'
+
+export interface SubTypeDef {
+    value: string
+    label: string
+    color?: string
+}
 
 export interface WidgetDefinition {
     type: string
@@ -36,119 +44,77 @@ export interface WidgetDefinition {
     disabled?: boolean
     /** Node type name per visual template (defaults to type) */
     nodeTypes?: Partial<Record<TemplateName, string>>
+    /** Available sub-type specializations */
+    subTypes?: SubTypeDef[]
 }
 
 // ── Widget Definitions ──────────────────────────────────────────────────────────
 
 const WIDGETS: WidgetDefinition[] = [
     {
-        type: 'agent',
-        label: 'Agent',
+        type: 'job',
+        label: 'Job',
         icon: 'sparkles',
-        category: 'AI',
-        tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute'],
-        description: 'AI agent that executes tasks, calls tools, and produces output',
+        category: 'Job',
+        tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
+        description: 'AI agent or code script that executes tasks',
         color: '#8b5cf6',
         minWidth: 120, minHeight: 60,
         defaultWidth: 200, defaultHeight: 120,
+        subTypes: [
+            { value: 'ai', label: 'AI Agent', color: '#8b5cf6' },
+            { value: 'js', label: 'JavaScript', color: '#f7df1e' },
+            { value: 'ts', label: 'TypeScript', color: '#3178c6' },
+            { value: 'sh', label: 'Shell', color: '#89e051' },
+            { value: 'py', label: 'Python', color: '#3776ab' },
+        ],
         templates: [
             {
                 name: 'Planner',
                 description: 'Strategic planning agent',
-                defaultData: { label: 'Planner', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Planner', subType: 'ai', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Worker',
                 description: 'Task execution agent',
-                defaultData: { label: 'Worker', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Worker', subType: 'ai', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Reviewer',
                 description: 'Code review and validation agent',
-                defaultData: { label: 'Reviewer', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
             },
-        ],
-    },
-    // ── Script widgets ──
-    {
-        type: 'script-js',
-        label: 'JavaScript',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'javascript', 'js', 'code', 'function'],
-        description: 'JavaScript script with activate() entry point',
-        color: '#f7df1e',
-        minWidth: 200, minHeight: 140,
-        defaultWidth: 280, defaultHeight: 200,
-        templates: [
             {
-                name: 'Default',
-                description: 'Standard JS script',
+                name: 'JS Script',
+                description: 'JavaScript with activate() entry',
                 defaultData: {
-                    label: 'script.js',
-                    language: 'js',
+                    label: 'script.js', subType: 'js', language: 'js',
                     code: `export function activate(ctx) {\n   console.log('Hello from', ctx.node.name);\n}`,
                 },
             },
-        ],
-    },
-    {
-        type: 'script-ts',
-        label: 'TypeScript',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'typescript', 'ts', 'code', 'typed'],
-        description: 'TypeScript script with type-safe activate() entry point',
-        color: '#3178c6',
-        minWidth: 200, minHeight: 140,
-        defaultWidth: 280, defaultHeight: 200,
-        disabled: true,
-        templates: [
             {
-                name: 'Default',
-                description: 'Standard TS script',
+                name: 'TS Script',
+                description: 'TypeScript with type-safe activate()',
                 defaultData: {
-                    label: 'script.ts', language: 'ts',
+                    label: 'script.ts', subType: 'ts', language: 'ts',
                     code: `export function activate(ctx: Context) {\n   console.log('Hello from', ctx.node.name);\n}`,
                 },
             },
-        ],
-    },
-    {
-        type: 'script-sh',
-        label: 'Shell',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'shell', 'bash', 'sh', 'command'],
-        description: 'Shell script for system commands and automation',
-        color: '#89e051',
-        minWidth: 200, minHeight: 140,
-        defaultWidth: 280, defaultHeight: 200,
-        disabled: true,
-        templates: [
             {
-                name: 'Default',
-                description: 'Standard shell script',
-                defaultData: { label: 'script.sh', language: 'sh', code: `#!/bin/bash\necho "Hello from $NODE_NAME"` },
+                name: 'Shell Script',
+                description: 'Shell script for system commands',
+                defaultData: {
+                    label: 'script.sh', subType: 'sh', language: 'sh',
+                    code: `#!/bin/bash\necho "Hello from $NODE_NAME"`,
+                },
             },
-        ],
-    },
-    {
-        type: 'script-py',
-        label: 'Python',
-        icon: 'terminal',
-        category: 'Script',
-        tags: ['script', 'python', 'py', 'code', 'ml'],
-        description: 'Python script for data processing and ML tasks',
-        color: '#3776ab',
-        minWidth: 200, minHeight: 140,
-        defaultWidth: 280, defaultHeight: 200,
-        disabled: true,
-        templates: [
             {
-                name: 'Default',
-                description: 'Standard Python script',
-                defaultData: { label: 'script.py', language: 'py', code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")` },
+                name: 'Python Script',
+                description: 'Python for data processing and ML',
+                defaultData: {
+                    label: 'script.py', subType: 'py', language: 'py',
+                    code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
+                },
             },
         ],
     },
@@ -195,68 +161,48 @@ const WIDGETS: WidgetDefinition[] = [
             },
         ],
     },
-    // ── Note widgets ──
+    // ── Note ──
     {
-        type: 'note-sticker',
-        label: 'Sticker',
+        type: 'note',
+        label: 'Note',
         icon: 'sticky-note',
         category: 'Note',
-        tags: ['note', 'sticker', 'annotation', 'comment', 'post-it'],
-        description: 'Post-it style note for quick annotations',
+        tags: ['note', 'sticker', 'annotation', 'comment', 'post-it', 'label', 'group', 'section'],
+        description: 'Annotation notes, stickers, and labels',
         color: '#fbbf24',
-        minWidth: 60, minHeight: 60,
+        minWidth: 60, minHeight: 40,
         defaultWidth: 160, defaultHeight: 120,
+        subTypes: [
+            { value: 'sticker', label: 'Sticker', color: '#fbbf24' },
+            { value: 'group', label: 'Group Note', color: '#6366f1' },
+            { value: 'group-note', label: 'Section', color: '#10b981' },
+            { value: 'label', label: 'Label', color: '#94a3b8' },
+        ],
         templates: [
             {
                 name: 'Yellow Sticker',
                 description: 'Classic yellow post-it',
-                defaultData: { label: 'Note', content: 'Remember to check this!', variant: 'sticker', color: 'yellow' },
+                defaultData: { label: 'Note', content: 'Remember to check this!', subType: 'sticker', color: 'yellow' },
             },
             {
                 name: 'Pink Sticker',
                 description: 'Pink post-it note',
-                defaultData: { label: 'Important', content: '', variant: 'sticker', color: 'pink' },
+                defaultData: { label: 'Important', content: '', subType: 'sticker', color: 'pink' },
             },
-        ],
-    },
-    {
-        type: 'note-group',
-        label: 'Group Note',
-        icon: 'sticky-note',
-        category: 'Note',
-        tags: ['note', 'group', 'section', 'background', 'container'],
-        description: 'Background label for grouping nodes',
-        color: '#6366f1',
-        minWidth: 200, minHeight: 120,
-        defaultWidth: 400, defaultHeight: 250,
-        templates: [
             {
                 name: 'Section',
                 description: 'Label a section of the workflow',
-                defaultData: { label: 'Section', content: 'Group related nodes here', variant: 'group-note', color: '#6366f1' },
+                defaultData: { label: 'Section', content: 'Group related nodes here', subType: 'group-note', color: '#6366f1' },
             },
-        ],
-    },
-    {
-        type: 'note-label',
-        label: 'Label',
-        icon: 'sticky-note',
-        category: 'Note',
-        tags: ['note', 'label', 'text', 'markdown', 'heading'],
-        description: 'Text label with optional markdown',
-        color: '#94a3b8',
-        minWidth: 60, minHeight: 40,
-        defaultWidth: 200, defaultHeight: 80,
-        templates: [
             {
                 name: 'Heading',
                 description: 'Large text heading',
-                defaultData: { label: 'Workflow Title', variant: 'label', color: '#e2e8f0' },
+                defaultData: { label: 'Workflow Title', subType: 'label', color: '#e2e8f0' },
             },
             {
                 name: 'Caption',
                 description: 'Small description text',
-                defaultData: { label: 'Step 1', content: 'Initialize the pipeline', variant: 'label', color: '#94a3b8' },
+                defaultData: { label: 'Step 1', content: 'Initialize the pipeline', subType: 'label', color: '#94a3b8' },
             },
         ],
     },
@@ -271,21 +217,25 @@ const WIDGETS: WidgetDefinition[] = [
         color: '#10b981',
         minWidth: 60, minHeight: 40,
         defaultWidth: 160, defaultHeight: 60,
+        subTypes: [
+            { value: 'artifact', label: 'Artifact', color: '#10b981' },
+            { value: 'tool-call', label: 'Tool Call', color: '#06b6d4' },
+        ],
         templates: [
             {
                 name: 'Artifact',
                 description: 'Expects agent to generate an artifact',
-                defaultData: { label: 'Creates README.md', variant: 'artifact', target: 'README.md', status: 'pending' },
+                defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', status: 'pending' },
             },
             {
                 name: 'Tool Call',
                 description: 'Expects agent to call a specific tool',
-                defaultData: { label: 'Calls deploy()', variant: 'tool-call', target: 'deploy()', status: 'pending' },
+                defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', status: 'pending' },
             },
             {
                 name: 'Pull Request',
                 description: 'Expects agent to create a pull request',
-                defaultData: { label: 'Creates PR', variant: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+                defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'pending' },
             },
         ],
     },
