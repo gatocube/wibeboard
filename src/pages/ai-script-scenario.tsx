@@ -6,31 +6,19 @@
  * Turn 1: Agent works, tests run, user clicks "Comment" → loop back
  * Turn 2: Agent re-works, tests re-run, user clicks "Approve" → Deploy runs
  *
- * Edge colors:
- *   🟢 Green animated — active inter-node flow
- *   🟠 Orange animated — waking next node
- *   ⚫ Inactive         — no communication
+ * Uses shared FlowBuilder component for settings + zoom autosize.
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import {
-    ReactFlow,
-    ReactFlowProvider,
-    Background,
-    Panel,
-    type Node,
-    type Edge,
-    type NodeTypes,
-} from '@xyflow/react'
+import { ReactFlowProvider, Panel, type Node, type Edge, type NodeTypes } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
+import { FlowBuilder, type NodeSize } from '@/components/FlowBuilder'
 import { AgentNode } from '@/widgets/wibeglow/AgentNode'
 import { ScriptNode } from '@/widgets/wibeglow/ScriptNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
 
 // ── Node types ───────────────────────────────────────────────────────────────
-
-type NodeSize = 'S' | 'M' | 'L'
 
 const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
     S: { w: 50, h: 50, gap: 100 },
@@ -110,14 +98,13 @@ function makeSteps(): StepDef[] {
             }
         },
 
-        // ── Turn 1: User reviews (interactive — pauses here) ──
+        // ── Turn 1: User reviews ──
         {
             label: 'Awaiting user review (turn 1)',
             apply: (s: FlowState) => {
                 s.nodes['tests'].knockSide = 'out'
                 s.nodes['review'].status = 'waiting'
                 s.nodes['review'].knockSide = 'in'
-                // Mark as interactive — player pauses, user must click Comment or Approve
             }
         },
 
@@ -128,7 +115,6 @@ function makeSteps(): StepDef[] {
                 s.nodes['review'].status = 'idle'
                 s.nodes['review'].knockSide = null
                 s.nodes['tests'].knockSide = null
-                // Reset agent and tests for Turn 2
                 s.nodes['agent'].status = 'idle'
                 s.nodes['agent'].progress = 0
                 s.nodes['agent'].logs.push('📝 Review feedback: "Add input validation"')
@@ -235,14 +221,12 @@ export function AIScriptScenarioPage() {
     const store = useMemo(() => new StepStore(['agent', 'tests', 'review', 'deploy'], makeSteps()), [])
     const [state, setState] = useState(store.getState())
 
-    // Read initial size from URL params
     const params = new URLSearchParams(window.location.search)
     const initialSize = (params.get('size') as NodeSize) || 'M'
     const [nodeSize, setNodeSize] = useState<NodeSize>(initialSize)
     const [showJson, setShowJson] = useState(false)
     const sz = SIZE_PRESETS[nodeSize]
 
-    // Sync size to URL params
     useEffect(() => {
         const url = new URL(window.location.href)
         url.searchParams.set('size', nodeSize)
@@ -251,21 +235,11 @@ export function AIScriptScenarioPage() {
 
     useEffect(() => store.subscribe(() => setState(store.getState())), [store])
 
-    // Determine comment count for the review node
     const commentCount = state.nodes['agent']?.logs.filter(l => l.includes('Review feedback')).length || 0
 
-    // User action callbacks
-    const handleComment = useCallback(() => {
-        // Advance to "User commented — restarting" step
-        store.next()
-    }, [store])
+    const handleComment = useCallback(() => { store.next() }, [store])
+    const handleApprove = useCallback(() => { store.next() }, [store])
 
-    const handleApprove = useCallback(() => {
-        // Advance to "User approved" step
-        store.next()
-    }, [store])
-
-    // Edge logic
     const activeEdge = (source: string, target: string): boolean => {
         const sKnock = state.nodes[source]?.knockSide
         const tKnock = state.nodes[target]?.knockSide
@@ -305,8 +279,6 @@ export function AIScriptScenarioPage() {
                 configured: true,
                 code: 'describe("auth", () => {\n  it("login flow", () => { ... })\n  it("token refresh", () => { ... })\n})',
                 logs: state.nodes['tests']?.logs || [],
-                execTime: state.nodes['tests']?.status === 'done' ? '0.3s' : '—',
-                callsCount: state.nodes['tests']?.status === 'done' ? 3 : 0,
                 progress: state.nodes['tests']?.progress || 0,
                 width: sz.w, height: sz.h,
                 connectedHandles: ['in', 'out'],
@@ -315,8 +287,7 @@ export function AIScriptScenarioPage() {
         {
             id: 'review', type: 'user', position: { x: 50 + (sz.w + sz.gap) * 2, y: 80 },
             data: {
-                label: 'Code Review',
-                color: '#f59e0b',
+                label: 'Code Review', color: '#f59e0b',
                 status: state.nodes['review']?.status || 'idle',
                 knockSide: state.nodes['review']?.knockSide || null,
                 reviewTitle: 'Review: auth.ts',
@@ -339,8 +310,6 @@ export function AIScriptScenarioPage() {
                 configured: true,
                 code: '#!/bin/bash\nnpm run build\naws s3 sync dist/ s3://staging/',
                 logs: state.nodes['deploy']?.logs || [],
-                execTime: state.nodes['deploy']?.status === 'done' ? '12.1s' : '—',
-                callsCount: state.nodes['deploy']?.status === 'done' ? 2 : 0,
                 progress: state.nodes['deploy']?.progress || 0,
                 width: sz.w, height: sz.h,
                 connectedHandles: ['in'],
@@ -349,71 +318,33 @@ export function AIScriptScenarioPage() {
     ]
 
     const edges: Edge[] = [
-        {
-            id: 'agent-tests', source: 'agent', target: 'tests',
-            sourceHandle: 'out', targetHandle: 'in',
-            animated: activeEdge('agent', 'tests'),
-            style: edgeStyle('agent', 'tests'),
-        },
-        {
-            id: 'tests-review', source: 'tests', target: 'review',
-            sourceHandle: 'out', targetHandle: 'in',
-            animated: activeEdge('tests', 'review'),
-            style: edgeStyle('tests', 'review'),
-        },
-        {
-            id: 'review-deploy', source: 'review', target: 'deploy',
-            sourceHandle: 'out', targetHandle: 'in',
-            animated: activeEdge('review', 'deploy'),
-            style: edgeStyle('review', 'deploy'),
-        },
+        { id: 'agent-tests', source: 'agent', target: 'tests', sourceHandle: 'out', targetHandle: 'in', animated: activeEdge('agent', 'tests'), style: edgeStyle('agent', 'tests') },
+        { id: 'tests-review', source: 'tests', target: 'review', sourceHandle: 'out', targetHandle: 'in', animated: activeEdge('tests', 'review'), style: edgeStyle('tests', 'review') },
+        { id: 'review-deploy', source: 'review', target: 'deploy', sourceHandle: 'out', targetHandle: 'in', animated: activeEdge('review', 'deploy'), style: edgeStyle('review', 'deploy') },
     ]
 
     return (
         <ReactFlowProvider>
-            <ReactFlow
+            <FlowBuilder
                 nodes={nodes}
                 edges={edges}
                 nodeTypes={NODE_TYPES}
                 fitView
-                proOptions={{ hideAttribution: true }}
-                style={{ background: '#0a0a14' }}
                 nodesDraggable={false}
                 nodesConnectable={false}
-                zoomOnScroll={false}
-                panOnDrag={false}
+                currentSize={nodeSize}
+                onSizeChange={setNodeSize}
             >
-                <Background color="#1e1e3a" gap={20} />
                 <StepPlayer store={store} />
 
-                {/* Size switcher */}
+                {/* JSON debug toggle */}
                 <Panel position="top-right">
                     <div style={{
-                        display: 'flex', gap: 4, padding: '6px 10px',
-                        borderRadius: 8, background: 'rgba(15,15,26,0.9)',
+                        display: 'flex', gap: 4, marginTop: 40,
+                        padding: '4px 6px', borderRadius: 6,
+                        background: 'rgba(15,15,26,0.9)',
                         border: '1px solid rgba(255,255,255,0.08)',
-                        backdropFilter: 'blur(8px)',
-                        fontFamily: 'Inter',
                     }}>
-                        {(['S', 'M', 'L'] as NodeSize[]).map(s => (
-                            <button
-                                key={s}
-                                data-testid={`size-${s}`}
-                                onClick={() => setNodeSize(s)}
-                                style={{
-                                    background: nodeSize === s ? 'rgba(139,92,246,0.2)' : 'transparent',
-                                    color: nodeSize === s ? '#c084fc' : '#64748b',
-                                    border: nodeSize === s ? '1px solid rgba(139,92,246,0.3)' : '1px solid transparent',
-                                    borderRadius: 5, padding: '3px 10px', fontSize: 10,
-                                    fontWeight: 600, cursor: 'pointer',
-                                    fontFamily: 'Inter',
-                                }}
-                            >
-                                {s}
-                            </button>
-                        ))}
-
-                        <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', margin: '0 4px' }} />
                         <button
                             onClick={() => setShowJson(j => !j)}
                             style={{
@@ -430,26 +361,21 @@ export function AIScriptScenarioPage() {
                     </div>
                 </Panel>
 
-                {/* JSON debug panel */}
                 {showJson && (
                     <Panel position="bottom-right">
                         <pre style={{
                             background: 'rgba(15,15,26,0.95)',
                             border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: 8,
-                            padding: '10px 14px',
-                            color: '#94a3b8',
-                            fontSize: 9,
+                            borderRadius: 8, padding: '10px 14px',
+                            color: '#94a3b8', fontSize: 9,
                             fontFamily: "'JetBrains Mono', monospace",
-                            maxHeight: 300,
-                            overflow: 'auto',
-                            backdropFilter: 'blur(8px)',
+                            maxHeight: 300, overflow: 'auto',
                         }}>
                             {JSON.stringify(state, null, 2)}
                         </pre>
                     </Panel>
                 )}
-            </ReactFlow>
+            </FlowBuilder>
         </ReactFlowProvider>
     )
 }

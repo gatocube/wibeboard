@@ -5,9 +5,10 @@
  * Supports: Agent, Script (JS/TS/SH/PY), Group nodes.
  */
 
-import { ReactFlow, ReactFlowProvider, Background, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
+import { ReactFlowProvider, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
+import { FlowBuilder } from '@/components/FlowBuilder'
 import { useConnectorFlow, ConnectorFlowOverlay, anchorMouseToGridRect } from '@/engine/ConnectorFlow'
 import { GRID_CELL, widgetRegistry } from '@/engine/widget-registry'
 import { TimelineDots } from '@/components/TimelineDots'
@@ -423,37 +424,27 @@ function BuilderInner() {
     )
 
     return (
-        <div
-            ref={connector.attachHandleInterceptor}
-            style={{
-                width: '100%', height: '100%',
-                background: '#0a0a14',
-                position: 'relative',
-            }}
-        >
-            <style>{`
-                .react-flow__handle {
-                    cursor: pointer !important;
-                    transition: box-shadow 0.15s, background 0.15s !important;
-                }
-                .react-flow__handle:hover {
-                    box-shadow: 0 0 0 3px rgba(139,92,246,0.4), 0 0 8px rgba(139,92,246,0.3);
-                    background: #8b5cf6 !important;
-                }
-            `}</style>
-
-            <ReactFlow
+        <>
+            <FlowBuilder
                 nodes={combinedNodes}
                 edges={combinedEdges}
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 nodesDraggable
                 defaultViewport={{ x: 80, y: 60, zoom: 0.65 }}
-                proOptions={{ hideAttribution: true }}
-                style={{ background: 'transparent' }}
+                wrapperRef={connector.attachHandleInterceptor}
+                gridGap={GRID_SIZE}
+                onSizeChange={(size) => {
+                    const presets: Record<string, { w: number; h: number }> = {
+                        S: { w: 50, h: 50 }, M: { w: 160, h: 100 }, L: { w: 300, h: 200 },
+                    }
+                    const { w, h } = presets[size]
+                    setNodes(prev => prev.map(n => ({
+                        ...n,
+                        data: { ...n.data, width: w, height: h },
+                    })))
+                }}
             >
-                <Background color="#1e1e3a" gap={GRID_SIZE} size={1} />
-
                 {/* ── Workflow selector ── */}
                 <Panel position="top-center">
                     <div style={{
@@ -469,136 +460,130 @@ function BuilderInner() {
                             value={activeWorkflowId || ''}
                             onChange={e => { if (e.target.value) handleLoadWorkflow(e.target.value) }}
                             style={{
-                                background: 'rgba(30,30,58,0.9)',
-                                color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 6, padding: '4px 8px', fontSize: 11,
-                                fontFamily: 'Inter', minWidth: 160, cursor: 'pointer',
-                                outline: 'none',
+                                background: 'rgba(30,30,58,0.8)', color: '#c084fc',
+                                border: '1px solid rgba(139,92,246,0.2)',
+                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer',
+                                fontFamily: 'Inter',
                             }}
                         >
                             <option value="" disabled>Select workflow…</option>
-                            {workflows.map(w => (
-                                <option key={w.id} value={w.id}>{w.name} ({w.nodeCount})</option>
+                            {workflows.map((w: WorkflowMeta) => (
+                                <option key={w.id} value={w.id}>{w.name}</option>
                             ))}
                         </select>
-
                         <button
-                            data-testid="workflow-new"
                             onClick={handleNewWorkflow}
                             style={{
-                                background: '#8b5cf6', color: '#fff', border: 'none',
-                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                                background: 'transparent', color: '#64748b',
+                                border: '1px solid transparent',
+                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
                             }}
-                        >
-                            + New
-                        </button>
-
+                        >＋ New</button>
                         <button
                             data-testid="workflow-save"
                             onClick={handleSaveNow}
                             style={{
-                                background: dirty ? '#22c55e' : 'rgba(30,30,58,0.9)',
-                                color: dirty ? '#fff' : '#64748b',
-                                border: dirty ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-                                transition: 'all 0.2s',
+                                background: dirty ? 'rgba(245,158,11,0.15)' : 'transparent',
+                                color: dirty ? '#f59e0b' : '#64748b',
+                                border: dirty ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
+                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
                             }}
-                        >
-                            {dirty ? '● Save' : '✓ Saved'}
-                        </button>
-
+                        >{dirty ? '● Save' : 'Saved'}</button>
                         {activeWorkflowId && (
                             <button
-                                data-testid="workflow-delete"
                                 onClick={handleDeleteWorkflow}
                                 style={{
-                                    background: 'rgba(239,68,68,0.15)', color: '#ef4444',
-                                    border: '1px solid rgba(239,68,68,0.2)',
-                                    borderRadius: 5, padding: '4px 8px', fontSize: 10,
-                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    background: 'transparent', color: '#ef4444',
+                                    border: '1px solid transparent',
+                                    borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                                    fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
                                 }}
-                            >
-                                🗑
-                            </button>
+                            >🗑</button>
                         )}
-
-                        {/* Edit mode toggle */}
+                        <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', height: 16 }} />
                         <button
                             data-testid="edit-mode-toggle"
                             onClick={() => setEditMode(m => !m)}
                             style={{
-                                background: editMode ? 'rgba(59,130,246,0.2)' : 'rgba(30,30,58,0.9)',
-                                color: editMode ? '#3b82f6' : '#64748b',
-                                border: editMode ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 5, padding: '4px 10px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-                                transition: 'all 0.2s',
+                                background: editMode ? 'rgba(139,92,246,0.15)' : 'transparent',
+                                color: editMode ? '#c084fc' : '#64748b',
+                                border: editMode ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
+                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
                             }}
-                        >
-                            {editMode ? '✏️ Edit' : '👁 View'}
-                        </button>
-
+                        >{editMode ? '✏️ Edit' : '👁 View'}</button>
                         {activeWorkflowId && (
-                            <span style={{ fontSize: 9, color: '#475569', marginLeft: 4 }}>
+                            <span style={{ fontSize: 8, color: '#475569', fontFamily: 'Inter' }}>
                                 {workflowName}
                             </span>
                         )}
                     </div>
                 </Panel>
 
+                {/* ── Sidebar catalog ── */}
                 <Panel position="top-left">
                     <div style={{
-                        display: 'flex', flexDirection: 'column', gap: 8,
-                        padding: '12px 14px', borderRadius: 10,
-                        background: 'rgba(15,15,26,0.9)',
+                        display: 'flex', flexDirection: 'column', gap: 4,
+                        padding: '8px', borderRadius: 8,
+                        background: 'rgba(15,15,26,0.92)',
                         border: '1px solid rgba(255,255,255,0.08)',
                         backdropFilter: 'blur(8px)',
-                        fontFamily: 'Inter',
+                        maxHeight: 'calc(100vh - 120px)',
+                        overflowY: 'auto',
                     }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#8b5cf6' }}>
-                            🔗 Builder
-                        </div>
-                        <div style={{ fontSize: 10, color: '#64748b', lineHeight: 1.5, maxWidth: 220 }}>
-                            <b>Click</b> a handle (●) → click canvas to place →
-                            {' '}move to size → click to confirm → pick widget.
-                        </div>
-                        <div style={{ fontSize: 9, color: '#475569', display: 'flex', gap: 8, marginTop: 2 }}>
-                            <span>ESC / RMB = cancel</span>
-                            <span>·</span>
-                            <span>Grid: {GRID_CELL}px</span>
-                        </div>
+                        {widgetRegistry.getAll()
+                            .filter(w => !['note-sticker', 'note-group', 'note-label', 'expectation'].includes(w.type))
+                            .map(w => (
+                                <button
+                                    key={w.type}
+                                    data-testid={`catalog-${w.type}`}
+                                    draggable
+                                    onDragStart={e => {
+                                        e.dataTransfer.setData('application/wibeboard-widget', JSON.stringify(w))
+                                        e.dataTransfer.effectAllowed = 'move'
+                                    }}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: 6,
+                                        background: 'transparent', color: '#94a3b8',
+                                        border: '1px solid transparent',
+                                        borderRadius: 6, padding: '4px 8px', fontSize: 10,
+                                        fontWeight: 500, cursor: 'grab', textAlign: 'left',
+                                        fontFamily: 'Inter',
+                                    }}
+                                >
+                                    <div style={{
+                                        width: 6, height: 6, borderRadius: 2,
+                                        background: w.color,
+                                    }} />
+                                    {w.label}
+                                </button>
+                            ))}
                     </div>
                 </Panel>
 
-                <Panel position="bottom-center">
+                {/* ── JSON debug panel (bottom-right) ── */}
+                <Panel position="bottom-right">
                     <div style={{
-                        padding: '4px 10px', borderRadius: 6,
-                        background: 'rgba(15,15,26,0.85)',
-                        border: '1px solid rgba(255,255,255,0.06)',
-                        backdropFilter: 'blur(8px)',
-                        fontFamily: 'Inter', fontSize: 9,
-                        color: '#64748b', display: 'flex', gap: 8, alignItems: 'center',
+                        display: 'flex', flexDirection: 'column', gap: 4,
+                        maxWidth: 320,
                     }}>
-                        <span>{nodes.length} nodes</span>
-                        <span>·</span>
-                        <span>{edges.length} edges</span>
-                        <span>·</span>
-                        <span>⊞ grid snap</span>
-                        {connector.phase.type !== 'idle' && (
-                            <>
-                                <span>·</span>
-                                <span style={{ color: '#8b5cf6' }}>
-                                    {connector.phase.type === 'positioning' && '🔗 positioning'}
-                                    {connector.phase.type === 'sizing' && `📐 ${connector.currentGrid.cols}×${connector.currentGrid.rows}`}
-                                    {connector.phase.type === 'placed' && `✅ ${connector.currentGrid.cols}×${connector.currentGrid.rows}`}
-                                </span>
-                            </>
-                        )}
+                        <pre style={{
+                            background: 'rgba(15,15,26,0.95)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: 8, padding: '6px 10px',
+                            color: '#475569', fontSize: 8,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            margin: 0, maxHeight: 140, overflow: 'auto',
+                        }}>
+                            {nodes.length} nodes • {edges.length} edges
+                        </pre>
                     </div>
                 </Panel>
 
+                {/* Timeline dots */}
                 <Panel position="bottom-left">
                     <TimelineDots
                         nodes={nodes
@@ -611,13 +596,13 @@ function BuilderInner() {
                             }))}
                     />
                 </Panel>
-            </ReactFlow>
+            </FlowBuilder>
 
             <ConnectorFlowOverlay
                 phase={connector.phase}
                 currentGrid={connector.currentGrid}
             />
-        </div>
+        </>
     )
 }
 
