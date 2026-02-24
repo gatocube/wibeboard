@@ -152,8 +152,9 @@ function buildData(
         base.task = status !== 'idle' ? 'Processing authentication module...' : undefined
         base.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
         base.progress = progress
-        base.execTime = status === 'done' ? '4.2s' : '—'
+        base.execTime = status === 'done' ? '4.2s' : status === 'running' ? '1.3s' : '—'
         base.callsCount = status === 'done' ? 7 : status === 'running' ? 3 : 0
+        base.totalRuns = status === 'done' ? 42 : status === 'running' ? 41 : 40
         base.logs = status === 'running'
             ? ['⚡ tool_call: search("auth patterns")', '← result: 5 patterns found', '⚡ tool_call: analyze(patterns)']
             : status === 'done'
@@ -163,13 +164,17 @@ function buildData(
 
     // Job: script
     if (widget.type === 'job' && isScript) {
+        const langLabels: Record<string, string> = { js: 'JavaScript', ts: 'TypeScript', sh: 'Shell', py: 'Python' }
+        base.agent = langLabels[subType || 'js'] || subType
         base.language = subType
+        base.color = widget.subTypes?.find(s => s.value === subType)?.color || widget.color
         base.configured = true
         base.code = template.defaultData.code || '// empty'
-        base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : []
+        base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : status === 'running' ? ['> Running...'] : []
         base.status = status === 'running' ? 'running' : status === 'done' ? 'done' : 'idle'
         base.execTime = status === 'done' ? '1.8s' : status === 'running' ? '0.6s' : '—'
         base.callsCount = status === 'done' ? 3 : status === 'running' ? 1 : 0
+        base.totalRuns = status === 'done' ? 18 : status === 'running' ? 17 : 16
         base.progress = progress
     }
 
