@@ -132,8 +132,9 @@ function makeSteps(): StepDef[] {
             label: 'Node B asking follow-up',
             apply: (s: FlowState) => {
                 s.nodes['b'].status = 'running'
-                s.nodes['b'].knockSide = 'out'
-                s.nodes['a'].knockSide = 'in'
+                // B reaches toward A (left side) — A receives from B (right side)
+                s.nodes['b'].knockSide = 'in'
+                s.nodes['a'].knockSide = 'out'
                 s.nodes['b'].progress = 5
                 s.nodes['b'].logs.push('❓ What JWT expiry should I use?')
                 s.nodes['a'].logs.push('📥 B asks: What JWT expiry?')
@@ -270,13 +271,13 @@ export function TwoNodeScenarioPage() {
         })
     }
 
-    // Artifact edges — A publishes to artifact
+    // Artifact edges — A publishes via the top "thinking" gate
     for (const art of artifactEntries) {
         edges.push({
-            id: `a-art-${art.id}`, source: 'a', target: `art-${art.id}`,
+            id: `a-art-${art.id}`, source: 'a', sourceHandle: 'thinking', target: `art-${art.id}`,
             animated: !art.ready,
             style: {
-                stroke: art.ready ? '#22c55e55' : '#f59e0b44',
+                stroke: art.ready ? '#c084fc55' : '#c084fc33',
                 strokeWidth: 1,
                 strokeDasharray: art.ready ? undefined : '4 2',
             },

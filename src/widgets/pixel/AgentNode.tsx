@@ -72,11 +72,14 @@ export function AgentNode({ data }: { data: any }) {
                     }}
                 >
                     <StatusDot status={status} />
-                    <Handle type="target" position={Position.Left} style={{
+                    <Handle type="target" position={Position.Left} id="in" style={{
                         background: '#fbbf24', border: '2px solid #fbbf2455', width: 4, height: 4, borderRadius: 0,
                     }} />
-                    <Handle type="source" position={Position.Right} style={{
+                    <Handle type="source" position={Position.Right} id="out" style={{
                         background: '#666', border: '2px solid #33333355', width: 4, height: 4, borderRadius: 0,
+                    }} />
+                    <Handle type="source" position={Position.Top} id="thinking" style={{
+                        background: '#c084fc', border: '2px solid rgba(192,132,252,0.3)', width: 3, height: 3, borderRadius: 0,
                     }} />
                     <span style={{ fontSize: 14, color: '#fbbf24' }}>◈</span>
                     <span style={{ fontSize: 7, color: st.color, fontWeight: 700 }}>{st.label}</span>
@@ -106,11 +109,14 @@ export function AgentNode({ data }: { data: any }) {
                 justifyContent: 'space-between',
                 boxSizing: 'border-box',
             }}>
-            <Handle type="target" position={Position.Left} style={{
+            <Handle type="target" position={Position.Left} id="in" style={{
                 background: '#fbbf24', border: '2px solid #fbbf2455', width: 6, height: 6, borderRadius: 0,
             }} />
-            <Handle type="source" position={Position.Right} style={{
+            <Handle type="source" position={Position.Right} id="out" style={{
                 background: '#666', border: '2px solid #33333355', width: 6, height: 6, borderRadius: 0,
+            }} />
+            <Handle type="source" position={Position.Top} id="thinking" style={{
+                background: '#c084fc', border: '2px solid rgba(192,132,252,0.3)', width: 4, height: 4, borderRadius: 0,
             }} />
 
             {/* Header row */}

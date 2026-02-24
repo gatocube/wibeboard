@@ -120,8 +120,9 @@ export function AgentNode({ data }: { data: any }) {
                     ...knockStyle,
                 }}
             >
-                <Handle type="target" position={Position.Left} style={{ background: gh.accent, width: 6, height: 6 }} />
-                <Handle type="source" position={Position.Right} style={{ background: gh.fgMuted, width: 6, height: 6 }} />
+                <Handle type="target" position={Position.Left} id="in" style={{ background: gh.accent, width: 6, height: 6 }} />
+                <Handle type="source" position={Position.Right} id="out" style={{ background: gh.fgMuted, width: 6, height: 6 }} />
+                <Handle type="source" position={Position.Top} id="thinking" style={{ background: '#c084fc', width: 5, height: 5 }} />
                 <StatusDot status={status} />
             </motion.div>
         )
@@ -142,8 +143,9 @@ export function AgentNode({ data }: { data: any }) {
                 ...knockStyle,
             }}
         >
-            <Handle type="target" position={Position.Left} style={{ background: gh.accent, width: 8, height: 8 }} />
-            <Handle type="source" position={Position.Right} style={{ background: gh.fgMuted, width: 8, height: 8 }} />
+            <Handle type="target" position={Position.Left} id="in" style={{ background: gh.accent, width: 8, height: 8 }} />
+            <Handle type="source" position={Position.Right} id="out" style={{ background: gh.fgMuted, width: 8, height: 8 }} />
+            <Handle type="source" position={Position.Top} id="thinking" style={{ background: '#c084fc', width: 6, height: 6 }} />
 
             {/* Header — matches GitHub's issue/PR header */}
             <div style={{
