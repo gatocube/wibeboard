@@ -35,9 +35,9 @@ export function AgentNode({ data }: { data: any }) {
     const isWaking = status === 'waking'
     const isRunning = status === 'running'
     const isActive = isWaking || isRunning || !!(data.knockSide)
-    // Gradient border: vibrant when active, visible when idle/done
-    const secondaryColor = isActive ? '#06b6d4' : `${color}80`
-    const tertiaryColor = isActive ? '#f59e0b' : `${color}55`
+    // Gradient border: always multicolor — vibrant when active, softer when idle/done
+    const secondaryColor = isActive ? '#06b6d4' : '#06b6d488'
+    const tertiaryColor = isActive ? '#f59e0b' : '#f59e0b66'
     const knockOut = data.knockSide === 'out'
     const knockIn = data.knockSide === 'in'
     const hasKnock = !!(data.knockSide)

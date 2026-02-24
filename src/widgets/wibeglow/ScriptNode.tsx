@@ -242,7 +242,12 @@ export function ScriptNode({ data }: { data: any }) {
         )
     }
 
-    // ── M / L — solid color border wrapper (same technique as AgentNode) ──
+    // Language-specific gradient accent colors
+    const langAccents: Record<string, string> = {
+        js: '#f97316', ts: '#6366f1', sh: '#14b8a6', py: '#8b5cf6',
+    }
+    const accentColor = langAccents[lang] || langColor
+
     const codeLines = editingCode.split('\n')
     const lineCount = codeLines.length
 
@@ -251,7 +256,7 @@ export function ScriptNode({ data }: { data: any }) {
             width: w, height: h,
             padding: 1,
             borderRadius: 14,
-            background: langColor,
+            background: `linear-gradient(135deg, ${langColor}, ${accentColor})`,
             boxShadow: `0 4px 16px rgba(0,0,0,0.3)`,
         }}>
             <Handle type="target" position={Position.Left} style={{
