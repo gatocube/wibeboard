@@ -166,11 +166,10 @@ function AgentVariant({ data }: { data: any }) {
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                         style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
                     >
-                        <WidgetIcon
-                            type={isActive ? 'sparkle-burst' : 'sparkles'}
-                            size={14}
-                            color={isActive ? color : `${color}99`}
-                        />
+                        {isActive
+                            ? <WidgetIcon type="sparkle-burst" size={14} color={color} />
+                            : <Sparkles size={14} style={{ color: `${color}99` }} />
+                        }
                     </motion.div>
                     <AnimatePresence mode="wait">
                         <motion.div
