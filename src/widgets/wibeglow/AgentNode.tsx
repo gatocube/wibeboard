@@ -48,24 +48,25 @@ export function AgentNode({ data }: { data: any }) {
 
     // Knocking animation: pulsing inset glow on the side TOWARD the other node
     // 'out' = sending → RIGHT border (toward receiver); 'in' = receiving → LEFT border (toward sender)
+    // Both inset shadow AND outer glow are directional — no bleed to the opposite side
     const knockBoxShadow = (hasKnock && !staticMode)
         ? knockOut
             ? [
-                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
-                `inset -4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
-                `inset -1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                `inset -1px 0 0 0 ${knockColor}, 6px 0 8px -4px ${knockColor}22`,
+                `inset -4px 0 0 0 ${knockColor}, 8px 0 16px -4px ${knockColor}44`,
+                `inset -1px 0 0 0 ${knockColor}, 6px 0 8px -4px ${knockColor}22`,
             ]
             : knockIn
                 ? [
-                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
-                    `inset 4px 0 0 0 ${knockColor}, 0 0 12px ${knockColor}44`,
-                    `inset 1px 0 0 0 ${knockColor}, 0 0 4px ${knockColor}22`,
+                    `inset 1px 0 0 0 ${knockColor}, -6px 0 8px -4px ${knockColor}22`,
+                    `inset 4px 0 0 0 ${knockColor}, -8px 0 16px -4px ${knockColor}44`,
+                    `inset 1px 0 0 0 ${knockColor}, -6px 0 8px -4px ${knockColor}22`,
                 ]
                 : undefined
         : hasKnock
             ? (knockOut
-                ? `inset -3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`
-                : `inset 3px 0 0 0 ${knockColor}, 0 0 8px ${knockColor}33`)
+                ? `inset -3px 0 0 0 ${knockColor}, 6px 0 12px -4px ${knockColor}33`
+                : `inset 3px 0 0 0 ${knockColor}, -6px 0 12px -4px ${knockColor}33`)
             : undefined
 
     const knockTransition = (hasKnock && !staticMode)

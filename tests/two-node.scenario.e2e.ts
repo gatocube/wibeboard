@@ -100,50 +100,72 @@ test.describe('Two-node scenario with Automerge player', () => {
         await page.goto('/?page=two-node')
         await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
 
-        // Advance to waking phase (step 9: A wakes B) — both nodes have knockSide set
+        // ── Helper: check that knock effects never appear on A-left or B-right ──
+        // For WibeGlow (box-shadow based): parse inset shadows and verify X-offset direction
+        // For GHub (CSS border based): check borderLeftColor/borderRightColor directly
+
+        const checkWibeGlowBorders = async (phase: string) => {
+            const nodeA = page.locator('.react-flow__node').first()
+            const nodeB = page.locator('.react-flow__node').last()
+
+            // Get box-shadow from the inner content div (the motion.div with knockBoxShadow)
+            const aBoxShadow = await nodeA.locator('div > div').first().evaluate(
+                el => window.getComputedStyle(el).boxShadow
+            )
+            const bBoxShadow = await nodeB.locator('div > div').first().evaluate(
+                el => window.getComputedStyle(el).boxShadow
+            )
+
+            // Parse inset shadows — format: "inset Xpx 0px ..."
+            // For node A (knockSide='out'): all inset X-offsets should be NEGATIVE (= RIGHT border)
+            // For node B (knockSide='in'): all inset X-offsets should be POSITIVE (= LEFT border)
+            if (aBoxShadow && aBoxShadow !== 'none') {
+                const insetMatches = aBoxShadow.matchAll(/inset\s+(-?\d+(?:\.\d+)?)px/g)
+                for (const m of insetMatches) {
+                    const xOffset = parseFloat(m[1])
+                    expect(xOffset, `[${phase}] Node A inset X-offset should be ≤ 0 (RIGHT side), got ${xOffset}`).toBeLessThanOrEqual(0)
+                }
+            }
+
+            if (bBoxShadow && bBoxShadow !== 'none') {
+                const insetMatches = bBoxShadow.matchAll(/inset\s+(-?\d+(?:\.\d+)?)px/g)
+                for (const m of insetMatches) {
+                    const xOffset = parseFloat(m[1])
+                    expect(xOffset, `[${phase}] Node B inset X-offset should be ≥ 0 (LEFT side), got ${xOffset}`).toBeGreaterThanOrEqual(0)
+                }
+            }
+        }
+
+        // ── Phase 1: Waking (step 9: A sends 'out' to B, B receives 'in') ──
         for (let i = 0; i < 9; i++) {
             await page.locator('[data-testid="btn-next"]').click()
             await page.waitForTimeout(200)
         }
+        await page.waitForTimeout(500) // let animation settle
+        await checkWibeGlowBorders('waking')
 
-        // Check A's border — for WibeGlow (default theme), knock is via box-shadow
-        // 'out' should put glow on RIGHT side (negative inset X), never LEFT (positive inset X)
-        const nodeA = page.locator('.react-flow__node').first()
-        const nodeB = page.locator('.react-flow__node').last()
-
-        // Get the inner motion div with the box-shadow (first div child of the node wrapper)
-        const aBoxShadow = await nodeA.locator('div').first().evaluate(
-            el => window.getComputedStyle(el).boxShadow
-        )
-        const bBoxShadow = await nodeB.locator('div').first().evaluate(
-            el => window.getComputedStyle(el).boxShadow
-        )
-
-        // A has knockSide='out' → should glow RIGHT (negative X inset)
-        // If box-shadow contains a positive inset X, the glow is on the LEFT (wrong for A)
-        // B has knockSide='in' → should glow LEFT (positive X inset)
-        // If box-shadow contains a negative inset X, the glow is on the RIGHT (wrong for B)
-
-        // Advance to follow-up phase (step 10: B asks follow-up, knockSides swap)
+        // ── Phase 2: A responding (step 11: A.knockSide='out', B.knockSide='in') ──
         await page.locator('[data-testid="btn-next"]').click()
-        await page.waitForTimeout(300)
-
-        // Step 11: A responding — A.knockSide='out', B.knockSide='in'
+        await page.waitForTimeout(200)
         await page.locator('[data-testid="btn-next"]').click()
-        await page.waitForTimeout(300)
+        await page.waitForTimeout(500)
+        await checkWibeGlowBorders('responding')
 
-        // Now switch to GHub theme where borders are CSS border-left/border-right
+        // ── Phase 3: Switch to GHub and verify CSS borders ──
         await page.locator('[data-testid="theme-ghub"]').click()
         await page.waitForTimeout(500)
 
-        // A should have borderRight colored, NOT borderLeft
+        const nodeA = page.locator('.react-flow__node').first()
+        const nodeB = page.locator('.react-flow__node').last()
+
+        // Get A's border colors — A should have RIGHT border colored, NOT LEFT
         const aBorderLeft = await nodeA.locator('div').first().evaluate(
             el => window.getComputedStyle(el).borderLeftColor
         )
         const aBorderRight = await nodeA.locator('div').first().evaluate(
             el => window.getComputedStyle(el).borderRightColor
         )
-        // B should have borderLeft colored, NOT borderRight
+        // Get B's border colors — B should have LEFT border colored, NOT RIGHT
         const bBorderLeft = await nodeB.locator('div').first().evaluate(
             el => window.getComputedStyle(el).borderLeftColor
         )
@@ -151,11 +173,31 @@ test.describe('Two-node scenario with Automerge player', () => {
             el => window.getComputedStyle(el).borderRightColor
         )
 
-        // A's LEFT border should be default/uncolored (not orange/green)
-        // B's RIGHT border should be default/uncolored (not orange/green)
+        // Orange and green are the knock colors — they should NEVER appear on A-left or B-right
         const activeColors = ['rgb(249, 115, 22)', 'rgb(34, 197, 94)'] // orange, green
-        expect(activeColors).not.toContain(aBorderLeft)
-        expect(activeColors).not.toContain(bBorderRight)
+        expect(activeColors, 'Node A LEFT border must not be orange/green').not.toContain(aBorderLeft)
+        expect(activeColors, 'Node B RIGHT border must not be orange/green').not.toContain(bBorderRight)
+
+        // ── Phase 4: Switch to Pixel and verify border animation direction ──
+        await page.locator('[data-testid="theme-pixel"]').click()
+        await page.waitForTimeout(500)
+
+        const pxNodeA = page.locator('.react-flow__node').first()
+        const pxNodeB = page.locator('.react-flow__node').last()
+
+        // For Pixel theme, knock uses borderRightColor / borderLeftColor animation
+        // We can check computed style at a point in time
+        const pxABorderLeft = await pxNodeA.locator('div').first().evaluate(
+            el => window.getComputedStyle(el).borderLeftColor
+        )
+        const pxBBorderRight = await pxNodeB.locator('div').first().evaluate(
+            el => window.getComputedStyle(el).borderRightColor
+        )
+
+        // A-left and B-right should NOT have the knock color
+        // (Pixel uses same border color for inactive sides)
+        expect(activeColors, 'Pixel: Node A LEFT border must not be orange/green').not.toContain(pxABorderLeft)
+        expect(activeColors, 'Pixel: Node B RIGHT border must not be orange/green').not.toContain(pxBBorderRight)
     })
 
     test('size switcher changes node size correctly', async ({ page }) => {
