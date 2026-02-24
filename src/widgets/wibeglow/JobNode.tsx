@@ -191,8 +191,10 @@ function AgentVariant({ data }: { data: any }) {
                                 )}
                             </motion.div>
                         </AnimatePresence>
-                        {/* StatusDot — right side */}
-                        <StatusDot status={status} />
+                        {/* StatusDot — right side, contained in relative wrapper */}
+                        <div style={{ position: 'relative', width: 10, height: 10, flexShrink: 0 }}>
+                            <StatusDot status={status} />
+                        </div>
                     </div>
 
                     {/* ── PreviewCanvas (large only, 16:9) ── */}
