@@ -4,6 +4,9 @@
  * Provides:
  *   - type / subType classification
  *   - ctx (NodeContext) via React context → useNodeCtx()
+ *     ctx.data — raw node data
+ *     ctx.ui   — theme metadata (themeName, themeType)
+ *     ctx.messenger — agent messaging
  *
  * Hierarchy:
  *   BaseNode             (type, subType, ctx)
@@ -16,7 +19,7 @@
  */
 
 import type { ReactNode } from 'react'
-import type { NodeContext } from '@/engine/NodeContext'
+import type { NodeContext, NodeUI } from '@/engine/NodeContext'
 import { NodeCtxProvider } from '@/engine/NodeContext'
 
 export interface BaseNodeProps {
@@ -30,8 +33,37 @@ export interface BaseNodeProps {
     children: ReactNode | ((ctx: NodeContext | undefined) => ReactNode)
 }
 
+/** Derive UI metadata from data flags */
+function buildUI(data: any): NodeUI {
+    // Explicit theme info takes priority
+    if (data._themeName) {
+        return { themeName: data._themeName, themeType: data._themeType || 'night' }
+    }
+    // Infer from mode flags (backwards compat)
+    if (data.dayMode) return { themeName: 'ghub', themeType: 'day' }
+    if (data.staticMode) return { themeName: 'wibeglow', themeType: 'static' }
+    if (data.tuiMode) return { themeName: 'pixel', themeType: 'tui' }
+    return { themeName: 'wibeglow', themeType: 'night' }
+}
+
 export function BaseNode({ data, children }: BaseNodeProps) {
-    const ctx = data.ctx as NodeContext | undefined
+    const rawCtx = data.ctx as { nodeId?: string; messenger?: any } | undefined
+    const ui = buildUI(data)
+
+    const ctx: NodeContext | undefined = rawCtx?.messenger
+        ? {
+            nodeId: rawCtx.nodeId || '',
+            messenger: rawCtx.messenger,
+            data,
+            ui,
+        }
+        : {
+            // Gallery / standalone mode — no messenger
+            nodeId: '',
+            messenger: undefined as any,
+            data,
+            ui,
+        }
 
     return (
         <NodeCtxProvider value={ctx}>

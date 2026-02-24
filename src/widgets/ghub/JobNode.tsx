@@ -12,19 +12,9 @@ import type { NodeContext } from '@/engine/NodeContext'
  *   'agent' → GitHub Issue card with rainbow accent, task list, AI badge
  *   'script' → GitHub Actions workflow card with step list, language dot
  *
- * data.subType — 'ai' | 'script' (default: 'ai')
- * data.ctx — NodeContext with messenger
- * data.label — title
- * data.status — 'idle' | 'waking' | 'running' | 'done' | 'error'
- * data.agent — agent model name (agent variant)
- * data.language — 'js' | 'ts' | 'sh' | 'py' (script variant)
- * data.logs — string[] output
- * data.progress — 0-100
- * data.execTime — execution time
- * data.callsCount — number of tool calls
- * data.knockSide — 'in' | 'out' | null
- * data.width / data.height — dimensions
- * data.dayMode — boolean, light/dark GitHub theme
+ * All state accessed via ctx:
+ *   ctx.data  — label, status, agent, language, logs, progress, etc.
+ *   ctx.ui    — { themeName: 'ghub', themeType: 'night' | 'day' }
  */
 
 // ── GitHub color tokens ─────────────────────────────────────────────────────
@@ -98,20 +88,20 @@ export function JobNode({ data }: { data: any }) {
 
     return (
         <BaseNode data={data} type="job" subType={subType}>
-            {(ctx) => <JobNodeInner data={data} ctx={ctx} subType={subType} />}
+            {(ctx) => <JobNodeInner ctx={ctx} />}
         </BaseNode>
     )
 }
 
-function JobNodeInner({ data, ctx, subType }: { data: any; ctx: NodeContext | undefined; subType: string }) {
+function JobNodeInner({ ctx }: { ctx: NodeContext | undefined }) {
+    const data = ctx?.data || {}
+    const subType = data.subType || 'ai'
     const isAI = subType === 'ai'
-    const gh = data.dayMode ? ghLight : ghDark
+    const gh = ctx?.ui.themeType === 'day' ? ghLight : ghDark
     const status = data.status || 'idle'
     const w = data.width || (isAI ? 240 : 220)
     const h = data.height || (isAI ? 160 : 120)
     const isCompact = w <= 60
-    const isLarge = w >= 280
-    const logs: string[] = data.logs || []
 
     // Knock styling
     const knockSide = data.knockSide
@@ -157,18 +147,31 @@ function JobNodeInner({ data, ctx, subType }: { data: any; ctx: NodeContext | un
 
     // ── Full mode ──
     if (isAI) {
-        return <AgentVariant data={data} ctx={ctx} gh={gh} status={status} w={w} h={h} isLarge={isLarge} logs={logs} knockStyle={knockStyle} />
+        return <AgentVariant ctx={ctx!} gh={gh} />
     }
-    return <ScriptVariant data={data} ctx={ctx} gh={gh} status={status} w={w} h={h} logs={logs} knockStyle={knockStyle} />
+    return <ScriptVariant ctx={ctx!} gh={gh} />
 }
 
 // ── Agent variant ───────────────────────────────────────────────────────────
 
-function AgentVariant({ data, ctx: _ctx, gh, status, w, h, isLarge, logs, knockStyle }: {
-    data: any; ctx: NodeContext | undefined; gh: typeof ghDark; status: string
-    w: number; h: number; isLarge: boolean; logs: string[]; knockStyle: React.CSSProperties
-}) {
+function AgentVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
+    const { data } = ctx
+    const status = data.status || 'idle'
+    const w = data.width || 240
+    const h = data.height || 160
+    const isLarge = w >= 280
+    const logs: string[] = data.logs || []
     const pct = data.progress ?? 0
+
+    const knockSide = data.knockSide
+    const hasKnock = !!knockSide
+    const kColor = data.knockColor || '#f97316'
+    const knockStyle = hasKnock ? (
+        knockSide === 'out'
+            ? { borderRight: `2px solid ${kColor}` }
+            : { borderLeft: `2px solid ${kColor}` }
+    ) : {}
+
     const tasks = [
         { done: pct >= 25, text: data.task?.split(',')[0]?.trim() || 'Initialize' },
         { done: pct >= 50, text: data.task?.split(',')[1]?.trim() || 'Process' },
@@ -312,11 +315,22 @@ function AgentVariant({ data, ctx: _ctx, gh, status, w, h, isLarge, logs, knockS
 
 // ── Script variant ──────────────────────────────────────────────────────────
 
-function ScriptVariant({ data, ctx: _ctx, gh, status, w, h, logs, knockStyle }: {
-    data: any; ctx: NodeContext | undefined; gh: typeof ghDark; status: string
-    w: number; h: number; logs: string[]; knockStyle: React.CSSProperties
-}) {
+function ScriptVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
+    const { data } = ctx
+    const status = data.status || 'idle'
+    const w = data.width || 220
+    const h = data.height || 120
+    const logs: string[] = data.logs || []
     const lang = LANG_COLORS[data.language || 'js'] || LANG_COLORS.js
+
+    const knockSide = data.knockSide
+    const hasKnock = !!knockSide
+    const kColor = data.knockColor || '#f97316'
+    const knockStyle = hasKnock ? (
+        knockSide === 'out'
+            ? { borderRight: `2px solid ${kColor}` }
+            : { borderLeft: `2px solid ${kColor}` }
+    ) : {}
 
     return (
         <div style={{

@@ -5,14 +5,26 @@
  * anywhere in the node component tree without prop drilling.
  *
  * Usage in node components:
- *   function MyNode({ data }) {
- *       const ctx = useNodeCtx()  // from React context (set by BaseNode)
- *       ctx?.messenger.getContacts()
+ *   function JobNodeInner({ ctx }: { ctx: NodeContext }) {
+ *       const { data, ui, messenger } = ctx
+ *       const label = data.label
+ *       const isDark = ui.themeType === 'night'
  *   }
  */
 
 import { createContext, useContext } from 'react'
 import type { AgentMessenger } from './AgentMessenger'
+
+// ── UI metadata ─────────────────────────────────────────────────────────────
+
+export interface NodeUI {
+    /** Theme name: 'wibeglow' | 'pixel' | 'ghub' */
+    themeName: string
+    /** Theme variant: 'night' | 'day' | 'animated' | 'static' | 'pixel' | 'tui' */
+    themeType: string
+}
+
+// ── Node Context ────────────────────────────────────────────────────────────
 
 export interface NodeContext {
     /** The node's own ID */
@@ -20,6 +32,12 @@ export interface NodeContext {
 
     /** Messenger instance — contacts, inbox, knock, system commands */
     messenger: AgentMessenger
+
+    /** Raw node data (label, status, progress, subType, etc.) */
+    data: Record<string, any>
+
+    /** UI/theme metadata */
+    ui: NodeUI
 }
 
 // ── React context ───────────────────────────────────────────────────────────

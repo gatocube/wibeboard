@@ -591,17 +591,23 @@ function WidgetGalleryInner() {
                                                     }
                                                 }
 
+                                                // Pass theme metadata for ctx.ui
+                                                data._themeName = theme.name
+                                                data._themeType = 'night' // default
                                                 // Pass dayMode to GHub theme nodes
                                                 if (theme.name === 'ghub' && ghubDay) {
                                                     data.dayMode = true
+                                                    data._themeType = 'day'
                                                 }
                                                 // Pass staticMode to WibeGlow nodes
                                                 if (theme.name === 'wibeglow' && wibeglowStatic) {
                                                     data.staticMode = true
+                                                    data._themeType = 'static'
                                                 }
                                                 // Pass tuiMode to Pixel nodes
                                                 if (theme.name === 'pixel' && pixelTui) {
                                                     data.tuiMode = true
+                                                    data._themeType = 'tui'
                                                 }
 
                                                 const connLineLen = size.label === 'S' ? 60 : 40

@@ -244,18 +244,13 @@ function AgentVariant({ data }: { data: any }) {
                         }}>{data.task}</div>
                     )}
 
-                    {/* ── Time + Progress bar + percentage ── */}
+                    {/* ── Progress bar + percentage + time ── */}
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 6,
                         padding: '3px 10px 5px',
                         marginTop: 'auto',
                         flexShrink: 0,
                     }}>
-                        <span style={{
-                            fontSize: 9, color: '#64748b',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            flexShrink: 0,
-                        }}>{data.execTime || '—'}</span>
                         <div style={{
                             flex: 1, height: 3, background: `${color}15`,
                             borderRadius: 2,
@@ -276,6 +271,11 @@ function AgentVariant({ data }: { data: any }) {
                             fontFamily: "'JetBrains Mono', monospace",
                             flexShrink: 0,
                         }}><AnimatedNumber value={progress} />%</span>
+                        <span style={{
+                            fontSize: 9, color: '#64748b',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            flexShrink: 0,
+                        }}>{data.execTime || '—'}</span>
                     </div>
                 </div>
             </motion.div>
