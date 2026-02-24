@@ -58,15 +58,21 @@ test.describe('Two-node scenario with Automerge player', () => {
 
         // Verify artifact node appeared
         await expect(page.getByText('todolist.json', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
-        // Should show "building..." indicator
-        await expect(page.getByText('building', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+        // Compact artifact uses dashed border to indicate building state
+        const artifactBorder = await page.locator('[data-testid="artifact-node"] div').first().evaluate(
+            el => window.getComputedStyle(el).borderStyle
+        )
+        expect(artifactBorder).toContain('dashed')
 
         // Step 5: Progress 3/3 — artifact ready (solid)
         await page.locator('[data-testid="btn-next"]').click()
         await page.waitForTimeout(500)
 
-        // Should show "ready" indicator
-        await expect(page.getByText('ready', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+        // Compact artifact: solid border indicates ready state
+        const artifactBorderReady = await page.locator('[data-testid="artifact-node"] div').first().evaluate(
+            el => window.getComputedStyle(el).borderStyle
+        )
+        expect(artifactBorderReady).toContain('solid')
 
         // Step 6: Node A waking Node B
         await page.locator('[data-testid="btn-next"]').click()
@@ -263,5 +269,80 @@ test.describe('Two-node scenario with Automerge player', () => {
 
         // Label should be visible below compact node (WibeGlow compact renders label below)
         await expect(page.getByText('Planner', { exact: false }).first()).toBeVisible({ timeout: 3_000 })
+    })
+
+    test('no active green/orange borders during solo agent work', async ({ page }) => {
+        await page.goto('/?page=two-node')
+        await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
+
+        const activeColors = ['rgb(249, 115, 22)', 'rgb(34, 197, 94)'] // orange, green
+
+        // Advance to step 3 (A progress 1/3 — solo work, no knock)
+        for (let i = 0; i < 3; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
+        await page.waitForTimeout(500)
+
+        // Check edge stroke — should NOT be orange or green during solo work
+        const edgeStroke = await page.locator('.react-flow__edge path').first().evaluate(
+            el => window.getComputedStyle(el).stroke
+        )
+        expect(activeColors, `Edge stroke should NOT be active during solo work, got: ${edgeStroke}`).not.toContain(edgeStroke)
+
+        // Check node A box-shadow — should have no active knock glow
+        const aBoxShadow = await page.locator('.react-flow__node').first().locator('div > div').first().evaluate(
+            el => window.getComputedStyle(el).boxShadow
+        )
+        // No orange/green glow should be present
+        if (aBoxShadow && aBoxShadow !== 'none') {
+            expect(aBoxShadow).not.toContain('249, 115, 22') // orange
+            expect(aBoxShadow).not.toContain('34, 197, 94')  // green
+        }
+
+        // Advance to step 5 (artifact ready — still solo, no knock)
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(200)
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(500)
+
+        const edgeStroke2 = await page.locator('.react-flow__edge path').first().evaluate(
+            el => window.getComputedStyle(el).stroke
+        )
+        expect(activeColors, `Edge stroke should NOT be active at step 5, got: ${edgeStroke2}`).not.toContain(edgeStroke2)
+    })
+
+    test('artifact node is compact 3×3 size', async ({ page }) => {
+        await page.goto('/?page=two-node')
+        await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
+
+        // Advance to step 4 (artifact appears)
+        for (let i = 0; i < 4; i++) {
+            await page.locator('[data-testid="btn-next"]').click()
+            await page.waitForTimeout(200)
+        }
+        await page.waitForTimeout(500)
+
+        // Verify artifact node exists
+        const artifactNode = page.locator('[data-testid="artifact-node"]')
+        await expect(artifactNode).toBeVisible({ timeout: 3_000 })
+
+        // Verify size — the inner box should be ≤ 60×60 (3×3 = 56×56 design)
+        const box = artifactNode.locator('div').first()
+        const size = await box.boundingBox()
+        expect(size, 'Artifact inner box should have bounding box').toBeTruthy()
+        expect(size!.width).toBeLessThanOrEqual(70) // 56px + padding/border tolerance
+        expect(size!.height).toBeLessThanOrEqual(70)
+
+        // Verify it shows dashed border (building state)
+        const border = await box.evaluate(el => window.getComputedStyle(el).borderStyle)
+        expect(border).toContain('dashed')
+
+        // Step 5 — artifact ready = solid border
+        await page.locator('[data-testid="btn-next"]').click()
+        await page.waitForTimeout(500)
+
+        const borderReady = await box.evaluate(el => window.getComputedStyle(el).borderStyle)
+        expect(borderReady).toContain('solid')
     })
 })
