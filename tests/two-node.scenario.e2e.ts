@@ -313,7 +313,7 @@ test.describe('Two-node scenario with Automerge player', () => {
     })
 
     test('artifact node is compact 3×3 size', async ({ page }) => {
-        await page.goto('/?page=two-node')
+        await page.goto('/?page=two-node&size=L')
         await page.waitForSelector('[data-testid="step-player"]', { timeout: 10_000 })
 
         // Advance to step 4 (artifact appears)

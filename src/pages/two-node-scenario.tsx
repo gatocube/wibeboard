@@ -174,10 +174,24 @@ function makeSteps(): StepDef[] {
 export function TwoNodeScenarioPage() {
     const store = useMemo(() => new StepStore(['a', 'b'], makeSteps()), [])
     const [state, setState] = useState(store.getState())
-    const [theme, setTheme] = useState<ThemeKey>('wibeglow')
-    const [nodeSize, setNodeSize] = useState<NodeSize>('L')
+
+    // Read initial values from URL params
+    const params = new URLSearchParams(window.location.search)
+    const initialTheme = (params.get('theme') as ThemeKey) || 'wibeglow'
+    const initialSize = (params.get('size') as NodeSize) || 'M'
+
+    const [theme, setTheme] = useState<ThemeKey>(initialTheme)
+    const [nodeSize, setNodeSize] = useState<NodeSize>(initialSize)
     const [showJson, setShowJson] = useState(false)
     const sz = SIZE_PRESETS[nodeSize]
+
+    // Sync size/theme back to URL params
+    useEffect(() => {
+        const url = new URL(window.location.href)
+        url.searchParams.set('theme', theme)
+        url.searchParams.set('size', nodeSize)
+        window.history.replaceState({}, '', url.toString())
+    }, [theme, nodeSize])
 
     useEffect(() => store.subscribe(() => setState(store.getState())), [store])
 
