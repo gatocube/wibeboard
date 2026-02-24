@@ -35,7 +35,7 @@ function lineColor(line: string): string {
 }
 
 export function PreviewCanvas({ type, lines = [], maxLines = 5 }: PreviewCanvasProps) {
-    if (type !== 'terminal' || lines.length === 0) return null
+    if (type !== 'terminal') return null
 
     const visibleLines = lines.slice(-maxLines)
 
