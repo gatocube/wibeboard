@@ -7,6 +7,7 @@ import { PreviewCanvas } from '@/components/PreviewCanvas'
 import { StatusDot } from '@/widgets/StatusDot'
 import { ShimmeringText, SplittingText } from '@/components/animate-ui'
 import { BaseNode } from '@/widgets/BaseNode'
+import { WidgetIcon } from '@/components/WidgetIcon'
 
 /**
  * JobNode (wibeglow) — Unified modern dark node for agents and scripts.
@@ -159,6 +160,18 @@ function AgentVariant({ data }: { data: any }) {
                     borderBottom: `1px solid ${color}15`,
                 }}>
                     <StatusDot status={status} />
+                    {/* State-aware icon: sparkle-burst when active, sparkles default */}
+                    <motion.div
+                        animate={isActive ? { rotate: [0, 15, -15, 0] } : {}}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
+                    >
+                        <WidgetIcon
+                            type={isActive ? 'sparkle-burst' : 'sparkles'}
+                            size={14}
+                            color={isActive ? color : `${color}99`}
+                        />
+                    </motion.div>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={status}
@@ -514,6 +527,11 @@ function ScriptVariant({ data }: { data: any }) {
                                     : '#475569',
                         boxShadow: status === 'running' ? '0 0 6px #f7df1e55' : 'none',
                     }} />
+                    <WidgetIcon
+                        type={status === 'running' ? 'terminal-blink' : 'terminal'}
+                        size={12}
+                        color={status === 'running' ? langColor : `${langColor}88`}
+                    />
                     <div style={{
                         flex: 1, fontSize: 10, fontWeight: 600, color: '#94a3b8',
                         fontFamily: "'JetBrains Mono', monospace",
