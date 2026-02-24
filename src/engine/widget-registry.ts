@@ -166,6 +166,30 @@ const WIDGETS: WidgetDefinition[] = [
             },
         ],
     },
+    // ── User (human interaction) ──
+    {
+        type: 'user',
+        label: 'User',
+        icon: 'user',
+        category: 'AI',
+        tags: ['user', 'human', 'review', 'approval', 'gate', 'interaction'],
+        description: 'Human interaction node for reviews, approvals, and manual gates',
+        color: '#f59e0b',
+        minWidth: 60, minHeight: 60,
+        defaultWidth: 160, defaultHeight: 100,
+        templates: [
+            {
+                name: 'Code Reviewer',
+                description: 'Human code review with approve/comment',
+                defaultData: { label: 'Code Review', color: '#f59e0b', status: 'idle', reviewTitle: 'Code Review', reviewBody: 'Review the changes and approve or request modifications.' },
+            },
+            {
+                name: 'Approval Gate',
+                description: 'Manual approval before deployment',
+                defaultData: { label: 'Approval', color: '#22c55e', status: 'idle', reviewTitle: 'Deploy Approval', reviewBody: 'Approve to start deployment.' },
+            },
+        ],
+    },
     // ── Note widgets ──
     {
         type: 'note-sticker',
