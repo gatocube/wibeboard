@@ -2,7 +2,7 @@ import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { Construction } from 'lucide-react'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { useCallback, useRef } from 'react'
-import { WidgetSelector } from '@/components/WidgetSelector'
+import { WidgetPicker } from '@/flow-builder'
 
 /**
  * PlaceholderNode — dashed "under construction" node.
@@ -68,7 +68,7 @@ export function PlaceholderNode({ data }: { data: any }) {
                 align="start"
                 style={{ zIndex: 1000 }}
             >
-                <WidgetSelector
+                <WidgetPicker
                     rectSize={{ width: w, height: h }}
                     gridSize={{ cols: gridCols, rows: gridRows }}
                     onSelect={(widget, template) => data.onSelectWidget?.(widget, template)}

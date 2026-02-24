@@ -6,10 +6,11 @@ import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
 import { IconsGalleryPage } from '@/pages/test-icons'
 import { AIScriptScenarioPage } from '@/pages/ai-script-scenario'
 import { IntegrationsPage } from '@/pages/integrations'
+import { UIKitPage } from '@/pages/ui-kit'
 import { FpsMeter } from '@/components/FpsMeter'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations'
+type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit'
 
 interface NavItem {
     id: Page
@@ -27,6 +28,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'integrations', label: 'Integrations', icon: <Key size={14} />, description: 'API keys for AI & external services' },
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
     { id: 'icons', label: 'Icon Reference', icon: <Palette size={14} />, description: 'All icons used in wibeboard' },
+    { id: 'ui-kit', label: 'UI Kit', icon: <Layers size={14} />, description: 'Reusable components & demos' },
 ]
 
 export function App() {
@@ -34,7 +36,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations'].includes(p)) {
+        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -58,7 +60,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations'].includes(p)) {
+            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -240,6 +242,7 @@ export function App() {
                     {page === 'widgets' && <TestWidgetsPage />}
                     {page === 'icons' && <IconsGalleryPage />}
                     {page === 'integrations' && <IntegrationsPage />}
+                    {page === 'ui-kit' && <UIKitPage />}
                 </div>
             </div>
         </div>

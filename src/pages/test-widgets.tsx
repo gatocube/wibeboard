@@ -13,7 +13,7 @@
 
 import { useState, useCallback } from 'react'
 import { ReactFlow, ReactFlowProvider, type Node, type Edge, Handle, Position } from '@xyflow/react'
-import { WidgetSelector } from '@/components/WidgetSelector'
+import { WidgetPicker } from '@/flow-builder'
 import {
     widgetRegistry,
     type WidgetDefinition,
@@ -266,7 +266,7 @@ function WidgetGalleryInner() {
                 display: 'flex', flexDirection: 'column',
                 overflow: 'hidden',
             }}>
-                <WidgetSelector
+                <WidgetPicker
                     rectSize={{ width: 200, height: 120 }}
                     onSelect={handleSelect as any}
                     onCancel={() => { }}

@@ -1,12 +1,12 @@
 /**
- * WidgetSelector — popup for choosing which widget to place.
+ * WidgetPicker — sidebar / popup for choosing which widget to place.
  *
  * Layout:
  *  1. Recently used tiles (icon grid)
  *  2. Category tiles row (AI, Script, Expectation, Note)
  *  3. Full widget list (searchable)
  *
- * Streamlined from magnetic-filament's WidgetSelector.tsx.
+ * Renamed from WidgetSelector.
  */
 
 import { useState, useEffect, useRef } from 'react'
@@ -54,7 +54,7 @@ function pushRecent(type: string) {
 
 // ── Component ────────────────────────────────────────────────────────────────────
 
-interface WidgetSelectorProps {
+interface WidgetPickerProps {
     rectSize: { width: number; height: number }
     gridSize?: { cols: number; rows: number }
     onSelect: (widget: WidgetDefinition, template: WidgetTemplate) => void
@@ -63,14 +63,14 @@ interface WidgetSelectorProps {
     embedded?: boolean
 }
 
-export function WidgetSelector({
+export function WidgetPicker({
     rectSize,
     gridSize,
     onSelect,
     onCancel,
     onHoverWidget,
     embedded,
-}: WidgetSelectorProps) {
+}: WidgetPickerProps) {
     const [search, setSearch] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<WidgetCategory | string | null>(null)
     const [expandedWidget, setExpandedWidget] = useState<string | null>(null)

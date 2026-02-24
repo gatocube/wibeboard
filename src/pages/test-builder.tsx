@@ -8,9 +8,8 @@
 import { ReactFlowProvider, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
-import { FlowBuilder } from '@/components/FlowBuilder'
-import { useConnectorFlow, ConnectorFlowOverlay, anchorMouseToGridRect } from '@/engine/ConnectorFlow'
-import { GRID_CELL, widgetRegistry } from '@/engine/widget-registry'
+import { FlowBuilder } from '@/flow-builder'
+import type { WidgetTemplate } from '@/engine/widget-registry'
 import { TimelineDots } from '@/components/TimelineDots'
 import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
 
@@ -222,18 +221,6 @@ function BuilderInner() {
         ))
     }, [])
 
-    // ── Placeholder resize helper ──
-    const handlePlaceholderResize = useCallback((placeholderId: string, newW: number, newH: number) => {
-        const snappedW = Math.max(40, Math.round(newW / GRID_CELL) * GRID_CELL)
-        const snappedH = Math.max(40, Math.round(newH / GRID_CELL) * GRID_CELL)
-        updateNodeData(placeholderId, {
-            width: snappedW,
-            height: snappedH,
-            gridCols: Math.round(snappedW / GRID_CELL),
-            gridRows: Math.round(snappedH / GRID_CELL),
-        })
-    }, [updateNodeData])
-
     // ── Script run callback ──
     const handleRunScript = useCallback((nodeId: string) => {
         setNodes(nds => {
@@ -274,131 +261,44 @@ function BuilderInner() {
         })
     }, [updateNodeData])
 
-    // ── Connector Flow ──
-    const connector = useConnectorFlow({
-        onCreatePlaceholder: (sourceId, anchor) => {
-            const placeholderId = `placeholder-${Date.now()}`
-            const defaultRect = anchorMouseToGridRect(anchor, { x: anchor.x + 160, y: anchor.y })
+    // ── Node created via FlowBuilder connector ──
+    const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetTemplate, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
+        const nodeData: Record<string, any> = {
+            label: template.defaultData.label || template.name,
+            ...template.defaultData,
+            width: rect.width,
+            height: rect.height,
+        }
 
-            setNodes(nds => [...nds, {
-                id: placeholderId,
-                type: 'placeholder',
-                position: { x: defaultRect.x, y: defaultRect.y },
-                data: {
-                    width: defaultRect.width,
-                    height: defaultRect.height,
-                    gridCols: defaultRect.cols,
-                    gridRows: defaultRect.rows,
-                    sizing: true,
-                },
+        // Inject script callbacks for script-* types
+        if (widgetType.startsWith('script-')) {
+            nodeData.configured = false
+            nodeData.logs = []
+            nodeData.status = 'idle'
+            nodeData.onSaveScript = (code: string) => {
+                updateNodeData(nodeId, { code, configured: true })
+            }
+            nodeData.onRunScript = () => handleRunScript(nodeId)
+        }
+
+        setNodes(nds => [...nds, {
+            id: nodeId,
+            type: widgetType,
+            position: { x: rect.x, y: rect.y },
+            data: nodeData,
+            style: { width: rect.width, height: rect.height },
+        }])
+
+        if (sourceNodeId) {
+            setEdges(eds => [...eds, {
+                id: `edge-${sourceNodeId}-${nodeId}`,
+                source: sourceNodeId,
+                target: nodeId,
+                animated: true,
+                style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
             }])
-
-            setEdges(eds => {
-                if (!sourceId) return eds // DnD drop — no source edge
-                return [...eds, {
-                    id: `edge-${sourceId}-${placeholderId}`,
-                    source: sourceId,
-                    target: placeholderId,
-                    animated: true,
-                    style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
-                }]
-            })
-
-            return placeholderId
-        },
-
-        onResizePlaceholder: (placeholderId, rect) => {
-            const gridCols = Math.round(rect.width / GRID_CELL)
-            const gridRows = Math.round(rect.height / GRID_CELL)
-            setNodes(nds => nds.map(n =>
-                n.id === placeholderId
-                    ? {
-                        ...n,
-                        position: { x: rect.x, y: rect.y },
-                        data: { ...n.data, width: rect.width, height: rect.height, gridCols, gridRows, sizing: true },
-                    }
-                    : n
-            ))
-        },
-
-        onSizingFinalized: (placeholderId) => {
-            setNodes(nds => nds.map(n =>
-                n.id === placeholderId
-                    ? {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            sizing: false,
-                            resizable: true,
-                            showSelector: true,
-                            onResize: (newW: number, newH: number) => handlePlaceholderResize(placeholderId, newW, newH),
-                            onSelectWidget: (widget: any, template: any) => {
-                                connector.selectWidget(widget, template)
-                            },
-                            onCancelSelector: () => connector.cancel(),
-                            onHoverWidget: (widget: any) => {
-                                setNodes(ns => ns.map(nd =>
-                                    nd.id === placeholderId
-                                        ? { ...nd, data: { ...nd.data, hoveredWidget: widget } }
-                                        : nd
-                                ))
-                            },
-                        },
-                    }
-                    : n
-            ))
-        },
-
-        onFinalize: (placeholderId, widgetType, template, _gridCols, _gridRows) => {
-            const nodeId = `node-${Date.now()}`
-
-            setNodes(nds => nds.map(n => {
-                if (n.id !== placeholderId) return n
-                const placeholderW = Number(n.data?.width) || 160
-                const placeholderH = Number(n.data?.height) || 100
-
-                const nodeData: Record<string, any> = {
-                    label: template.defaultData.label || template.name,
-                    ...template.defaultData,
-                    width: placeholderW,
-                    height: placeholderH,
-                }
-
-                // Inject script callbacks for script-* types
-                if (widgetType.startsWith('script-')) {
-                    nodeData.configured = false
-                    nodeData.logs = []
-                    nodeData.status = 'idle'
-                    nodeData.onSaveScript = (code: string) => {
-                        updateNodeData(nodeId, { code, configured: true })
-                    }
-                    nodeData.onRunScript = () => handleRunScript(nodeId)
-                }
-
-                return {
-                    ...n,
-                    id: nodeId,
-                    type: widgetType,
-                    style: { width: placeholderW, height: placeholderH },
-                    data: nodeData,
-                } satisfies Node
-            }))
-
-            // Update edge target
-            setEdges(eds => eds.map(e =>
-                e.target === placeholderId
-                    ? { ...e, target: nodeId, animated: true }
-                    : e
-            ))
-
-            widgetRegistry.markUsed(widgetType)
-        },
-
-        onCancel: (placeholderId) => {
-            setNodes(nds => nds.filter(n => n.id !== placeholderId))
-            setEdges(eds => eds.filter(e => e.target !== placeholderId))
-        },
-    })
+        }
+    }, [updateNodeData, handleRunScript])
 
     // ── Inject callbacks into existing script nodes (memoized to avoid blinking) ──
     const nodesWithCallbacks = useMemo(() => nodes.map(n => {
@@ -416,160 +316,190 @@ function BuilderInner() {
         return base
     }), [nodes, editMode, handleRunScript, updateNodeData])
 
-    // ── Memoize combined arrays to prevent React Flow edge blinking ──
-    const combinedNodes = useMemo(
-        () => [...nodesWithCallbacks, ...connector.previewNodes],
-        [nodesWithCallbacks, connector.previewNodes]
-    )
-    const combinedEdges = useMemo(
-        () => [...edges, ...connector.previewEdges],
-        [edges, connector.previewEdges]
-    )
-
     return (
-        <>
-            <FlowBuilder
-                nodes={combinedNodes}
-                edges={combinedEdges}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                nodesDraggable
-                defaultViewport={{ x: 80, y: 60, zoom: 0.65 }}
-                wrapperRef={connector.attachHandleInterceptor}
-                gridGap={GRID_SIZE}
-                editMode={editMode}
-                onWidgetDrop={(position) => {
-                    connector.startSizingAt(position)
-                }}
-                onSizeChange={(size) => {
-                    const presets: Record<string, { w: number; h: number }> = {
-                        S: { w: 50, h: 50 }, M: { w: 160, h: 100 }, L: { w: 300, h: 200 },
-                    }
-                    const { w, h } = presets[size]
-                    setNodes(prev => prev.map(n => ({
-                        ...n,
-                        data: { ...n.data, width: w, height: h },
-                    })))
-                }}
-            >
-                {/* ── Workflow selector ── */}
-                <Panel position="top-center">
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '6px 10px', borderRadius: 8,
-                        background: 'rgba(15,15,26,0.92)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        backdropFilter: 'blur(8px)',
-                        fontFamily: 'Inter',
-                    }}>
-                        <select
-                            data-testid="workflow-select"
-                            value={activeWorkflowId || ''}
-                            onChange={e => { if (e.target.value) handleLoadWorkflow(e.target.value) }}
-                            style={{
-                                background: 'rgba(30,30,58,0.8)', color: '#c084fc',
-                                border: '1px solid rgba(139,92,246,0.2)',
-                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer',
-                                fontFamily: 'Inter',
-                            }}
-                        >
-                            <option value="" disabled>Select workflow…</option>
-                            {workflows.map((w: WorkflowMeta) => (
-                                <option key={w.id} value={w.id}>{w.name}</option>
-                            ))}
-                        </select>
+        <FlowBuilder
+            nodes={nodesWithCallbacks}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            nodesDraggable
+            defaultViewport={{ x: 80, y: 60, zoom: 0.65 }}
+            gridGap={GRID_SIZE}
+            editMode={editMode}
+            onNodeCreated={handleNodeCreated}
+            onAddBefore={(nodeId) => {
+                // Insert a new node between the incoming source and this node
+                const incomingEdge = edges.find(e => e.target === nodeId)
+                const sourceId = incomingEdge?.source || null
+
+                const targetNode = nodes.find(n => n.id === nodeId)
+                if (!targetNode) return
+
+                // Position the new node between source and target
+                const sourceNode = sourceId ? nodes.find(n => n.id === sourceId) : null
+                const newX = sourceNode
+                    ? (sourceNode.position.x + targetNode.position.x) / 2
+                    : targetNode.position.x - 200
+                const newY = targetNode.position.y
+
+                const newNodeId = `node-${Date.now()}`
+                setNodes(nds => [...nds, {
+                    id: newNodeId,
+                    type: 'placeholder',
+                    position: { x: newX, y: newY },
+                    data: {
+                        width: 160, height: 100,
+                        gridCols: 4, gridRows: 2,
+                        sizing: false, showSelector: true,
+                    },
+                }])
+
+                // Rewire: sourceId → newNode → nodeId
+                setEdges(eds => {
+                    const updated = sourceId
+                        ? eds.map(e => e.target === nodeId && e.source === sourceId
+                            ? { ...e, target: newNodeId }
+                            : e)
+                        : eds
+                    return [...updated, {
+                        id: `edge-${newNodeId}-${nodeId}`,
+                        source: newNodeId,
+                        target: nodeId,
+                        animated: true,
+                        style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+                    }]
+                })
+            }}
+            onRename={(nodeId, newName) => {
+                updateNodeData(nodeId, { label: newName })
+            }}
+            onConfigure={(nodeId) => {
+                console.log('Configure node:', nodeId)
+                // TODO: open configuration panel for the node
+            }}
+            onSizeChange={(size) => {
+                const presets: Record<string, { w: number; h: number }> = {
+                    S: { w: 50, h: 50 }, M: { w: 160, h: 100 }, L: { w: 300, h: 200 },
+                }
+                const { w, h } = presets[size]
+                setNodes(prev => prev.map(n => ({
+                    ...n,
+                    data: { ...n.data, width: w, height: h },
+                })))
+            }}
+        >
+            {/* ── Workflow selector ── */}
+            <Panel position="top-center">
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 10px', borderRadius: 8,
+                    background: 'rgba(15,15,26,0.92)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(8px)',
+                    fontFamily: 'Inter',
+                }}>
+                    <select
+                        data-testid="workflow-select"
+                        value={activeWorkflowId || ''}
+                        onChange={e => { if (e.target.value) handleLoadWorkflow(e.target.value) }}
+                        style={{
+                            background: 'rgba(30,30,58,0.8)', color: '#c084fc',
+                            border: '1px solid rgba(139,92,246,0.2)',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                            fontWeight: 600, cursor: 'pointer',
+                            fontFamily: 'Inter',
+                        }}
+                    >
+                        <option value="" disabled>Select workflow…</option>
+                        {workflows.map((w: WorkflowMeta) => (
+                            <option key={w.id} value={w.id}>{w.name}</option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={handleNewWorkflow}
+                        style={{
+                            background: 'transparent', color: '#64748b',
+                            border: '1px solid transparent',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                            fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
+                        }}
+                    >＋ New</button>
+                    <button
+                        data-testid="workflow-save"
+                        onClick={handleSaveNow}
+                        style={{
+                            background: dirty ? 'rgba(245,158,11,0.15)' : 'transparent',
+                            color: dirty ? '#f59e0b' : '#64748b',
+                            border: dirty ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                            fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
+                        }}
+                    >{dirty ? '● Save' : 'Saved'}</button>
+                    {activeWorkflowId && (
                         <button
-                            onClick={handleNewWorkflow}
+                            onClick={handleDeleteWorkflow}
                             style={{
-                                background: 'transparent', color: '#64748b',
+                                background: 'transparent', color: '#ef4444',
                                 border: '1px solid transparent',
                                 borderRadius: 5, padding: '3px 8px', fontSize: 10,
                                 fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
                             }}
-                        >＋ New</button>
-                        <button
-                            data-testid="workflow-save"
-                            onClick={handleSaveNow}
-                            style={{
-                                background: dirty ? 'rgba(245,158,11,0.15)' : 'transparent',
-                                color: dirty ? '#f59e0b' : '#64748b',
-                                border: dirty ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
-                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
-                            }}
-                        >{dirty ? '● Save' : 'Saved'}</button>
-                        {activeWorkflowId && (
-                            <button
-                                onClick={handleDeleteWorkflow}
-                                style={{
-                                    background: 'transparent', color: '#ef4444',
-                                    border: '1px solid transparent',
-                                    borderRadius: 5, padding: '3px 8px', fontSize: 10,
-                                    fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
-                                }}
-                            >🗑</button>
-                        )}
-                        <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', height: 16 }} />
-                        <button
-                            data-testid="edit-mode-toggle"
-                            onClick={() => setEditMode(m => !m)}
-                            style={{
-                                background: editMode ? 'rgba(139,92,246,0.15)' : 'transparent',
-                                color: editMode ? '#c084fc' : '#64748b',
-                                border: editMode ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
-                                borderRadius: 5, padding: '3px 8px', fontSize: 10,
-                                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
-                            }}
-                        >{editMode ? '✏️ Edit' : '👁 View'}</button>
-                        {activeWorkflowId && (
-                            <span style={{ fontSize: 8, color: '#475569', fontFamily: 'Inter' }}>
-                                {workflowName}
-                            </span>
-                        )}
-                    </div>
-                </Panel>
+                        >🗑</button>
+                    )}
+                    <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', height: 16 }} />
+                    <button
+                        data-testid="edit-mode-toggle"
+                        onClick={() => setEditMode(m => !m)}
+                        style={{
+                            background: editMode ? 'rgba(139,92,246,0.15)' : 'transparent',
+                            color: editMode ? '#c084fc' : '#64748b',
+                            border: editMode ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                            fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
+                        }}
+                    >{editMode ? '✏️ Edit' : '👁 View'}</button>
+                    {activeWorkflowId && (
+                        <span style={{ fontSize: 8, color: '#475569', fontFamily: 'Inter' }}>
+                            {workflowName}
+                        </span>
+                    )}
+                </div>
+            </Panel>
 
 
-                {/* ── JSON debug panel (bottom-right) ── */}
-                <Panel position="bottom-right">
-                    <div style={{
-                        display: 'flex', flexDirection: 'column', gap: 4,
-                        maxWidth: 320,
+            {/* ── JSON debug panel (bottom-right) ── */}
+            <Panel position="bottom-right">
+                <div style={{
+                    display: 'flex', flexDirection: 'column', gap: 4,
+                    maxWidth: 320,
+                }}>
+                    <pre style={{
+                        background: 'rgba(15,15,26,0.95)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: 8, padding: '6px 10px',
+                        color: '#475569', fontSize: 8,
+                        fontFamily: "'JetBrains Mono', monospace",
+                        margin: 0, maxHeight: 140, overflow: 'auto',
                     }}>
-                        <pre style={{
-                            background: 'rgba(15,15,26,0.95)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: 8, padding: '6px 10px',
-                            color: '#475569', fontSize: 8,
-                            fontFamily: "'JetBrains Mono', monospace",
-                            margin: 0, maxHeight: 140, overflow: 'auto',
-                        }}>
-                            {nodes.length} nodes • {edges.length} edges
-                        </pre>
-                    </div>
-                </Panel>
+                        {nodes.length} nodes • {edges.length} edges
+                    </pre>
+                </div>
+            </Panel>
 
-                {/* Timeline dots */}
-                <Panel position="bottom-left">
-                    <TimelineDots
-                        nodes={nodes
-                            .filter(n => n.type !== 'placeholder')
-                            .map(n => ({
-                                id: n.id,
-                                label: (n.data as any).label || n.id,
-                                status: (n.data as any).status || 'idle',
-                                type: n.type,
-                            }))}
-                    />
-                </Panel>
-            </FlowBuilder>
-
-            <ConnectorFlowOverlay
-                phase={connector.phase}
-                currentGrid={connector.currentGrid}
-            />
-        </>
+            {/* Timeline dots */}
+            <Panel position="bottom-left">
+                <TimelineDots
+                    nodes={nodes
+                        .filter(n => n.type !== 'placeholder')
+                        .map(n => ({
+                            id: n.id,
+                            label: (n.data as any).label || n.id,
+                            status: (n.data as any).status || 'idle',
+                            type: n.type,
+                        }))}
+                />
+            </Panel>
+        </FlowBuilder>
     )
 }
 
