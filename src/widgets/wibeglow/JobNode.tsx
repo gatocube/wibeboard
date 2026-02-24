@@ -190,20 +190,6 @@ function AgentVariant({ data }: { data: any }) {
                     )}
                 </div>
 
-                {/* Progress bar */}
-                <div style={{ height: 2, background: `${color}15` }}>
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8 }}
-                        style={{
-                            height: '100%',
-                            background: `linear-gradient(90deg, ${color}, ${secondaryColor})`,
-                            boxShadow: progress > 0 ? `0 0 6px ${color}44` : 'none',
-                        }}
-                    />
-                </div>
-
                 {/* Content area */}
                 <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     {/* Thought / task area */}
@@ -243,6 +229,20 @@ function AgentVariant({ data }: { data: any }) {
                             />
                         </div>
                     )}
+
+                    {/* Progress bar (bottom) */}
+                    <div style={{ height: 2, background: `${color}15`, marginTop: 'auto' }}>
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.8 }}
+                            style={{
+                                height: '100%',
+                                background: `linear-gradient(90deg, ${color}, ${secondaryColor})`,
+                                boxShadow: progress > 0 ? `0 0 6px ${color}44` : 'none',
+                            }}
+                        />
+                    </div>
 
                     {/* Stats row */}
                     <div style={{
