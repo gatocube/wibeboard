@@ -81,18 +81,35 @@ Non-compact nodes render as a card with these fields:
 | **Exec time**   | `data.execTime` | "1.3s"            | "0.6s"             |
 | **Calls/Runs**  | `data.callsCount` | 3               | 1                  |
 
-### Card structure (top → bottom)
+### Card structure for medium (default) size (top → bottom)
 
 ```
 ┌──────────────────────────────┐
-│ StatusDot  Icon  Label  Agent│  ← Header
+│ Icon  Label        StatusDot |← Header
 ├──────────────────────────────┤
-│ 💭 Thought / Task text       │  ← Content (AI: thought/task, Script: code/output)
-│ Logs / PreviewCanvas         │
-├──────────────────────────────┤
-│ ████████░░░░░░░░░░           │  ← Progress bar
-│ 55%  1.3s  ⚡3               │  ← Stats row
+│ Agent name                 ⚡3|<- Agent name (AI) like: Reviewer: Claude 3.5 or Lang (Script) like: TS: hello-world.ts
+│ Current task                 |<- Current task (AI) or Code last Output line
+│ 1.3s  ████████░░░░░░░░░░ 55% │<- Total running time and Progress bar
 └──────────────────────────────┘
+  Some AI thoughts or script output line here
+```
+
+### Card structure for large size (top → bottom)
+
+```
+┌──────────────────────────────┐
+│ Icon  Label        StatusDot |← Header
+├──────────────────────────────┤
+|                              |
+|       Preview Canvas         |
+|      16/9 aspect ratio       |
+|                              |
+├──────────────────────────────┤
+│ Agent name                 ⚡3|<- Agent name (AI) like: Reviewer: Claude 3.5 or Lang (Script) like: TS: hello-world.ts
+│ Current task                 |<- Current task (AI) or Code last Output line
+│ 1.3s  ████████░░░░░░░░░░ 55% │<- Total running time and Progress bar
+└──────────────────────────────┘
+  Some AI thoughts or script output line here
 ```
 
 ### Theme-specific progress bar position

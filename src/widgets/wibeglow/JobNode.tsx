@@ -118,155 +118,177 @@ function AgentVariant({ data }: { data: any }) {
 
     // ── Full mode ──
     const logs: string[] = data.logs || []
+    const lastLog = logs.length > 0 ? logs[logs.length - 1] : null
+    const thoughtText = data.thought || lastLog
 
     return (
-        <motion.div
-            animate={hasKnock ? (knockOut
-                ? { boxShadow: [`4px 0 0 0 ${kColor}`, `4px 0 0 0 transparent`] }
-                : { boxShadow: [`-4px 0 0 0 ${kColor}`, `-4px 0 0 0 transparent`] }
-            ) : {}}
-            transition={hasKnock ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' } : {}}
-            style={{
-                width: w, height: h,
-                padding: 1.5,
-                borderRadius: 14,
-                background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
-                boxShadow: isActive
-                    ? `0 0 20px ${color}33, 0 0 40px ${color}15`
-                    : `0 4px 16px rgba(0,0,0,0.3)`,
-            }}
-        >
-            <Handle type="target" position={Position.Left} id="in" style={{
-                background: color, border: `2px solid ${color}55`, width: 8, height: 8,
-            }} />
-            <Handle type="source" position={Position.Right} id="out" style={{
-                background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
-            }} />
-            <Handle type="source" position={Position.Top} id="thinking" style={{
-                background: '#c084fc', border: '2px solid #c084fc55', width: 6, height: 6,
-            }} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+            <motion.div
+                animate={hasKnock ? (knockOut
+                    ? { boxShadow: [`4px 0 0 0 ${kColor}`, `4px 0 0 0 transparent`] }
+                    : { boxShadow: [`-4px 0 0 0 ${kColor}`, `-4px 0 0 0 transparent`] }
+                ) : {}}
+                transition={hasKnock ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' } : {}}
+                style={{
+                    width: w, height: h,
+                    padding: 1.5,
+                    borderRadius: 14,
+                    background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
+                    boxShadow: isActive
+                        ? `0 0 20px ${color}33, 0 0 40px ${color}15`
+                        : `0 4px 16px rgba(0,0,0,0.3)`,
+                }}
+            >
+                <Handle type="target" position={Position.Left} id="in" style={{
+                    background: color, border: `2px solid ${color}55`, width: 8, height: 8,
+                }} />
+                <Handle type="source" position={Position.Right} id="out" style={{
+                    background: '#64748b', border: '2px solid rgba(100,116,139,0.3)', width: 8, height: 8,
+                }} />
+                <Handle type="source" position={Position.Top} id="thinking" style={{
+                    background: '#c084fc', border: '2px solid #c084fc55', width: 6, height: 6,
+                }} />
 
-            <div style={{
-                background: '#1a1b26', borderRadius: 12.5,
-                height: '100%',
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden',
-            }}>
-                {/* Header */}
                 <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 10px',
-                    background: `${color}08`,
-                    borderBottom: `1px solid ${color}15`,
+                    background: '#1a1b26', borderRadius: 12.5,
+                    height: '100%',
+                    display: 'flex', flexDirection: 'column',
+                    overflow: 'hidden',
                 }}>
-                    <StatusDot status={status} />
-                    {/* AI icon: Sparkles default, sparkle-burst animated when active */}
-                    {isActive
-                        ? <AnimatedIcon name="sparkle-burst" size={14} color={color} />
-                        : <Sparkles size={14} style={{ color: `${color}99` }} />
-                    }
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={status}
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 4 }}
-                            style={{
-                                flex: 1, fontSize: 11, fontWeight: 700,
-                                color: '#e2e8f0',
-                                fontFamily: 'Inter',
-                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                            }}
-                        >
-                            {isWaking ? (
-                                <SplittingText text={data.label || 'Agent'} />
-                            ) : isRunning ? (
-                                <ShimmeringText color={color}>{data.label || 'Agent'}</ShimmeringText>
-                            ) : (
-                                data.label || 'Agent'
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                    {data.agent && (
-                        <span style={{
-                            fontSize: 8, color: `${color}cc`,
-                            fontFamily: "'JetBrains Mono', monospace",
-                            background: `${color}11`, padding: '1px 5px', borderRadius: 4,
-                        }}>{data.agent}</span>
-                    )}
-                </div>
-
-                {/* Content area */}
-                <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    {/* Thought / task area */}
-                    {(data.thought || data.task) && (
-                        <div style={{
-                            padding: '4px 10px',
-                            borderBottom: `1px solid rgba(255,255,255,0.04)`,
-                        }}>
-                            {data.thought && (
-                                <div style={{
-                                    fontSize: 9, color: '#c084fc', fontStyle: 'italic',
-                                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    {/* ── Header: Icon → Label → StatusDot (right) ── */}
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '6px 10px',
+                        background: `${color}08`,
+                        borderBottom: `1px solid ${color}15`,
+                        flexShrink: 0,
+                    }}>
+                        {/* AI icon */}
+                        {isActive
+                            ? <AnimatedIcon name="sparkle-burst" size={14} color={color} />
+                            : <Sparkles size={14} style={{ color: `${color}99` }} />
+                        }
+                        {/* Label */}
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={status}
+                                initial={{ opacity: 0, y: -4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 4 }}
+                                style={{
+                                    flex: 1, fontSize: 11, fontWeight: 700,
+                                    color: '#e2e8f0',
                                     fontFamily: 'Inter',
-                                }}>💭 {data.thought}</div>
-                            )}
-                            {data.task && (
-                                <div style={{
-                                    fontSize: 9, color: '#94a3b8',
                                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                    fontFamily: 'Inter',
-                                }}>{data.task}</div>
-                            )}
-                        </div>
-                    )}
+                                }}
+                            >
+                                {isWaking ? (
+                                    <SplittingText text={data.label || 'Agent'} />
+                                ) : isRunning ? (
+                                    <ShimmeringText color={color}>{data.label || 'Agent'}</ShimmeringText>
+                                ) : (
+                                    data.label || 'Agent'
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                        {/* StatusDot — right side */}
+                        <StatusDot status={status} />
+                    </div>
 
-                    {/* PreviewCanvas / logs */}
-                    {isLarge && logs.length > 0 && (
+                    {/* ── PreviewCanvas (large only, 16:9) ── */}
+                    {isLarge && (
                         <div style={{
-                            flex: 1, margin: '4px 6px',
+                            margin: '4px 6px',
                             borderRadius: 8,
                             overflow: 'hidden',
+                            aspectRatio: '16 / 9',
+                            background: '#0d0d1a',
+                            flexShrink: 0,
                         }}>
                             <PreviewCanvas
                                 width={w - 16}
-                                height={Math.min(h - 100, 140)}
+                                height={Math.round((w - 16) * 9 / 16)}
                                 lines={logs}
                             />
                         </div>
                     )}
 
-                    {/* Progress bar (bottom) */}
-                    <div style={{ height: 2, background: `${color}15`, marginTop: 'auto' }}>
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.8 }}
-                            style={{
-                                height: '100%',
-                                background: `linear-gradient(90deg, ${color}, ${secondaryColor})`,
-                                boxShadow: progress > 0 ? `0 0 6px ${color}44` : 'none',
-                            }}
-                        />
+                    {/* ── Agent name + calls row ── */}
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        padding: '3px 10px',
+                        flexShrink: 0,
+                    }}>
+                        <span style={{
+                            flex: 1, fontSize: 9, color: `${color}cc`,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{data.agent || '—'}</span>
+                        <span style={{
+                            fontSize: 9, color: '#64748b',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            flexShrink: 0,
+                        }}>⚡{data.callsCount ?? 0}</span>
                     </div>
 
-                    {/* Stats row */}
+                    {/* ── Current task row ── */}
+                    {data.task && (
+                        <div style={{
+                            padding: '0 10px 3px',
+                            fontSize: 9, color: '#94a3b8',
+                            fontFamily: 'Inter',
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                        }}>{data.task}</div>
+                    )}
+
+                    {/* ── Time + Progress bar + percentage ── */}
                     <div style={{
-                        display: 'flex', gap: 8, padding: '3px 10px',
-                        fontSize: 9, color: '#64748b',
-                        fontFamily: "'JetBrains Mono', monospace",
-                        borderTop: '1px solid rgba(255,255,255,0.04)',
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '3px 10px 5px',
                         marginTop: 'auto',
+                        flexShrink: 0,
                     }}>
-                        <span style={{ color: `${color}88` }}>
-                            <AnimatedNumber value={progress} />%
-                        </span>
-                        <span>{data.execTime || '—'}</span>
-                        <span>⚡{data.callsCount ?? 0}</span>
+                        <span style={{
+                            fontSize: 9, color: '#64748b',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            flexShrink: 0,
+                        }}>{data.execTime || '—'}</span>
+                        <div style={{
+                            flex: 1, height: 3, background: `${color}15`,
+                            borderRadius: 2,
+                        }}>
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                transition={{ duration: 0.8 }}
+                                style={{
+                                    height: '100%', borderRadius: 2,
+                                    background: `linear-gradient(90deg, ${color}, ${secondaryColor})`,
+                                    boxShadow: progress > 0 ? `0 0 6px ${color}44` : 'none',
+                                }}
+                            />
+                        </div>
+                        <span style={{
+                            fontSize: 9, color: `${color}88`,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            flexShrink: 0,
+                        }}><AnimatedNumber value={progress} />%</span>
                     </div>
                 </div>
-            </div>
-        </motion.div>
+            </motion.div>
+
+            {/* ── Below card: AI thoughts or last log ── */}
+            {thoughtText && (
+                <div style={{
+                    width: w,
+                    padding: '3px 4px 0',
+                    fontSize: 8, color: '#c084fc', fontStyle: 'italic',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    fontFamily: 'Inter',
+                }}>💭 {thoughtText}</div>
+            )}
+        </div>
     )
 }
 
