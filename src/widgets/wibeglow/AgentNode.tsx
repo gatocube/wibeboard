@@ -5,6 +5,7 @@ import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { PreviewCanvas } from '@/components/PreviewCanvas'
 import { StatusDot } from '@/widgets/StatusDot'
 import { ShimmeringText, SplittingText } from '@/components/animate-ui'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * AgentNode (wibeglow) — #26 Gradient Border design.
@@ -23,8 +24,10 @@ import { ShimmeringText, SplittingText } from '@/components/animate-ui'
  * data.callsCount — number of tool calls
  * data.logs — string[] terminal output lines
  * data.width / data.height — dimensions
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 export function AgentNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const color = data.color || '#8b5cf6'
     const status = data.status || 'idle'
     const w = data.width || 200

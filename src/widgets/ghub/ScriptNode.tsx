@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { CheckCircle, Circle, Loader2, Terminal } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * ScriptNode (ghub) — GitHub Actions workflow run style.
@@ -19,6 +20,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.knockSide — 'in' | 'out' | null
  * data.width / data.height — dimensions
  * data.dayMode — boolean, switches to light GitHub theme
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 
 // ── GitHub color tokens (exact from github.com) ─────────────────────────────
@@ -64,6 +66,7 @@ const LANG_COLORS: Record<string, { color: string; label: string }> = {
 }
 
 export function ScriptNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const gh = data.dayMode ? ghLightColors : ghDark
     const status = data.status || 'idle'
     const w = data.width || 220

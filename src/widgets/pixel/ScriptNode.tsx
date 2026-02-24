@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StatusDot } from '@/widgets/StatusDot'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * ScriptNode (pixel) — Terminal/retro style.
@@ -14,6 +15,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.logs — string[] output lines
  * data.knockSide — 'in' | 'out' | null
  * data.width / data.height — dimensions
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 
 const LANG_COLORS: Record<string, string> = {
@@ -21,6 +23,7 @@ const LANG_COLORS: Record<string, string> = {
 }
 
 export function ScriptNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100

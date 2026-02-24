@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StatusDot } from '@/widgets/StatusDot'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * AgentNode (pixel) — #16 Airport Departure Board design.
@@ -15,8 +16,10 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.execTime — execution time string
  * data.callsCount — number of tool calls
  * data.width / data.height — dimensions
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 export function AgentNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const status = data.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100

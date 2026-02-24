@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { Check, CheckCircle, Circle, Loader2 } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * AgentNode (ghub) — GitHub-style agent card.
@@ -19,6 +20,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.agent — agent model name
  * data.width / data.height — dimensions
  * data.dayMode — boolean, switches to light GitHub theme
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 
 // ── GitHub color tokens (exact from github.com) ─────────────────────────────
@@ -60,6 +62,7 @@ const ghFont = { fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'No
 const ghMono = { fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" }
 
 export function AgentNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const gh = data.dayMode ? ghLight : ghDark
     const status = data.status || 'idle'
     const w = data.width || 240

@@ -2,6 +2,7 @@ import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { Play, Settings, Check, Terminal } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
+import type { NodeContext } from '@/engine/NodeContext'
 
 /**
  * ScriptNode — JavaScript script node with editing + configured modes.
@@ -15,6 +16,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  * data.status — 'idle' | 'running' | 'done' | 'error'
  * data.onSaveScript — callback(code) when user saves
  * data.onRunScript — callback() to trigger execution
+ * data.ctx — NodeContext (optional, messenger + node identity)
  */
 
 const LANG_COLORS: Record<string, string> = {
@@ -25,6 +27,7 @@ const LANG_LABELS: Record<string, string> = {
 }
 
 export function ScriptNode({ data }: { data: any }) {
+    const _ctx = data.ctx as NodeContext | undefined  // eslint-disable-line @typescript-eslint/no-unused-vars
     const lang = data.language || 'js'
     const langColor = LANG_COLORS[lang] || '#8b5cf6'
     const w = data.width || 280
