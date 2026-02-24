@@ -26,7 +26,7 @@ test.describe('Pages smoke check', () => {
         await page.goto('/')
         await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
         await expect(page.locator('text=3 nodes')).toBeVisible()
-        await expect(page.locator('text=Planner')).toBeVisible()
+        await expect(page.locator('.react-flow__node').locator('text=Planner')).toBeVisible()
         visitedPages.push('builder')
 
         // 2. Navigate to widgets using top nav button (exact match)
@@ -48,7 +48,7 @@ test.describe('Pages smoke check', () => {
         // 4. Back to Builder via sidebar
         await page.locator('[data-testid="nav-builder"]').click({ timeout: 3_000 })
         await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
-        await expect(page.locator('text=Planner')).toBeVisible()
+        await expect(page.locator('.react-flow__node').locator('text=Planner')).toBeVisible()
         visitedPages.push('builder (return)')
 
         console.log(`Visited ${visitedPages.length} pages:`)

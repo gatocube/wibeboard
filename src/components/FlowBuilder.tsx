@@ -6,9 +6,10 @@
  * and optional zoom-autosize (node size follows zoom level).
  */
 
-import { ReactFlow, Background, Panel, useStore, type Node, type Edge, type NodeTypes, type OnNodesChange, type Viewport } from '@xyflow/react'
+import { ReactFlow, Background, Panel, useStore, useReactFlow, type Node, type Edge, type NodeTypes, type OnNodesChange, type Viewport } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
+import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/engine/widget-registry'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,10 @@ export interface FlowBuilderProps {
     bgColor?: string
     /** Grid gap */
     gridGap?: number
+    /** Show widget selector and editing handles */
+    editMode?: boolean
+    /** Called when a widget is dropped from the selector onto the canvas */
+    onNodeAdd?: (widgetType: string, template: WidgetTemplate, position: { x: number; y: number }) => void
 }
 
 // ── Theme backgrounds ────────────────────────────────────────────────────────
@@ -223,6 +228,143 @@ function SettingsPanel({
     )
 }
 
+// ── Widget Selector Panel ────────────────────────────────────────────────────
+
+const CATEGORY_COLORS: Record<string, string> = {
+    AI: '#8b5cf6',
+    Script: '#22c55e',
+    Layout: '#6366f1',
+    Note: '#f59e0b',
+    Expectation: '#ef4444',
+}
+
+function WidgetSelectorPanel({ onDragStart }: {
+    onDragStart?: (widget: WidgetDefinition, template: WidgetTemplate) => void
+}) {
+    const allWidgets = widgetRegistry.getAll()
+        .filter(w => !['note-sticker', 'note-group', 'note-label', 'expectation'].includes(w.type))
+
+    // Group by category
+    const grouped = allWidgets.reduce((acc, w) => {
+        const cat = w.category || 'Other'
+        if (!acc[cat]) acc[cat] = []
+        acc[cat].push(w)
+        return acc
+    }, {} as Record<string, WidgetDefinition[]>)
+
+    return (
+        <div
+            data-testid="widget-selector-panel"
+            style={{
+                width: 180, flexShrink: 0,
+                borderLeft: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(10,10,20,0.95)',
+                display: 'flex', flexDirection: 'column',
+                overflow: 'hidden',
+                fontFamily: 'Inter',
+            }}
+        >
+            <div style={{
+                padding: '10px 12px 6px', fontSize: 10, fontWeight: 700,
+                color: '#64748b', textTransform: 'uppercase', letterSpacing: 1,
+            }}>
+                Widgets
+            </div>
+
+            <div style={{
+                flex: 1, overflowY: 'auto', padding: '0 6px 8px',
+                display: 'flex', flexDirection: 'column', gap: 2,
+            }}>
+                {Object.entries(grouped).map(([category, widgets]) => (
+                    <div key={category}>
+                        <div style={{
+                            fontSize: 9, fontWeight: 600,
+                            color: CATEGORY_COLORS[category] || '#475569',
+                            padding: '8px 6px 3px',
+                            textTransform: 'uppercase', letterSpacing: 0.8,
+                        }}>
+                            {category}
+                        </div>
+                        {widgets.map(widget => (
+                            widget.templates.map((template, i) => (
+                                <button
+                                    key={`${widget.type}-${i}`}
+                                    data-testid={`ws-${widget.type}-${i}`}
+                                    draggable
+                                    onDragStart={e => {
+                                        e.dataTransfer.setData(
+                                            'application/flowbuilder-widget',
+                                            JSON.stringify({ type: widget.type, template }),
+                                        )
+                                        e.dataTransfer.effectAllowed = 'move'
+                                        onDragStart?.(widget, template)
+                                    }}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: 6,
+                                        width: '100%',
+                                        background: 'transparent', color: '#94a3b8',
+                                        border: '1px solid transparent',
+                                        borderRadius: 6, padding: '5px 8px', fontSize: 10,
+                                        fontWeight: 500, cursor: 'grab', textAlign: 'left',
+                                        fontFamily: 'Inter',
+                                        transition: 'background 0.15s',
+                                    }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                                >
+                                    <div style={{
+                                        width: 6, height: 6, borderRadius: 2,
+                                        background: widget.color, flexShrink: 0,
+                                    }} />
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {template.name || widget.label}
+                                    </span>
+                                </button>
+                            ))
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+// ── Drop handler (needs ReactFlow context) ───────────────────────────────────
+
+function DropTarget({ onNodeAdd }: {
+    onNodeAdd?: (widgetType: string, template: WidgetTemplate, position: { x: number; y: number }) => void
+}) {
+    const { screenToFlowPosition } = useReactFlow()
+
+    const onDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'move'
+    }, [])
+
+    const onDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault()
+        const raw = e.dataTransfer.getData('application/flowbuilder-widget')
+        if (!raw || !onNodeAdd) return
+
+        try {
+            const { type, template } = JSON.parse(raw)
+            const position = screenToFlowPosition({ x: e.clientX, y: e.clientY })
+            onNodeAdd(type, template, position)
+        } catch { /* ignore bad data */ }
+    }, [onNodeAdd, screenToFlowPosition])
+
+    return (
+        <div
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            style={{
+                position: 'absolute', inset: 0,
+                pointerEvents: 'none',
+            }}
+        />
+    )
+}
+
 // ── FlowBuilder ──────────────────────────────────────────────────────────────
 
 export function FlowBuilder({
@@ -242,6 +384,8 @@ export function FlowBuilder({
     wrapperRef,
     bgColor,
     gridGap = 20,
+    editMode = false,
+    onNodeAdd,
 }: FlowBuilderProps) {
     const [theme, setTheme] = useState<ThemeKey>(currentTheme)
     const [mode, setMode] = useState<ThemeMode>('dark')
@@ -262,55 +406,73 @@ export function FlowBuilder({
     const canvasBg = bgColor || THEME_CANVAS[theme]
     const gridColor = THEME_BG[theme]
 
+    // ── Drop handler for the ReactFlow pane ──
+    const onDragOver = useCallback((e: React.DragEvent) => {
+        if (e.dataTransfer.types.includes('application/flowbuilder-widget')) {
+            e.preventDefault()
+            e.dataTransfer.dropEffect = 'move'
+        }
+    }, [])
+
     return (
         <div
             ref={wrapperRef}
             style={{
                 width: '100%', height: '100%',
+                display: 'flex',
                 background: canvasBg,
                 position: 'relative',
                 ...wrapperStyle,
             }}
         >
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                nodesDraggable={nodesDraggable}
-                nodesConnectable={nodesConnectable}
-                panOnDrag={panOnDrag}
-                zoomOnScroll={zoomOnScroll}
-                fitView={fitView}
-                defaultViewport={defaultViewport}
-                proOptions={{ hideAttribution: true }}
-                style={{ background: 'transparent' }}
-            >
-                <Background color={gridColor} gap={gridGap} size={1} />
+            {/* Canvas area */}
+            <div style={{ flex: 1, position: 'relative', height: '100%' }} onDragOver={onDragOver}>
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    onNodesChange={onNodesChange}
+                    nodesDraggable={nodesDraggable}
+                    nodesConnectable={nodesConnectable}
+                    panOnDrag={panOnDrag}
+                    zoomOnScroll={zoomOnScroll}
+                    fitView={fitView}
+                    defaultViewport={defaultViewport}
+                    proOptions={{ hideAttribution: true }}
+                    style={{ background: 'transparent' }}
+                >
+                    <Background color={gridColor} gap={gridGap} size={1} />
 
-                {/* Zoom autosize watcher */}
-                <ZoomAutosizeWatcher
-                    enabled={zoomAutosize}
-                    onSizeChange={handleSizeChange}
-                />
+                    {/* Zoom autosize watcher */}
+                    <ZoomAutosizeWatcher
+                        enabled={zoomAutosize}
+                        onSizeChange={handleSizeChange}
+                    />
 
-                {/* Settings gear — top-right */}
-                <Panel position="top-right">
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-                        <SettingsPanel
-                            theme={theme}
-                            onThemeChange={handleThemeChange}
-                            mode={mode}
-                            onModeChange={setMode}
-                            zoomAutosize={zoomAutosize}
-                            onZoomAutosizeChange={setZoomAutosize}
-                            currentSize={currentSize}
-                        />
-                    </div>
-                </Panel>
+                    {/* Drop target inside ReactFlow for screen→flow coordinate conversion */}
+                    {editMode && <DropTarget onNodeAdd={onNodeAdd} />}
 
-                {children}
-            </ReactFlow>
+                    {/* Settings gear — top-right */}
+                    <Panel position="top-right">
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                            <SettingsPanel
+                                theme={theme}
+                                onThemeChange={handleThemeChange}
+                                mode={mode}
+                                onModeChange={setMode}
+                                zoomAutosize={zoomAutosize}
+                                onZoomAutosizeChange={setZoomAutosize}
+                                currentSize={currentSize}
+                            />
+                        </div>
+                    </Panel>
+
+                    {children}
+                </ReactFlow>
+            </div>
+
+            {/* Widget selector panel — right side, 100% height */}
+            {editMode && <WidgetSelectorPanel />}
         </div>
     )
 }

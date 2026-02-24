@@ -17,8 +17,9 @@ test.describe('Builder Demo', () => {
     })
 
     test('Agent node is visible with correct label', async ({ page }) => {
-        await expect(page.locator('text=Planner')).toBeVisible()
-        await expect(page.locator('text=Claude 3.5')).toBeVisible()
+        const nodes = page.locator('.react-flow__node')
+        await expect(nodes.locator('text=Planner')).toBeVisible()
+        await expect(nodes.locator('text=Claude 3.5')).toBeVisible()
     })
 
     test('Script node is visible in configured mode', async ({ page }) => {
@@ -30,7 +31,8 @@ test.describe('Builder Demo', () => {
     })
 
     test('Group node is visible with label', async ({ page }) => {
-        await expect(page.locator('text=Processing Pipeline')).toBeVisible()
+        const nodes = page.locator('.react-flow__node')
+        await expect(nodes.locator('text=Processing Pipeline')).toBeVisible()
     })
 
     test('edge between Agent and Script is rendered', async ({ page }) => {

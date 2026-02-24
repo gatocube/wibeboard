@@ -434,6 +434,33 @@ function BuilderInner() {
                 defaultViewport={{ x: 80, y: 60, zoom: 0.65 }}
                 wrapperRef={connector.attachHandleInterceptor}
                 gridGap={GRID_SIZE}
+                editMode={editMode}
+                onNodeAdd={(widgetType, template, position) => {
+                    const nodeId = `node-${Date.now()}`
+                    const def = widgetRegistry.getByType(widgetType)
+                    const w = def?.defaultWidth || 160
+                    const h = def?.defaultHeight || 100
+                    const nodeData: Record<string, any> = {
+                        label: template.defaultData?.label || template.name,
+                        ...template.defaultData,
+                        width: w, height: h,
+                    }
+                    if (widgetType.startsWith('script-')) {
+                        nodeData.configured = false
+                        nodeData.logs = []
+                        nodeData.status = 'idle'
+                        nodeData.onSaveScript = (code: string) => updateNodeData(nodeId, { code, configured: true })
+                        nodeData.onRunScript = () => handleRunScript(nodeId)
+                    }
+                    setNodes(prev => [...prev, {
+                        id: nodeId,
+                        type: widgetType,
+                        position,
+                        data: nodeData,
+                        style: { width: w, height: h },
+                    }])
+                    widgetRegistry.markUsed(widgetType)
+                }}
                 onSizeChange={(size) => {
                     const presets: Record<string, { w: number; h: number }> = {
                         S: { w: 50, h: 50 }, M: { w: 160, h: 100 }, L: { w: 300, h: 200 },
@@ -523,46 +550,6 @@ function BuilderInner() {
                     </div>
                 </Panel>
 
-                {/* ── Sidebar catalog ── */}
-                <Panel position="top-left">
-                    <div style={{
-                        display: 'flex', flexDirection: 'column', gap: 4,
-                        padding: '8px', borderRadius: 8,
-                        background: 'rgba(15,15,26,0.92)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        backdropFilter: 'blur(8px)',
-                        maxHeight: 'calc(100vh - 120px)',
-                        overflowY: 'auto',
-                    }}>
-                        {widgetRegistry.getAll()
-                            .filter(w => !['note-sticker', 'note-group', 'note-label', 'expectation'].includes(w.type))
-                            .map(w => (
-                                <button
-                                    key={w.type}
-                                    data-testid={`catalog-${w.type}`}
-                                    draggable
-                                    onDragStart={e => {
-                                        e.dataTransfer.setData('application/wibeboard-widget', JSON.stringify(w))
-                                        e.dataTransfer.effectAllowed = 'move'
-                                    }}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: 6,
-                                        background: 'transparent', color: '#94a3b8',
-                                        border: '1px solid transparent',
-                                        borderRadius: 6, padding: '4px 8px', fontSize: 10,
-                                        fontWeight: 500, cursor: 'grab', textAlign: 'left',
-                                        fontFamily: 'Inter',
-                                    }}
-                                >
-                                    <div style={{
-                                        width: 6, height: 6, borderRadius: 2,
-                                        background: w.color,
-                                    }} />
-                                    {w.label}
-                                </button>
-                            ))}
-                    </div>
-                </Panel>
 
                 {/* ── JSON debug panel (bottom-right) ── */}
                 <Panel position="bottom-right">

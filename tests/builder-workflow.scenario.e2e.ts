@@ -29,9 +29,10 @@ test.describe('Builder full scenario', () => {
         await page.goto('/')
         await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
         await expect(page.locator('text=3 nodes')).toBeVisible()
-        await expect(page.locator('text=Planner')).toBeVisible()
-        await expect(page.locator('text=process.js')).toBeVisible()
-        await expect(page.locator('text=Processing Pipeline')).toBeVisible()
+        const rfNodes = page.locator('.react-flow__node')
+        await expect(rfNodes.locator('text=Planner')).toBeVisible()
+        await expect(rfNodes.locator('text=process.js')).toBeVisible()
+        await expect(rfNodes.locator('text=Processing Pipeline')).toBeVisible()
 
         // Step 2: Run script
         await page.locator('button[title="Run"]').click()
