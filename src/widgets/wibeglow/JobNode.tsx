@@ -1,7 +1,7 @@
 import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Settings, Check, Terminal } from 'lucide-react'
+import { Sparkles, Play, Settings, Check, Terminal } from 'lucide-react'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { PreviewCanvas } from '@/components/PreviewCanvas'
 import { StatusDot } from '@/widgets/StatusDot'
@@ -108,7 +108,7 @@ function AgentVariant({ data }: { data: any }) {
                         gap: 2, boxSizing: 'border-box',
                     }}>
                         <StatusDot status={status} />
-                        <WidgetIcon type="sparkle-burst" size={16} color={color} />
+                        <Sparkles size={16} style={{ color }} />
                     </div>
                 </motion.div>
                 <span style={{ fontSize: 8, color: '#e2e8f0', fontWeight: 600, marginTop: 4, maxWidth: w + 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', fontFamily: 'Inter' }}>{data.label || 'Agent'}</span>
@@ -160,17 +160,16 @@ function AgentVariant({ data }: { data: any }) {
                     borderBottom: `1px solid ${color}15`,
                 }}>
                     <StatusDot status={status} />
-                    {/* AI icon: sparkle-burst from icon gallery */}
+                    {/* AI icon: Sparkles default, sparkle-burst when active */}
                     <motion.div
                         animate={isActive ? { rotate: [0, 15, -15, 0] } : {}}
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                         style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
                     >
-                        <WidgetIcon
-                            type="sparkle-burst"
-                            size={14}
-                            color={isActive ? color : `${color}99`}
-                        />
+                        {isActive
+                            ? <WidgetIcon type="sparkle-burst" size={14} color={color} />
+                            : <Sparkles size={14} style={{ color: `${color}99` }} />
+                        }
                     </motion.div>
                     <AnimatePresence mode="wait">
                         <motion.div

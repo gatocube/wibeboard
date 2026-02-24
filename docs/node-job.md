@@ -49,10 +49,10 @@ The dot must be visible across all themes (WibeGlow, GitHub, Pixel).
 
 Each node displays an icon in its header (or centered in compact mode).
 
-| Kind     | Default icon        | Active icon (running/waking) |
-|----------|--------------------|-----------------------------|
-| **AI**   | `sparkle-burst`    | `sparkle-burst` (animated rotation) |
-| **Script** | `terminal`       | `terminal-blink`            |
+| Kind     | Default icon           | Active icon (running/waking)         |
+|----------|------------------------|--------------------------------------|
+| **AI**   | `Sparkles` (lucide)    | `sparkle-burst` (WidgetIcon, animated rotation) |
+| **Script** | `terminal` (WidgetIcon) | `terminal-blink` (WidgetIcon)       |
 
 Icons are rendered via `WidgetIcon` from the [icon gallery](/wibeboard/?page=icons).
 
