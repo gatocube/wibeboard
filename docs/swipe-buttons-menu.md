@@ -2,9 +2,10 @@
 ## Menu configuration for editor
 
 Add buttons (prev and after):
-  - user node
+  - subflow node
   - job node
-    - script node (default js)
+    - user (yellow or orangish)
+    - script node (default js, lime green rgb(137, 224, 81)
       - js
       - sh
       - py

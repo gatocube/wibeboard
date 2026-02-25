@@ -11,6 +11,7 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:5173/wibeboard/',
         trace: 'on-first-retry',
+        ...(process.env.TEST_RUNNER_HUMAN === '1' ? { cursor: 'css' } : {}),
     },
     projects: [
         {

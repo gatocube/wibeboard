@@ -20,7 +20,7 @@ export interface WidgetTemplate {
     defaultData: Record<string, any>
 }
 
-export type WidgetCategory = 'Job' | 'Script' | 'Expectation' | 'Assertion' | 'Note' | 'AI'
+export type WidgetCategory = 'Job' | 'Script' | 'Expectation' | 'Assertion' | 'Note' | 'AI' | 'SubFlow'
 
 export interface SubTypeDef {
     value: string
@@ -255,6 +255,30 @@ const WIDGETS: WidgetDefinition[] = [
                 name: 'Start',
                 description: 'Default starting point',
                 defaultData: { label: 'Start', color: '#22c55e' },
+            },
+        ],
+    },
+    // ── SubFlow ──
+    {
+        type: 'subflow',
+        label: 'SubFlow',
+        icon: 'workflow',
+        category: 'SubFlow',
+        tags: ['subflow', 'scope', 'container', 'nested', 'group', 'boundary'],
+        description: 'Nested flow — displays node count, avg exec time, and AI border',
+        color: '#6366f1',
+        minWidth: 120, minHeight: 80,
+        defaultWidth: 280, defaultHeight: 160,
+        templates: [
+            {
+                name: 'SubFlow',
+                description: 'Nested sub-flow with summary stats',
+                defaultData: { label: 'SubFlow', nodeCount: 0, avgExecTime: '—', hasAI: false, color: '#6366f1' },
+            },
+            {
+                name: 'AI Pipeline',
+                description: 'SubFlow containing AI agents — rainbow border',
+                defaultData: { label: 'AI Pipeline', nodeCount: 3, avgExecTime: '4.2s', hasAI: true, color: '#8b5cf6' },
             },
         ],
     },

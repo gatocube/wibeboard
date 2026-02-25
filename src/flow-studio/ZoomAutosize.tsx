@@ -1,6 +1,6 @@
 /**
  * ZoomAutosize — zoom-level → node-size watcher + screen↔flow bridge.
- * Extracted from FlowBuilder.tsx.
+ * Extracted from FlowStudio.tsx.
  */
 
 import { useEffect, useRef } from 'react'

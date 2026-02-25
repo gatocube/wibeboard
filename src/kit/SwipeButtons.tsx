@@ -22,7 +22,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Cpu, Code, UserCircle, Trash2, FileCode, Terminal, FileType, Brain, Wrench, Search, Paperclip, Clock, StickyNote, Briefcase, ClipboardCheck } from 'lucide-react'
+import { Plus, Settings, Cpu, Code, UserCircle, Trash2, FileCode, Terminal, FileType, Brain, Wrench, Search, Paperclip, Clock, StickyNote, Briefcase, ClipboardCheck, Workflow } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -35,14 +35,15 @@ interface SubButton {
 
 // Top-level sub-buttons for Add (Before / After)
 const ADD_NODE_TYPES: SubButton[] = [
-    { key: 'user', label: 'User', icon: UserCircle, color: '#22c55e' },
+    { key: 'subflow', label: 'SubFlow', icon: Workflow, color: '#6366f1' },
     { key: 'job', label: 'Job', icon: Briefcase, color: '#8b5cf6' },
     { key: 'recent', label: 'Recent', icon: Clock, color: '#64748b' },
 ]
 
 // Job sub-types (children of Job)
 const JOB_TYPES: SubButton[] = [
-    { key: 'script', label: 'Script', icon: Code, color: '#f7df1e' },
+    { key: 'user', label: 'User', icon: UserCircle, color: '#f59e0b' },
+    { key: 'script', label: 'Script', icon: Code, color: '#89e051' },
     { key: 'ai', label: 'AI', icon: Cpu, color: '#8b5cf6' },
 ]
 
@@ -306,13 +307,8 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         delay={i * 0.03}
                         active={sub.key === 'job' && jobExpanded === 'after'}
                         onClick={() => {
-                            if (sub.key === 'job') {
-                                setJobExpanded(prev => prev === 'after' ? null : 'after')
-                                setScriptExpanded(null); setAiExpanded(null)
-                            } else {
-                                onAddAfter(nodeId, sub.key)
-                                setExpanded(null); resetSubs()
-                            }
+                            onAddAfter(nodeId, sub.key)
+                            setExpanded(null); resetSubs()
                         }}
                         onHover={
                             sub.key === 'job' ? () => { setJobExpanded('after'); setScriptExpanded(null); setAiExpanded(null) }
@@ -321,7 +317,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     />
                 ))}
 
-                {/* After → Job sub-types: Script & AI */}
+                {/* After → Job sub-types: Sleep, Script & AI */}
                 {show('right') && expanded === 'after' && jobExpanded === 'after' && (() => {
                     const jobBtnX = positions.right.x + TILE
                     const jobBtnY = positions.right.y  // Job is at center (index 1)
@@ -329,26 +325,28 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         <MotionButton
                             key={`after-job-${jt.key}`}
                             testId={`ext-after-job-${jt.key}`}
-                            pos={{ x: jobBtnX + TILE, y: jobBtnY + (i === 0 ? -TILE : TILE) }}
+                            pos={{ x: jobBtnX + TILE, y: jobBtnY + (i - 1) * TILE }}
                             icon={jt.icon}
                             label={jt.label}
                             color={jt.color}
                             delay={i * 0.03}
                             active={(jt.key === 'script' && scriptExpanded === 'after') || (jt.key === 'ai' && aiExpanded === 'after')}
                             onClick={() => {
-                                if (jt.key === 'script') {
-                                    // Direct click on Script → create JS (default)
+                                if (jt.key === 'user') {
+                                    onAddAfter(nodeId, 'user')
+                                    setExpanded(null); resetSubs()
+                                } else if (jt.key === 'script') {
                                     onAddAfter(nodeId, 'script:js')
                                     setExpanded(null); resetSubs()
-                                } else {
-                                    // Direct click on AI → create Worker (default)
+                                } else if (jt.key === 'ai') {
                                     onAddAfter(nodeId, 'ai:worker')
                                     setExpanded(null); resetSubs()
                                 }
                             }}
                             onHover={
                                 jt.key === 'script' ? () => { setScriptExpanded('after'); setAiExpanded(null) }
-                                    : () => { setAiExpanded('after'); setScriptExpanded(null) }
+                                    : jt.key === 'ai' ? () => { setAiExpanded('after'); setScriptExpanded(null) }
+                                        : () => { setScriptExpanded(null); setAiExpanded(null) }
                             }
                         />
                     ))
@@ -418,13 +416,8 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         delay={i * 0.03}
                         active={sub.key === 'job' && jobExpanded === 'before'}
                         onClick={() => {
-                            if (sub.key === 'job') {
-                                setJobExpanded(prev => prev === 'before' ? null : 'before')
-                                setScriptExpanded(null); setAiExpanded(null)
-                            } else {
-                                onAddBefore(nodeId, sub.key)
-                                setExpanded(null); resetSubs()
-                            }
+                            onAddBefore(nodeId, sub.key)
+                            setExpanded(null); resetSubs()
                         }}
                         onHover={
                             sub.key === 'job' ? () => { setJobExpanded('before'); setScriptExpanded(null); setAiExpanded(null) }
@@ -433,7 +426,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     />
                 ))}
 
-                {/* Before → Job sub-types: Script & AI */}
+                {/* Before → Job sub-types: User, Script & AI */}
                 {show('left') && expanded === 'before' && jobExpanded === 'before' && (() => {
                     const jobBtnX = positions.left.x - TILE
                     const jobBtnY = positions.left.y
@@ -441,24 +434,28 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         <MotionButton
                             key={`before-job-${jt.key}`}
                             testId={`ext-before-job-${jt.key}`}
-                            pos={{ x: jobBtnX - TILE, y: jobBtnY + (i === 0 ? -TILE : TILE) }}
+                            pos={{ x: jobBtnX - TILE, y: jobBtnY + (i - 1) * TILE }}
                             icon={jt.icon}
                             label={jt.label}
                             color={jt.color}
                             delay={i * 0.03}
                             active={(jt.key === 'script' && scriptExpanded === 'before') || (jt.key === 'ai' && aiExpanded === 'before')}
                             onClick={() => {
-                                if (jt.key === 'script') {
+                                if (jt.key === 'user') {
+                                    onAddBefore(nodeId, 'user')
+                                    setExpanded(null); resetSubs()
+                                } else if (jt.key === 'script') {
                                     onAddBefore(nodeId, 'script:js')
                                     setExpanded(null); resetSubs()
-                                } else {
+                                } else if (jt.key === 'ai') {
                                     onAddBefore(nodeId, 'ai:worker')
                                     setExpanded(null); resetSubs()
                                 }
                             }}
                             onHover={
                                 jt.key === 'script' ? () => { setScriptExpanded('before'); setAiExpanded(null) }
-                                    : () => { setAiExpanded('before'); setScriptExpanded(null) }
+                                    : jt.key === 'ai' ? () => { setAiExpanded('before'); setScriptExpanded(null) }
+                                        : () => { setScriptExpanded(null); setAiExpanded(null) }
                             }
                         />
                     ))
@@ -587,7 +584,8 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
         }
     }, [activationMode, onHover])
 
-    const handlePointerUp = useCallback(() => {
+    const handlePointerUp = useCallback((e?: React.PointerEvent) => {
+        e?.stopPropagation()
         if (holdTimerRef.current) {
             clearTimeout(holdTimerRef.current)
             holdTimerRef.current = null

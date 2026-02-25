@@ -1,8 +1,10 @@
-# FlowBuilder Component — Requirements
+# FlowStudio Component — Requirements
 
 ## Overview
 
-`FlowBuilder` is the **single shared component** for all canvas-based pages. It provides the interactive flow editor with widget management, settings, and zoom-responsive sizing.
+`FlowStudio` is the **single shared component** for all canvas-based pages. It provides the interactive flow editor with widget management, settings, and zoom-responsive sizing.
+
+State is managed via **MobX** (`FlowStudioStore`): theme, mode, zoomAutosize, currentSize, selectedNodeId.
 
 ## Layout
 
@@ -25,7 +27,7 @@
 
 ## Widget Selector Panel
 
-- **Position**: right side, 100% height of the FlowBuilder container
+- **Position**: right side, 100% height of the FlowStudio container
 - **Width**: ~200px, collapsible
 - **Contents**: all widgets from `widgetRegistry.getAll()`, grouped by category
 - **Interaction**: drag a widget item from the panel onto the canvas
@@ -48,10 +50,10 @@ This reuses the existing `ConnectorFlow` sizing phases (`positioning` → `sizin
 
 ## Props
 
-FlowBuilder accepts:
+FlowStudio accepts:
 - `nodes`, `edges`, `nodeTypes` — standard React Flow data
 - `onNodesChange` — node change handler (dragging, etc.)
-- `onNodeAdd(node)` — called when a widget is dropped and sized
+- `onNodeCreated(...)` — called when a widget is dropped and sized
 - `editMode` — controls whether handles and widget selector are visible
 - `children` — extra panels (StepPlayer, workflow bar, etc.)
 - `currentSize`, `onSizeChange` — zoom autosize callbacks
@@ -59,7 +61,8 @@ FlowBuilder accepts:
 
 ## Used By
 
-| Page | editMode | Extra children |
-|------|----------|---------------|
-| Builder Demo | `true` | Workflow selector, TimelineDots, ConnectorFlowOverlay |
-| AI+Script | `false` | StepPlayer, JSON debug |
+| Page | URL | editMode | Extra children |
+|------|-----|----------|---------------|
+| Builder Demo Complex | `?page=builder-complex` (alias: `?page=builder`) | `true` | Workflow selector, TimelineDots |
+| Builder Demo Simple | `?page=builder-simple` | `false` | — |
+| AI+Script | `?page=ai-script` | `true` | StepPlayer, JSON debug |

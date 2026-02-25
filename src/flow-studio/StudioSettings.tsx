@@ -1,27 +1,26 @@
 /**
- * FlowBuilderSettings — gear-icon settings panel (theme, mode, zoom-autosize).
- * Extracted from FlowBuilder.tsx.
+ * StudioSettings — gear-icon settings panel (theme, mode, zoom-autosize).
+ * Reads state from FlowStudioStore (MobX).
  */
 
 import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
 import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
-import type { ThemeKey, ThemeMode, NodeSize } from './types'
+import type { ThemeKey } from './types'
+import { useFlowStudioStore } from './FlowStudioStore'
 
-export function FlowBuilderSettings({
-    theme, onThemeChange,
-    mode, onModeChange,
-    zoomAutosize, onZoomAutosizeChange,
-    currentSize,
+export const StudioSettings = observer(function StudioSettings({
+    onThemeChange,
 }: {
-    theme: ThemeKey
-    onThemeChange: (t: ThemeKey) => void
-    mode: ThemeMode
-    onModeChange: (m: ThemeMode) => void
-    zoomAutosize: boolean
-    onZoomAutosizeChange: (v: boolean) => void
-    currentSize?: NodeSize
+    onThemeChange?: (t: ThemeKey) => void
 }) {
+    const store = useFlowStudioStore()
     const [open, setOpen] = useState(false)
+
+    const theme = store.theme
+    const mode = store.mode
+    const zoomAutosize = store.zoomAutosize
+    const currentSize = store.currentSize
 
     return (
         <div style={{ position: 'relative' }}>
@@ -64,7 +63,10 @@ export function FlowBuilderSettings({
                         <button
                             key={t}
                             data-testid={`theme-${t}`}
-                            onClick={() => onThemeChange(t)}
+                            onClick={() => {
+                                store.setTheme(t)
+                                onThemeChange?.(t)
+                            }}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                                 padding: '6px 12px', border: 'none', cursor: 'pointer',
@@ -90,7 +92,7 @@ export function FlowBuilderSettings({
                     </div>
                     <button
                         data-testid="mode-toggle"
-                        onClick={() => onModeChange(mode === 'dark' ? 'light' : 'dark')}
+                        onClick={() => store.setMode(mode === 'dark' ? 'light' : 'dark')}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                             padding: '6px 12px', border: 'none', cursor: 'pointer',
@@ -110,7 +112,7 @@ export function FlowBuilderSettings({
                     </div>
                     <button
                         data-testid="zoom-autosize-toggle"
-                        onClick={() => onZoomAutosizeChange(!zoomAutosize)}
+                        onClick={() => store.setZoomAutosize(!zoomAutosize)}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                             padding: '6px 12px', border: 'none', cursor: 'pointer',
@@ -127,4 +129,4 @@ export function FlowBuilderSettings({
             )}
         </div>
     )
-}
+})

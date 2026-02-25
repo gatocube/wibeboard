@@ -68,7 +68,7 @@ test.describe('SwipeButtons activation modes', () => {
         await page.waitForTimeout(200)
 
         // Sub-buttons should appear
-        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-after-job')).toBeVisible()
         await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
@@ -94,7 +94,7 @@ test.describe('SwipeButtons activation modes', () => {
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.click()
 
-        await expect(page.getByTestId('ext-after-user')).not.toBeVisible({ timeout: 1_000 })
+        await expect(page.getByTestId('ext-after-subflow')).not.toBeVisible({ timeout: 1_000 })
     })
 
     test('hold mode: menu expands on long-press', async ({ page }) => {
@@ -114,7 +114,7 @@ test.describe('SwipeButtons activation modes', () => {
         await page.mouse.up()
 
         // Sub-buttons should now be visible
-        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-after-job')).toBeVisible()
         await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
@@ -133,7 +133,7 @@ test.describe('SwipeButtons activation modes', () => {
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.hover()
 
-        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-after-job')).toBeVisible()
         await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })

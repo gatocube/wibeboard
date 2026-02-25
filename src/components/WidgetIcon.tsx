@@ -29,7 +29,7 @@ import {
 
 export type WidgetIconName =
     | 'agent' | 'script-js' | 'script-ts' | 'script-sh' | 'script-py'
-    | 'group' | 'expectation' | 'note'
+    | 'group' | 'expectation' | 'note' | 'subflow'
 
 const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'agent': Sparkles, 'script-js': Terminal, 'script-ts': Terminal,
@@ -50,7 +50,9 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'sync': RefreshCw, 'radio': Radio, 'wifi': Wifi, 'activity': Activity,
     'bar-chart': BarChart3, 'pie-chart': PieChart, 'gauge': Gauge,
     'radar': Radar, 'scan': Scan, 'target': Target, 'crosshair': Crosshair,
-    'mic': Mic, 'volume': Volume2,
+    'mic': Mic, 'volume': Volume2, 'sleep': Hourglass, 'timer': Timer, 'clock': Clock,
+    'starting': Play,
+    'subflow': Workflow,
 }
 
 export const WIDGET_ICON_COLORS: Record<string, string> = {
@@ -75,13 +77,16 @@ export const WIDGET_ICON_COLORS: Record<string, string> = {
     'activity': '#ef4444', 'bar-chart': '#3b82f6', 'pie-chart': '#a855f7',
     'gauge': '#f97316', 'radar': '#06b6d4', 'scan': '#22c55e',
     'target': '#ef4444', 'crosshair': '#64748b', 'mic': '#ef4444',
-    'volume': '#3b82f6',
+    'volume': '#3b82f6', 'sleep': '#64748b', 'timer': '#8b5cf6', 'clock': '#f59e0b',
+    'starting': '#22c55e',
+    'subflow': '#6366f1',
 }
 
 export const CATEGORY_ICONS: Record<string, React.ComponentType<LucideProps>> = {
     'AI': Sparkles, 'Script': Terminal, 'Expectation': CheckCircle2,
     'Note': StickyNote, 'Layout': Package, 'Integration': Globe,
-    'Workflow': Workflow, 'Dev': Code2,
+    'SubFlow': Workflow,
+    'Workflow': Workflow, 'Dev': Code2, 'Starting': Play,
 }
 
 export const STATUS_ICONS: Record<string, React.ComponentType<LucideProps>> = {

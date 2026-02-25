@@ -6,7 +6,7 @@
  * Turn 1: Agent works, tests run, user clicks "Comment" → loop back
  * Turn 2: Agent re-works, tests re-run, user clicks "Approve" → Deploy runs
  *
- * Uses shared FlowBuilder component for settings + zoom autosize.
+ * Uses shared FlowStudio component for settings + zoom autosize.
  * Supports drag-and-drop widget creation from the sidebar WidgetPicker.
  */
 
@@ -14,7 +14,8 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { ReactFlowProvider, Panel, type Node, type Edge, type NodeTypes, type NodeChange, applyNodeChanges } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
-import { FlowBuilder, NodeConfigPanel, type NodeSize } from '@/flow-builder'
+import { FlowStudio, NodeConfigPanel, type NodeSize, FlowStudioStoreProvider } from '@/flow-studio'
+import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import { AgentNode } from '@/widgets/wibeglow/AgentNode'
 import { ScriptNode } from '@/widgets/wibeglow/ScriptNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
@@ -393,6 +394,9 @@ function AIScriptInner() {
 
     // ── onNodesChange: handle drag + selection for all nodes ─────────────────
 
+    // Track which scenario nodes are currently being dragged (ref = no re-renders)
+    const draggingIdsRef = useRef<Set<string>>(new Set())
+
     const onNodesChange = useCallback((changes: NodeChange[]) => {
         const scenarioChanges: NodeChange[] = []
         const extraChanges: NodeChange[] = []
@@ -406,14 +410,25 @@ function AIScriptInner() {
             }
         }
 
-        // Only commit position overrides for scenario nodes when drag ENDS.
-        // During drag, React Flow manages positions internally — writing back
-        // on every frame causes a re-render loop that makes the screen blink.
+        // For scenario nodes: only commit position overrides on drag END.
+        // During drag, React Flow manages positions internally — writing state
+        // on every frame causes re-render blinking.
         if (scenarioChanges.length > 0) {
             const posChanges = scenarioChanges.filter(
                 (c): c is NodeChange & { type: 'position'; id: string; position?: { x: number; y: number }; dragging?: boolean } =>
                     c.type === 'position'
             )
+
+            // Track dragging state in ref (no re-renders)
+            for (const c of posChanges) {
+                if (c.dragging) {
+                    draggingIdsRef.current.add(c.id)
+                } else {
+                    draggingIdsRef.current.delete(c.id)
+                }
+            }
+
+            // Commit final positions on drag end
             const finalPositions = posChanges.filter(c => c.position && !c.dragging)
             if (finalPositions.length > 0) {
                 setPositionOverrides(prev => {
@@ -481,7 +496,7 @@ function AIScriptInner() {
         })
     }, [updateExtraNodeData])
 
-    // ── Node created via FlowBuilder connector ───────────────────────────────
+    // ── Node created via FlowStudio connector ───────────────────────────────
 
     const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetTemplate, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
         const nodeData: Record<string, any> = {
@@ -700,7 +715,7 @@ function AIScriptInner() {
     )
 
     return (
-        <FlowBuilder
+        <FlowStudio
             nodes={combinedNodes}
             edges={combinedEdges}
             nodeTypes={NODE_TYPES}
@@ -775,16 +790,20 @@ function AIScriptInner() {
                     </pre>
                 </Panel>
             )}
-        </FlowBuilder>
+        </FlowStudio>
     )
 }
 
 // ── Exported wrapper with ReactFlowProvider ──────────────────────────────────
 
+const aiScriptStore = new FlowStudioStore()
+
 export function AIScriptScenarioPage() {
     return (
-        <ReactFlowProvider>
-            <AIScriptInner />
-        </ReactFlowProvider>
+        <FlowStudioStoreProvider store={aiScriptStore}>
+            <ReactFlowProvider>
+                <AIScriptInner />
+            </ReactFlowProvider>
+        </FlowStudioStoreProvider>
     )
 }

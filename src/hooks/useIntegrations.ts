@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
-export type IntegrationId = 'github' | 'cursor' | 'openhands' | 'openai' | 'claudecode'
+export type IntegrationId = string
 
 export interface IntegrationConfig {
     id: IntegrationId
     name: string
     envKey: string
     storageKey: string
+    isCustom?: boolean
 }
 
 export const INTEGRATIONS: IntegrationConfig[] = [
@@ -24,37 +25,52 @@ export interface IntegrationState {
 }
 
 export function useIntegrations() {
-    const [states, setStates] = useState<Record<IntegrationId, IntegrationState>>({} as any)
+    const [states, setStates] = useState<Record<IntegrationId, IntegrationState>>({})
+    const [customConfigs, setCustomConfigs] = useState<IntegrationConfig[]>([])
     const [isLoaded, setIsLoaded] = useState(false)
 
-    useEffect(() => {
-        const initialStates: Record<IntegrationId, IntegrationState> = {} as any
+    const allIntegrations = [...INTEGRATIONS, ...customConfigs]
 
-        for (const config of INTEGRATIONS) {
+    const loadStates = useCallback((configs: IntegrationConfig[]) => {
+        const newStates: Record<IntegrationId, IntegrationState> = {}
+
+        for (const config of configs) {
             // Check process.env equivalent in Vite
             const envValue = (import.meta as any).env[config.envKey]
             if (envValue) {
-                initialStates[config.id] = { id: config.id, value: envValue, source: 'env' }
+                newStates[config.id] = { id: config.id, value: envValue, source: 'env' }
             } else {
                 const storedValue = localStorage.getItem(config.storageKey)
                 if (storedValue) {
-                    initialStates[config.id] = { id: config.id, value: storedValue, source: 'localStorage' }
+                    newStates[config.id] = { id: config.id, value: storedValue, source: 'localStorage' }
                 } else {
-                    initialStates[config.id] = { id: config.id, value: '', source: 'none' }
+                    newStates[config.id] = { id: config.id, value: '', source: 'none' }
                 }
             }
         }
-
-        setStates(initialStates)
-        setIsLoaded(true)
+        setStates(newStates)
     }, [])
 
+    useEffect(() => {
+        // Load custom integrations from localStorage
+        let loadedCustomConfigs: IntegrationConfig[] = []
+        try {
+            const storedCustom = localStorage.getItem('custom_integrations')
+            if (storedCustom) {
+                loadedCustomConfigs = JSON.parse(storedCustom).map((c: any) => ({ ...c, isCustom: true }))
+            }
+        } catch (err) {
+            console.error('Failed to parse custom_integrations from localStorage', err)
+        }
+        setCustomConfigs(loadedCustomConfigs)
+        loadStates([...INTEGRATIONS, ...loadedCustomConfigs])
+        setIsLoaded(true)
+    }, [loadStates])
+
     const saveKey = (id: IntegrationId, value: string) => {
-        const config = INTEGRATIONS.find(i => i.id === id)
+        const config = allIntegrations.find(i => i.id === id)
         if (!config) return
 
-        // We cannot save to env at runtime, so we only save to localStorage
-        // If there's an env value, it overrides localStorage anyway, but we allow saving.
         if (value) {
             localStorage.setItem(config.storageKey, value)
             setStates(prev => ({
@@ -70,13 +86,40 @@ export function useIntegrations() {
         }
     }
 
+    const saveCustomIntegrations = (jsonString: string): boolean => {
+        try {
+            const parsed = JSON.parse(jsonString)
+            if (!Array.isArray(parsed)) throw new Error('Must be an array of objects')
+            const valid = parsed.every(c => c.id && c.name && c.storageKey)
+            if (!valid) throw new Error('Each object must have at least id, name, and storageKey')
+
+            const newConfigs = parsed.map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                envKey: c.envKey || `VITE_${c.id.toUpperCase()}_TOKEN`,
+                storageKey: c.storageKey,
+                isCustom: true
+            }))
+
+            localStorage.setItem('custom_integrations', JSON.stringify(newConfigs))
+            setCustomConfigs(newConfigs)
+            loadStates([...INTEGRATIONS, ...newConfigs])
+            return true
+        } catch (err) {
+            console.error('Failed to save custom integrations:', err)
+            throw err
+        }
+    }
+
     const getKey = (id: IntegrationId) => states[id]?.value || ''
 
     return {
-        integrations: INTEGRATIONS,
+        integrations: allIntegrations,
         states,
         isLoaded,
         saveKey,
-        getKey
+        getKey,
+        saveCustomIntegrations,
+        customIntegrationsRaw: JSON.stringify(customConfigs, null, 2)
     }
 }

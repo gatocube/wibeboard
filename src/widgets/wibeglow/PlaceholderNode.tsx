@@ -2,7 +2,7 @@ import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { Construction } from 'lucide-react'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { useCallback, useRef } from 'react'
-import { WidgetPicker } from '@/flow-builder'
+import { WidgetPicker } from '@/flow-studio'
 import { BaseNode } from '@/widgets/BaseNode'
 
 /**

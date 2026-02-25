@@ -1,5 +1,5 @@
 /**
- * Shared types for the FlowBuilder family of components.
+ * Shared types for the FlowStudio family of components.
  */
 
 import type { Node, Edge, NodeTypes, OnNodesChange, Viewport } from '@xyflow/react'
@@ -11,17 +11,9 @@ export type NodeSize = 'S' | 'M' | 'L'
 export type ThemeKey = 'wibeglow' | 'pixel' | 'ghub'
 export type ThemeMode = 'dark' | 'light'
 
-// ── Connector phase (internal state machine) ────────────────────────────────────
+// ── FlowStudio props ────────────────────────────────────────────────────────────
 
-export type ConnectorPhase =
-    | { type: 'idle' }
-    | { type: 'positioning'; sourceId: string; sourcePos: { x: number; y: number }; cursorPos: { x: number; y: number } }
-    | { type: 'sizing'; placeholderId: string; sourceId: string | null; anchor: { x: number; y: number } }
-    | { type: 'placed'; placeholderId: string; sourceId: string | null; anchor: { x: number; y: number }; gridCols: number; gridRows: number }
-
-// ── FlowBuilder props ───────────────────────────────────────────────────────────
-
-export interface FlowBuilderProps {
+export interface FlowStudioProps {
     nodes: Node[]
     edges: Edge[]
     nodeTypes: NodeTypes
@@ -50,9 +42,9 @@ export interface FlowBuilderProps {
     /** Show widget picker sidebar and editing handles */
     editMode?: boolean
     /**
-     * Called when a new node is fully created through the connector flow:
-     *   handle click → position → resize → pick widget type.
-     * Also called when a widget is dropped from the sidebar picker.
+     * Called when a new node is created via:
+     *  - Drag from WidgetPicker sidebar
+     *  - Click on a widget in the sidebar picker
      */
     onNodeCreated?: (
         nodeId: string,
@@ -62,16 +54,11 @@ export interface FlowBuilderProps {
         sourceNodeId: string | null,
     ) => void
     /**
-     * Called when a node creation is cancelled (ESC, right-click).
-     * If not provided, FlowBuilder handles cleanup internally.
-     */
-    onNodeCancelled?: (placeholderId: string) => void
-    /**
-     * Called when "Add Before" is clicked — widgetType is 'ai', 'script', or 'user'.
+     * Called when "Add Before" is clicked — widgetType is 'ai', 'script', 'sleep', or 'user'.
      */
     onAddBefore?: (nodeId: string, widgetType: string) => void
     /**
-     * Called when "Add After" is clicked — widgetType is 'ai', 'script', or 'user'.
+     * Called when "Add After" is clicked — widgetType is 'ai', 'script', 'sleep', or 'user'.
      */
     onAddAfter?: (nodeId: string, widgetType: string) => void
     /**
@@ -82,6 +69,11 @@ export interface FlowBuilderProps {
      * Called when "Rename" is confirmed with a new name.
      */
     onRename?: (nodeId: string, newName: string) => void
+    /**
+     * When returns true for a given nodeId, the "Before" SwipeButton is hidden.
+     * Useful for starting/entry-point nodes that shouldn't have predecessors.
+     */
+    hideBeforeButton?: (nodeId: string) => boolean
     /**
      * When provided, replaces the default WidgetPicker in the right sidebar.
      * Useful for showing a node configuration panel after creation.

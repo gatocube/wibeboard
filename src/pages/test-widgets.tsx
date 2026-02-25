@@ -13,7 +13,7 @@
 
 import { useState, useCallback } from 'react'
 import { ReactFlow, ReactFlowProvider, type Node, type Edge, Handle, Position } from '@xyflow/react'
-import { WidgetPicker } from '@/flow-builder'
+import { WidgetPicker } from '@/flow-studio'
 import {
     widgetRegistry,
     type WidgetDefinition,
@@ -23,7 +23,7 @@ import {
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components — use unified JobNode/NoteNode directly
-import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser } from '@/widgets/wibeglow'
+import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser, StartingNode as WibeGlowStarting, SubFlowNode as WibeGlowSubFlow } from '@/widgets/wibeglow'
 import { JobNode as PixelJob, NoteNode as PixelNote } from '@/widgets/pixel'
 import { JobNode as GhubJob, NoteNode as GhubNote } from '@/widgets/ghub'
 import { RawNode } from '@/widgets/RawNode'
@@ -105,6 +105,8 @@ const THEME_COMPONENTS: ThemeComponents = {
         note: WibeGlowNote,
         expectation: WibeGlowExpectation,
         user: WibeGlowUser,
+        starting: WibeGlowStarting,
+        subflow: WibeGlowSubFlow,
     },
     pixel: {
         job: PixelJob,

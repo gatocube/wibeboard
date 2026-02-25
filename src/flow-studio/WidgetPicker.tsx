@@ -206,7 +206,7 @@ export function WidgetPicker({
                                     title={widget.label}
                                     draggable
                                     onDragStart={e => {
-                                        e.dataTransfer.setData('application/flowbuilder-widget', JSON.stringify({
+                                        e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
                                             type: widget.type, template: widget.templates[0],
                                         }))
                                         e.dataTransfer.effectAllowed = 'move'
@@ -375,7 +375,7 @@ export function WidgetPicker({
                                             data-testid={`widget-${widget.type}`}
                                             draggable
                                             onDragStart={e => {
-                                                e.dataTransfer.setData('application/flowbuilder-widget', JSON.stringify({
+                                                e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
                                                     type: widget.type, template: widget.templates[0],
                                                 }))
                                                 e.dataTransfer.effectAllowed = 'move'

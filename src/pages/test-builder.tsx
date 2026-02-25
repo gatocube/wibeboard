@@ -8,7 +8,8 @@
 import { ReactFlowProvider, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
-import { FlowBuilder } from '@/flow-builder'
+import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
+import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import type { WidgetTemplate } from '@/engine/widget-registry'
 import { TimelineDots } from '@/components/TimelineDots'
 import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
@@ -261,7 +262,7 @@ function BuilderInner() {
         })
     }, [updateNodeData])
 
-    // ── Node created via FlowBuilder connector ──
+    // ── Node created via FlowStudio connector ──
     const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetTemplate, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
         const nodeData: Record<string, any> = {
             label: template.defaultData.label || template.name,
@@ -317,7 +318,7 @@ function BuilderInner() {
     }), [nodes, editMode, handleRunScript, updateNodeData])
 
     return (
-        <FlowBuilder
+        <FlowStudio
             nodes={nodesWithCallbacks}
             edges={edges}
             nodeTypes={nodeTypes}
@@ -499,16 +500,20 @@ function BuilderInner() {
                         }))}
                 />
             </Panel>
-        </FlowBuilder>
+        </FlowStudio>
     )
 }
 
 // ── Wrapper with ReactFlowProvider ──
 
+const studioStore = new FlowStudioStore()
+
 export function TestBuilderPage() {
     return (
-        <ReactFlowProvider>
-            <BuilderInner />
-        </ReactFlowProvider>
+        <FlowStudioStoreProvider store={studioStore}>
+            <ReactFlowProvider>
+                <BuilderInner />
+            </ReactFlowProvider>
+        </FlowStudioStoreProvider>
     )
 }

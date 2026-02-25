@@ -17,7 +17,7 @@ export interface WidgetTemplate {
     defaultData: Record<string, any>
 }
 
-export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Note' | 'Expectation'
+export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Note' | 'Expectation' | 'Starting' | 'SubFlow'
 
 export interface WidgetDefinition {
     type: string
@@ -104,6 +104,30 @@ const WIDGETS: WidgetDefinition[] = [
                     label: 'script.py', subType: 'py', language: 'py',
                     code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
                 },
+            },
+        ],
+    },
+    // ── SubFlow ──
+    {
+        type: 'subflow',
+        label: 'SubFlow',
+        icon: 'workflow',
+        category: 'SubFlow',
+        tags: ['subflow', 'scope', 'container', 'nested', 'group', 'boundary'],
+        description: 'Nested flow — displays node count, avg exec time, and AI border',
+        color: '#6366f1',
+        minWidth: 120, minHeight: 80,
+        defaultWidth: 280, defaultHeight: 160,
+        templates: [
+            {
+                name: 'SubFlow',
+                description: 'Nested sub-flow with summary stats',
+                defaultData: { label: 'SubFlow', nodeCount: 0, avgExecTime: '—', hasAI: false, color: '#6366f1' },
+            },
+            {
+                name: 'AI Pipeline',
+                description: 'SubFlow containing AI agents — rainbow border',
+                defaultData: { label: 'AI Pipeline', nodeCount: 3, avgExecTime: '4.2s', hasAI: true, color: '#8b5cf6' },
             },
         ],
     },
@@ -230,6 +254,25 @@ const WIDGETS: WidgetDefinition[] = [
                 name: 'Pull Request',
                 description: 'Expects agent to create a pull request',
                 defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+            },
+        ],
+    },
+    // ── Starting (flow entry point) ──
+    {
+        type: 'starting',
+        label: 'Starting',
+        icon: 'play',
+        category: 'Starting',
+        tags: ['start', 'begin', 'entry', 'trigger', 'play'],
+        description: 'Entry point of the flow — a play-button node',
+        color: '#22c55e',
+        minWidth: 48, minHeight: 48,
+        defaultWidth: 48, defaultHeight: 48,
+        templates: [
+            {
+                name: 'Start',
+                description: 'Green play-button entry point',
+                defaultData: { label: 'Start', color: '#22c55e' },
             },
         ],
     },
