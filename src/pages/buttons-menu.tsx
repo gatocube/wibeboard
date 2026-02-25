@@ -1,57 +1,53 @@
 /**
- * Buttons Menu — dedicated showcase for NodeButtonsMenu and ExtendedNodeButtonsMenu.
+ * SwipeButtons — dedicated showcase page.
  *
  * Sections:
- *  1. NodeButtonsMenu — basic radial action buttons around a node
- *  2. ExtendedNodeButtonsMenu — with sub-menu fans for widget type selection
+ *  1. Center preview — a floating button in the middle with a multilevel radial menu
+ *  2. Left-corner preview — a button pinned to the top-left corner
+ *  3. Right-edge preview — a button pinned to the right edge
+ *
+ * An activation mode selector (click / hold / swipe) is provided at the top.
  */
 
 import { useState, useCallback } from 'react'
-import { ExtendedNodeButtonsMenu } from '@/kit'
-import { NodeButtonsMenu } from '@/flow-builder/NodeButtonsMenu'
+import { SwipeButtons, type SwipeButtonsActivation } from '@/kit'
 
-// ── MockNode ────────────────────────────────────────────────────────────────────
+// ── Activation mode pill selector ───────────────────────────────────────────────
 
-function MockNode({ id, label, color, icon, selected, onClick }: {
-    id: string
-    label: string
-    color: string
-    icon: string
-    selected: boolean
-    onClick: () => void
-}) {
+const MODES: { key: SwipeButtonsActivation; label: string; desc: string }[] = [
+    { key: 'click', label: 'Click', desc: 'Tap / click to open menu' },
+    { key: 'hold', label: 'Hold', desc: 'Long-press ~500 ms to open' },
+    { key: 'swipe', label: 'Swipe', desc: 'Hover to open instantly' },
+]
+
+function ModeSelector({ mode, onChange }: { mode: SwipeButtonsActivation; onChange: (m: SwipeButtonsActivation) => void }) {
     return (
-        <div
-            data-id={id}
-            data-testid={`mock-node-${id}`}
-            onClick={(e) => { e.stopPropagation(); onClick() }}
-            style={{
-                width: 120, height: 60,
-                borderRadius: 10,
-                background: selected ? `${color}20` : 'rgba(15,15,26,0.9)',
-                border: `1.5px solid ${selected ? `${color}66` : 'rgba(255,255,255,0.1)'}`,
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '0 12px',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                boxShadow: selected ? `0 0 20px ${color}22` : 'none',
-            }}
-        >
-            <span style={{ fontSize: 20 }}>{icon}</span>
-            <div>
-                <div style={{
-                    fontSize: 11, fontWeight: 700, color: '#e2e8f0',
-                    fontFamily: 'Inter',
-                }}>
-                    {label}
-                </div>
-                <div style={{
-                    fontSize: 7, color: '#64748b',
-                    fontFamily: "'JetBrains Mono', monospace",
-                }}>
-                    {id}
-                </div>
-            </div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            {MODES.map(m => (
+                <button
+                    key={m.key}
+                    onClick={() => onChange(m.key)}
+                    style={{
+                        padding: '8px 20px',
+                        borderRadius: 10,
+                        border: `1.5px solid ${mode === m.key ? '#8b5cf688' : 'rgba(255,255,255,0.08)'}`,
+                        background: mode === m.key ? 'rgba(139,92,246,0.12)' : 'rgba(15,15,26,0.7)',
+                        color: mode === m.key ? '#c4b5fd' : '#64748b',
+                        cursor: 'pointer',
+                        fontFamily: 'Inter',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        transition: 'all 0.15s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 2,
+                    }}
+                >
+                    <span>{m.label}</span>
+                    <span style={{ fontSize: 8, fontWeight: 400, opacity: 0.7 }}>{m.desc}</span>
+                </button>
+            ))}
         </div>
     )
 }
@@ -61,7 +57,7 @@ function MockNode({ id, label, color, icon, selected, onClick }: {
 function EventLog({ log, placeholder }: { log: string[]; placeholder: string }) {
     return (
         <div style={{
-            width: 220, minHeight: 100,
+            width: 220, minHeight: 80,
             background: 'rgba(15,15,26,0.8)',
             border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 8,
@@ -94,6 +90,54 @@ function EventLog({ log, placeholder }: { log: string[]; placeholder: string }) 
     )
 }
 
+// ── Mock node ───────────────────────────────────────────────────────────────────
+
+function MockNode({ id, label, color, icon, selected, onClick, style }: {
+    id: string
+    label: string
+    color: string
+    icon: string
+    selected: boolean
+    onClick: () => void
+    style?: React.CSSProperties
+}) {
+    return (
+        <div
+            data-id={id}
+            data-testid={`mock-node-${id}`}
+            onClick={(e) => { e.stopPropagation(); onClick() }}
+            style={{
+                width: 120, height: 60,
+                borderRadius: 10,
+                background: selected ? `${color}20` : 'rgba(15,15,26,0.9)',
+                border: `1.5px solid ${selected ? `${color}66` : 'rgba(255,255,255,0.1)'}`,
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '0 12px',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                boxShadow: selected ? `0 0 20px ${color}22` : 'none',
+                ...style,
+            }}
+        >
+            <span style={{ fontSize: 20 }}>{icon}</span>
+            <div>
+                <div style={{
+                    fontSize: 11, fontWeight: 700, color: '#e2e8f0',
+                    fontFamily: 'Inter',
+                }}>
+                    {label}
+                </div>
+                <div style={{
+                    fontSize: 7, color: '#64748b',
+                    fontFamily: "'JetBrains Mono', monospace",
+                }}>
+                    {id}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // ── Section heading ─────────────────────────────────────────────────────────────
 
 function SectionHeading({ emoji, emojiColor, title, description }: {
@@ -121,73 +165,9 @@ function SectionHeading({ emoji, emojiColor, title, description }: {
     )
 }
 
-// ── 1. NodeButtonsMenu demo ─────────────────────────────────────────────────────
+// ── 1. Center Preview ───────────────────────────────────────────────────────────
 
-function NodeButtonsMenuSection() {
-    const [selectedId, setSelectedId] = useState<string | null>(null)
-    const [label, setLabel] = useState('My Node')
-    const [log, setLog] = useState<string[]>([])
-
-    const addLog = useCallback((msg: string) => {
-        setLog(prev => [...prev.slice(-6), msg])
-    }, [])
-
-    return (
-        <section>
-            <SectionHeading
-                emoji="⚡"
-                emojiColor="rgba(139,92,246,0.15)"
-                title="NodeButtonsMenu"
-                description="Click a node to see the action buttons appear around it. iPad-friendly 48px touch targets."
-            />
-
-            <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
-                <div style={{
-                    position: 'relative',
-                    width: 400, height: 300,
-                    background: 'rgba(15,15,26,0.6)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: 12,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 40,
-                }}
-                    onClick={(e) => { if (e.target === e.currentTarget) setSelectedId(null) }}
-                >
-                    <MockNode id="node-a" label={label} color="#8b5cf6" icon="🤖"
-                        selected={selectedId === 'node-a'}
-                        onClick={() => setSelectedId(prev => prev === 'node-a' ? null : 'node-a')}
-                    />
-                    <MockNode id="node-b" label="process.js" color="#f7df1e" icon="📜"
-                        selected={selectedId === 'node-b'}
-                        onClick={() => setSelectedId(prev => prev === 'node-b' ? null : 'node-b')}
-                    />
-                </div>
-
-                <EventLog log={log} placeholder="Click a node to start..." />
-            </div>
-
-            {selectedId && (
-                <NodeButtonsMenu
-                    nodeId={selectedId}
-                    nodeWidth={120}
-                    nodeHeight={60}
-                    currentLabel={selectedId === 'node-a' ? label : 'process.js'}
-                    onAddBefore={(id) => { addLog(`⬆ Add Before: ${id}`); setSelectedId(null) }}
-                    onAddAfter={(id) => { addLog(`⬇ Add After: ${id}`); setSelectedId(null) }}
-                    onConfigure={(id) => { addLog(`⚙ Configure: ${id}`) }}
-                    onRename={(id, newName) => {
-                        addLog(`✏ Rename: ${id} → ${newName}`)
-                        if (id === 'node-a') setLabel(newName)
-                    }}
-                    onDismiss={() => setSelectedId(null)}
-                />
-            )}
-        </section>
-    )
-}
-
-// ── 2. ExtendedNodeButtonsMenu demo ─────────────────────────────────────────────
-
-function ExtendedMenuSection() {
+function CenterPreview({ mode }: { mode: SwipeButtonsActivation }) {
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [label, setLabel] = useState('Planner')
     const [log, setLog] = useState<string[]>([])
@@ -199,40 +179,41 @@ function ExtendedMenuSection() {
     return (
         <section>
             <SectionHeading
-                emoji="🚀"
-                emojiColor="rgba(34,197,94,0.15)"
-                title="ExtendedNodeButtonsMenu"
-                description="Click After or Before to see widget-type sub-buttons fan out. Click Config to see Rename / Duplicate / Delete options."
+                emoji="🎯"
+                emojiColor="rgba(139,92,246,0.15)"
+                title="Center — Radial Menu"
+                description="Click the node to activate SwipeButtons. Menu fans out in all 4 directions."
             />
 
-            <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
                 <div style={{
                     position: 'relative',
-                    width: 500, height: 350,
+                    width: 520, height: 380,
                     background: 'rgba(15,15,26,0.6)',
                     border: '1px solid rgba(255,255,255,0.06)',
                     borderRadius: 12,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 80,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
-                    onClick={(e) => { if (e.target === e.currentTarget) setSelectedId(null) }}
+                    onClick={() => setSelectedId(null)}
                 >
-                    <MockNode id="ext-node-a" label={label} color="#8b5cf6" icon="🤖"
-                        selected={selectedId === 'ext-node-a'}
-                        onClick={() => setSelectedId(prev => prev === 'ext-node-a' ? null : 'ext-node-a')}
-                    />
-                    <MockNode id="ext-node-b" label="process.js" color="#f7df1e" icon="📜"
-                        selected={selectedId === 'ext-node-b'}
-                        onClick={() => setSelectedId(prev => prev === 'ext-node-b' ? null : 'ext-node-b')}
+                    <MockNode
+                        id="center-node"
+                        label={label}
+                        color="#8b5cf6"
+                        icon="🤖"
+                        selected={selectedId === 'center-node'}
+                        onClick={() => setSelectedId(prev => prev === 'center-node' ? null : 'center-node')}
                     />
                 </div>
 
-                <EventLog log={log} placeholder="Click a node, then a button..." />
+                <EventLog log={log} placeholder="Click the node, then a button..." />
             </div>
 
             {selectedId && (
-                <ExtendedNodeButtonsMenu
+                <SwipeButtons
                     nodeId={selectedId}
-                    currentLabel={selectedId === 'ext-node-a' ? label : 'process.js'}
+                    currentLabel={label}
+                    activationMode={mode}
                     onAddBefore={(id, type) => { addLog(`⬅ Before ${type}: ${id}`); setSelectedId(null) }}
                     onAddAfter={(id, type) => { addLog(`➡ After ${type}: ${id}`); setSelectedId(null) }}
                     onConfigure={(id, action) => {
@@ -241,8 +222,134 @@ function ExtendedMenuSection() {
                     }}
                     onRename={(id, newName) => {
                         addLog(`✏ Rename: ${id} → ${newName}`)
-                        if (id === 'ext-node-a') setLabel(newName)
+                        setLabel(newName)
                     }}
+                    onDismiss={() => setSelectedId(null)}
+                />
+            )}
+        </section>
+    )
+}
+
+// ── 2. Left-Corner Preview ──────────────────────────────────────────────────────
+
+function LeftCornerPreview({ mode }: { mode: SwipeButtonsActivation }) {
+    const [selectedId, setSelectedId] = useState<string | null>(null)
+    const [log, setLog] = useState<string[]>([])
+
+    const addLog = useCallback((msg: string) => {
+        setLog(prev => [...prev.slice(-6), msg])
+    }, [])
+
+    return (
+        <section>
+            <SectionHeading
+                emoji="↖"
+                emojiColor="rgba(34,197,94,0.15)"
+                title="Left Corner — Pinned Button"
+                description="Node pinned to the top-left corner. Menu fans right and down."
+            />
+
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+                <div style={{
+                    position: 'relative',
+                    width: 520, height: 380,
+                    background: 'rgba(15,15,26,0.6)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 12,
+                    overflow: 'visible',
+                }}
+                    onClick={() => setSelectedId(null)}
+                >
+                    <MockNode
+                        id="left-node"
+                        label="Start"
+                        color="#22c55e"
+                        icon="▶"
+                        selected={selectedId === 'left-node'}
+                        onClick={() => setSelectedId(prev => prev === 'left-node' ? null : 'left-node')}
+                        style={{ position: 'absolute', top: 24, left: 24 }}
+                    />
+                </div>
+
+                <EventLog log={log} placeholder="Click the corner node..." />
+            </div>
+
+            {selectedId && (
+                <SwipeButtons
+                    nodeId={selectedId}
+                    currentLabel="Start"
+                    activationMode={mode}
+                    onAddBefore={(id, type) => { addLog(`⬅ Before ${type}: ${id}`); setSelectedId(null) }}
+                    onAddAfter={(id, type) => { addLog(`➡ After ${type}: ${id}`); setSelectedId(null) }}
+                    onConfigure={(id, action) => {
+                        addLog(`⚙ ${action}: ${id}`)
+                        if (action !== 'rename') setSelectedId(null)
+                    }}
+                    onRename={(id, newName) => { addLog(`✏ Rename: ${id} → ${newName}`) }}
+                    onDismiss={() => setSelectedId(null)}
+                />
+            )}
+        </section>
+    )
+}
+
+// ── 3. Right-Edge Preview ───────────────────────────────────────────────────────
+
+function RightEdgePreview({ mode }: { mode: SwipeButtonsActivation }) {
+    const [selectedId, setSelectedId] = useState<string | null>(null)
+    const [log, setLog] = useState<string[]>([])
+
+    const addLog = useCallback((msg: string) => {
+        setLog(prev => [...prev.slice(-6), msg])
+    }, [])
+
+    return (
+        <section>
+            <SectionHeading
+                emoji="→"
+                emojiColor="rgba(245,158,11,0.15)"
+                title="Right Edge — Pinned Button"
+                description="Node pinned to the right edge. Menu fans left."
+            />
+
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+                <div style={{
+                    position: 'relative',
+                    width: 520, height: 380,
+                    background: 'rgba(15,15,26,0.6)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 12,
+                    overflow: 'visible',
+                }}
+                    onClick={() => setSelectedId(null)}
+                >
+                    <MockNode
+                        id="right-node"
+                        label="Deploy"
+                        color="#f59e0b"
+                        icon="🚀"
+                        selected={selectedId === 'right-node'}
+                        onClick={() => setSelectedId(prev => prev === 'right-node' ? null : 'right-node')}
+                        style={{ position: 'absolute', top: '50%', right: 24, transform: 'translateY(-50%)' }}
+                    />
+                </div>
+
+                <EventLog log={log} placeholder="Click the edge node..." />
+            </div>
+
+            {selectedId && (
+                <SwipeButtons
+                    nodeId={selectedId}
+                    currentLabel="Deploy"
+                    activationMode={mode}
+                    onAddBefore={(id, type) => { addLog(`⬅ Before ${type}: ${id}`); setSelectedId(null) }}
+                    onAddAfter={(id, type) => { addLog(`➡ After ${type}: ${id}`); setSelectedId(null) }}
+                    onConfigure={(id, action) => {
+                        addLog(`⚙ ${action}: ${id}`)
+                        if (action !== 'rename') setSelectedId(null)
+                    }}
+                    onRename={(id, newName) => { addLog(`✏ Rename: ${id} → ${newName}`) }}
                     onDismiss={() => setSelectedId(null)}
                 />
             )}
@@ -253,6 +360,8 @@ function ExtendedMenuSection() {
 // ── Page Component ──────────────────────────────────────────────────────────────
 
 export function ButtonsMenuPage() {
+    const [mode, setMode] = useState<SwipeButtonsActivation>('click')
+
     return (
         <div style={{
             height: '100%', overflow: 'auto',
@@ -264,17 +373,29 @@ export function ButtonsMenuPage() {
                 fontFamily: "'JetBrains Mono', monospace",
                 marginBottom: 4,
             }}>
-                Buttons Menu
+                SwipeButtons
             </h1>
-            <p style={{ fontSize: 11, color: '#64748b', marginBottom: 32 }}>
-                Interactive node action menus — basic and extended variants
+            <p style={{ fontSize: 11, color: '#64748b', marginBottom: 8 }}>
+                Radial action menus optimised for touchscreen devices — trains muscle memory for frequent actions
+            </p>
+            <p style={{ fontSize: 10, color: '#475569', marginBottom: 24, maxWidth: 600, lineHeight: 1.5 }}>
+                Select an activation mode below, then interact with the nodes in each preview.
+                In <strong style={{ color: '#c4b5fd' }}>Click</strong> mode, tap the buttons directly.
+                In <strong style={{ color: '#c4b5fd' }}>Hold</strong> mode, press and hold (~500 ms) — watch the progress ring.
+                In <strong style={{ color: '#c4b5fd' }}>Swipe</strong> mode, just hover to expand sub-menus.
             </p>
 
-            <NodeButtonsMenuSection />
+            <ModeSelector mode={mode} onChange={setMode} />
+
+            <CenterPreview mode={mode} />
 
             <div style={{ height: 48 }} />
 
-            <ExtendedMenuSection />
+            <LeftCornerPreview mode={mode} />
+
+            <div style={{ height: 48 }} />
+
+            <RightEdgePreview mode={mode} />
         </div>
     )
 }

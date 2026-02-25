@@ -3,4 +3,4 @@
  */
 export { IconButton, ICON_BUTTON_COLORS } from './IconButton'
 export type { IconButtonProps, IconButtonColor, IconButtonSize } from './IconButton'
-export { ExtendedNodeButtonsMenu, type ExtendedNodeButtonsMenuProps } from './ExtendedNodeButtonsMenu'
+export { SwipeButtons, type SwipeButtonsProps, type SwipeButtonsActivation } from './SwipeButtons'

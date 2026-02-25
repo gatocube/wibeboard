@@ -26,7 +26,7 @@ import { FlowBuilderSettings } from './FlowBuilderSettings'
 import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { ConnectorOverlay } from './ConnectorOverlay'
 import { WidgetPicker } from './WidgetPicker'
-import { ExtendedNodeButtonsMenu } from '@/kit/ExtendedNodeButtonsMenu'
+import { SwipeButtons } from '@/kit/SwipeButtons'
 
 // ── Ghost node/edge IDs ─────────────────────────────────────────────────────────
 const GHOST_NODE_ID = '__connector-ghost__'
@@ -676,7 +676,7 @@ export function FlowBuilder({
 
             {/* Node buttons menu — fixed position overlay */}
             {editMode && selectedNode && (
-                <ExtendedNodeButtonsMenu
+                <SwipeButtons
                     nodeId={selectedNode.id}
                     currentLabel={String(selectedNode.data?.label || selectedNode.id)}
                     onAddBefore={(id, widgetType) => {

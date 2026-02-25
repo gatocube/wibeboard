@@ -1,15 +1,23 @@
 /**
- * ExtendedNodeButtonsMenu — enhanced version with sub-menus.
+ * SwipeButtons — radial action menu optimised for touchscreen devices.
  *
- * When the user hovers Before/After, a fan of widget-type buttons
- * appears on the corresponding side: Script | AI → (Planner, Worker, Reviewer) | User.
- * When Configure is hovered, sub-options fan out above: Rename, Delete, Duplicate.
+ * This component provides a convenient method to use menus on touchscreen
+ * devices like iPad. It is ideal for frequently used actions, because it
+ * trains the user to rely on the same gestures/movements for the same
+ * actions — building muscle memory over time.
  *
- * Layout:
+ * Activation modes:
+ *   click  — menu appears on tap / click (default)
+ *   hold   — menu appears after a long-press (~500 ms) with a progress ring
+ *   swipe  — menu appears instantly on hover / pointer-enter
+ *
+ * Layout (default wibeboard configuration):
  *   Top:    Configure (orange) → fan: Rename | Delete | Duplicate
- *   Right:  After (+) purple → fan: Script | AI → roles | User
+ *   Right:  After (+) purple  → fan: Script | AI → roles | User
  *   Bottom: Rename
  *   Left:   Before (+) purple → fan: Script | AI → roles | User
+ *
+ * Designed to be reusable across projects.
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
@@ -55,9 +63,13 @@ const TILE = 56
 
 // ── Props ───────────────────────────────────────────────────────────────────────
 
-export interface ExtendedNodeButtonsMenuProps {
+export type SwipeButtonsActivation = 'click' | 'hold' | 'swipe'
+
+export interface SwipeButtonsProps {
     nodeId: string
     currentLabel: string
+    /** Activation mode: click (default), hold (long-press), swipe (hover) */
+    activationMode?: SwipeButtonsActivation
     onAddBefore: (nodeId: string, widgetType: string) => void
     onAddAfter: (nodeId: string, widgetType: string) => void
     onConfigure: (nodeId: string, action: string) => void
@@ -88,11 +100,21 @@ function btnStyle(color: string, size = 48): React.CSSProperties {
     }
 }
 
+// CSS keyframe for hold progress ring (injected once)
+let holdKeyframeInjected = false
+function ensureHoldKeyframe() {
+    if (holdKeyframeInjected) return
+    holdKeyframeInjected = true
+    const style = document.createElement('style')
+    style.textContent = `@keyframes swipe-btn-hold-fill { from { stroke-dashoffset: var(--circ); } to { stroke-dashoffset: 0; } }`
+    document.head.appendChild(style)
+}
+
 
 // ── Component ───────────────────────────────────────────────────────────────────
 
-export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
-    const { nodeId, currentLabel, onAddBefore, onAddAfter, onConfigure, onRename } = props
+export function SwipeButtons(props: SwipeButtonsProps) {
+    const { nodeId, currentLabel, activationMode = 'click', onAddBefore, onAddAfter, onConfigure, onRename } = props
     const [expanded, setExpanded] = useState<null | 'before' | 'after' | 'config'>(null)
     const [scriptExpanded, setScriptExpanded] = useState<null | 'after' | 'before'>(null)
     const [aiExpanded, setAiExpanded] = useState<null | 'after' | 'before'>(null)
@@ -155,14 +177,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
     }
 
     return (
-        <div data-testid="extended-node-buttons-menu"
+        <div data-testid="swipe-buttons-menu"
             style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, zIndex: 1000, pointerEvents: 'none' }}>
 
             <AnimatePresence>
                 {/* ── Config (top) — orange ── */}
                 <MotionButton
                     key="config"
-                    testId="ext-btn-configure"
+                    testId="swipe-btn-configure"
                     pos={positions.top}
                     icon={Settings}
                     label="Config"
@@ -170,6 +192,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0}
                     active={expanded === 'config'}
                     dimmed={expanded !== null && expanded !== 'config'}
+                    activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'config' ? null : 'config')}
                     onHover={() => setExpanded('config')}
                 />
@@ -199,7 +222,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                 {/* ── After (right) — purple ── */}
                 <MotionButton
                     key="after"
-                    testId="ext-btn-add-after"
+                    testId="swipe-btn-add-after"
                     pos={positions.right}
                     icon={Plus}
                     label="After"
@@ -207,6 +230,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0.04}
                     active={expanded === 'after'}
                     dimmed={expanded !== null && expanded !== 'after'}
+                    activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
                     onHover={() => { setExpanded('after'); setAiExpanded(null) }}
                 />
@@ -289,20 +313,21 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                 {/* ── Rename (bottom) ── */}
                 <MotionButton
                     key="rename"
-                    testId="ext-btn-rename"
+                    testId="swipe-btn-rename"
                     pos={positions.bottom}
                     icon={Pencil}
                     label="Name"
                     color="#f59e0b"
                     delay={0.08}
                     dimmed={expanded !== null}
+                    activationMode={activationMode}
                     onClick={() => { setRenaming(true); setExpanded(null) }}
                 />
 
                 {/* ── Before (left) — purple ── */}
                 <MotionButton
                     key="before"
-                    testId="ext-btn-add-before"
+                    testId="swipe-btn-add-before"
                     pos={positions.left}
                     icon={Plus}
                     label="Before"
@@ -310,6 +335,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     delay={0.12}
                     active={expanded === 'before'}
                     dimmed={expanded !== null && expanded !== 'before'}
+                    activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
                     onHover={() => { setExpanded('before'); setAiExpanded(null) }}
                 />
@@ -442,7 +468,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
 
 // ── MotionButton ────────────────────────────────────────────────────────────────
 
-function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, dimmed, onClick, onHover }: {
+function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, dimmed, onClick, onHover, activationMode = 'click' }: {
     testId: string
     pos: { x: number; y: number }
     icon: typeof Plus
@@ -454,8 +480,61 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
     dimmed?: boolean
     onClick: () => void
     onHover?: () => void
+    activationMode?: SwipeButtonsActivation
 }) {
     const half = size / 2
+    const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const [holdProgress, setHoldProgress] = useState(false)
+
+    // Clear hold timer on unmount
+    useEffect(() => () => {
+        if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+    }, [])
+
+    const handlePointerDown = useCallback((e: React.PointerEvent) => {
+        e.stopPropagation()
+        if (activationMode === 'hold' && onHover) {
+            setHoldProgress(true)
+            holdTimerRef.current = setTimeout(() => {
+                setHoldProgress(false)
+                onHover()
+            }, 500)
+        }
+    }, [activationMode, onHover])
+
+    const handlePointerUp = useCallback(() => {
+        if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+        }
+        setHoldProgress(false)
+    }, [])
+
+    const handlePointerEnter = useCallback((e: React.PointerEvent) => {
+        e.stopPropagation()
+        const el = e.currentTarget as HTMLElement
+        el.style.borderColor = `${color}88`
+        el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
+        if (activationMode === 'swipe' && onHover) {
+            onHover()
+        } else if (activationMode === 'click' && onHover) {
+            onHover()
+        }
+    }, [activationMode, onHover, color])
+
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (activationMode === 'hold') return // hold mode uses pointer events
+        onClick()
+    }, [activationMode, onClick])
+
+    // SVG ring for hold progress
+    const ringRadius = half + 2
+    const circumference = 2 * Math.PI * ringRadius
+
+    // Inject keyframe on first render
+    useEffect(() => { ensureHoldKeyframe() }, [])
+
     return (
         <motion.button
             data-testid={testId}
@@ -463,24 +542,17 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
             animate={{ opacity: dimmed ? 0.35 : 1, scale: dimmed ? 0.85 : 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ delay, duration: 0.15, ease: 'easeOut' }}
-            onClick={(e) => { e.stopPropagation(); onClick() }}
+            onClick={handleClick}
             onMouseDown={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            onPointerEnter={onHover ? (e) => {
-                e.stopPropagation()
-                const el = e.currentTarget as HTMLElement
-                el.style.borderColor = `${color}88`
-                el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
-                onHover()
-            } : (e) => {
-                const el = e.currentTarget as HTMLElement
-                el.style.borderColor = `${color}88`
-                el.style.boxShadow = `0 4px 20px rgba(0,0,0,0.5), 0 0 12px ${color}33`
-            }}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onPointerEnter={handlePointerEnter}
             onPointerLeave={(e) => {
                 const el = e.currentTarget as HTMLElement
                 el.style.borderColor = `${color}44`
                 el.style.boxShadow = `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${color}11`
+                handlePointerUp()
             }}
             style={{
                 position: 'fixed',
@@ -491,6 +563,34 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
                 ...(active ? { borderColor: `${color}aa`, boxShadow: `0 4px 20px rgba(0,0,0,0.5), 0 0 16px ${color}44` } : {}),
             }}
         >
+            {/* Hold progress ring */}
+            {holdProgress && (
+                <svg
+                    style={{
+                        position: 'absolute',
+                        left: -4, top: -4,
+                        width: size + 8, height: size + 8,
+                        pointerEvents: 'none',
+                    }}
+                >
+                    <circle
+                        cx={(size + 8) / 2}
+                        cy={(size + 8) / 2}
+                        r={ringRadius}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth={2.5}
+                        strokeLinecap="round"
+                        strokeDasharray={`${circumference}`}
+                        strokeDashoffset={`${circumference}`}
+                        style={{
+                            // @ts-expect-error CSS custom property
+                            '--circ': `${circumference}`,
+                            animation: 'swipe-btn-hold-fill 0.5s linear forwards',
+                        }}
+                    />
+                </svg>
+            )}
             <Icon size={size <= 40 ? 14 : 18} strokeWidth={2} />
             <span style={{
                 fontSize: size <= 40 ? 6 : 7,
