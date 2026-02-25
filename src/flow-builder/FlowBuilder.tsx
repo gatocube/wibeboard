@@ -121,18 +121,67 @@ export function FlowBuilder({
     // Find selected node data for the menu
     const selectedNode = selectedNodeId ? nodes.find(n => n.id === selectedNodeId) : null
 
-    // Node click detection via pointerup — works reliably despite
-    // capture-phase mousedown listener for handle interception.
-    // React Flow's onNodeClick doesn't fire because the capture-phase
-    // mousedown disrupts its internal click tracking.
+    // Node click + long-press detection
+    // Desktop: pointerup toggles menu.
+    // Touch: long-press (500ms hold) also triggers menu with scale animation.
+    const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const pressedNodeRef = useRef<{ id: string; el: HTMLElement } | null>(null)
+    const didLongPressRef = useRef(false)
+
     useEffect(() => {
         const el = wrapperElRef.current
         if (!el) return
 
-        const handler = (e: PointerEvent) => {
-            const target = e.target as HTMLElement
+        const clearLongPress = () => {
+            if (longPressTimerRef.current) {
+                clearTimeout(longPressTimerRef.current)
+                longPressTimerRef.current = null
+            }
+            // Restore node scale
+            if (pressedNodeRef.current) {
+                pressedNodeRef.current.el.style.transition = 'transform 0.2s ease-out'
+                pressedNodeRef.current.el.style.transform = ''
+                pressedNodeRef.current = null
+            }
+        }
 
-            // Clicked on a node?
+        const onPointerDown = (e: PointerEvent) => {
+            if (!editMode) return
+            const target = e.target as HTMLElement
+            const nodeEl = target.closest('.react-flow__node') as HTMLElement | null
+            if (!nodeEl) return
+            const nodeId = nodeEl.getAttribute('data-id')
+            if (!nodeId) return
+            if (nodeId.startsWith(PLACEHOLDER_PREFIX) || nodeId === GHOST_NODE_ID) return
+            if (target.closest('.react-flow__handle')) return
+
+            didLongPressRef.current = false
+            pressedNodeRef.current = { id: nodeId, el: nodeEl }
+
+            // Animate press-down effect
+            nodeEl.style.transition = 'transform 0.15s ease-out'
+            nodeEl.style.transform = 'scale(0.95)'
+
+            // Start long-press timer
+            longPressTimerRef.current = setTimeout(() => {
+                didLongPressRef.current = true
+                setSelectedNodeId(prev => prev === nodeId ? null : nodeId)
+                // Release scale
+                nodeEl.style.transition = 'transform 0.2s ease-out'
+                nodeEl.style.transform = ''
+                pressedNodeRef.current = null
+                longPressTimerRef.current = null
+            }, 500)
+        }
+
+        const onPointerUp = (e: PointerEvent) => {
+            clearLongPress()
+            if (didLongPressRef.current) {
+                didLongPressRef.current = false
+                return // Already handled by long-press
+            }
+
+            const target = e.target as HTMLElement
             const nodeEl = target.closest('.react-flow__node') as HTMLElement | null
             if (nodeEl) {
                 if (!editMode) return
@@ -150,8 +199,26 @@ export function FlowBuilder({
             }
         }
 
-        el.addEventListener('pointerup', handler)
-        return () => el.removeEventListener('pointerup', handler)
+        // Cancel long-press on drag or pointer leave
+        const onPointerMove = () => {
+            if (!pressedNodeRef.current) return
+            // Allow small movement (5px threshold)
+            clearLongPress()
+        }
+
+        const onPointerCancel = () => clearLongPress()
+
+        el.addEventListener('pointerdown', onPointerDown)
+        el.addEventListener('pointerup', onPointerUp)
+        el.addEventListener('pointermove', onPointerMove, { passive: true })
+        el.addEventListener('pointercancel', onPointerCancel)
+        return () => {
+            clearLongPress()
+            el.removeEventListener('pointerdown', onPointerDown)
+            el.removeEventListener('pointerup', onPointerUp)
+            el.removeEventListener('pointermove', onPointerMove)
+            el.removeEventListener('pointercancel', onPointerCancel)
+        }
     }, [editMode])  // recreate when editMode changes
 
     // ── Connector state machine ─────────────────────────────────────────────────
