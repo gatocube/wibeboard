@@ -179,4 +179,88 @@ test.describe('SwipeButtons activation modes', () => {
         await expect(page.getByTestId('mock-node-left-node')).toBeVisible({ timeout: 3_000 })
         await expect(page.getByTestId('mock-node-right-node')).toBeVisible({ timeout: 3_000 })
     })
+
+    // ── Touch event tests ────────────────────────────────────────────────
+
+    test('touch: tap opens menu in click mode', async ({ page }) => {
+        await selectMode(page, 'Click')
+
+        const node = page.getByTestId('mock-node-center-node')
+        const box = await node.boundingBox()
+        expect(box).toBeTruthy()
+        const cx = box!.x + box!.width / 2
+        const cy = box!.y + box!.height / 2
+
+        // Use CDP to dispatch real touch events
+        const cdp = await page.context().newCDPSession(page)
+        await cdp.send('Input.dispatchTouchEvent', {
+            type: 'touchStart',
+            touchPoints: [{ x: cx, y: cy }],
+        })
+        await cdp.send('Input.dispatchTouchEvent', {
+            type: 'touchEnd',
+            touchPoints: [],
+        })
+
+        await expectMenuVisible(page)
+        await cdp.detach()
+    })
+
+    test('touch: buttons have touch-action:none to prevent text selection', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await clickCenterNode(page)
+        await expectMenuVisible(page)
+
+        // All radial buttons should have touch-action:none and user-select:none
+        for (const testId of [
+            'swipe-btn-configure',
+            'swipe-btn-add-after',
+            'swipe-btn-add-before',
+        ]) {
+            const btn = page.getByTestId(testId)
+            const styles = await btn.evaluate(el => {
+                const s = getComputedStyle(el)
+                return {
+                    touchAction: s.touchAction,
+                    userSelect: s.userSelect,
+                }
+            })
+            expect(styles.touchAction, `${testId} touch-action`).toBe('none')
+            expect(styles.userSelect, `${testId} user-select`).toBe('none')
+        }
+    })
+
+    test('touch: swipe container has correct CSS for touch prevention', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+        await page.getByTestId('mock-node-center-node').hover()
+        await expectMenuVisible(page)
+
+        const container = page.getByTestId('swipe-buttons-menu')
+        const styles = await container.evaluate(el => {
+            const s = getComputedStyle(el)
+            return {
+                touchAction: s.touchAction,
+                userSelect: s.userSelect,
+            }
+        })
+        expect(styles.touchAction).toBe('none')
+        expect(styles.userSelect).toBe('none')
+    })
+
+    test('touch: no text selected after hover interaction', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+
+        // Hover across multiple buttons
+        const node = page.getByTestId('mock-node-center-node')
+        await node.hover()
+        await expectMenuVisible(page)
+
+        await page.getByTestId('swipe-btn-add-after').hover()
+        await page.waitForTimeout(100)
+        await page.getByTestId('swipe-btn-configure').hover()
+        await page.waitForTimeout(100)
+
+        const selection = await page.evaluate(() => window.getSelection()?.toString() || '')
+        expect(selection).toBe('')
+    })
 })

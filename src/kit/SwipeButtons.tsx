@@ -113,7 +113,9 @@ function btnStyle(color: string, size = 48): React.CSSProperties {
         boxShadow: `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${color}11`,
         transition: 'border-color 0.15s, box-shadow 0.15s',
         WebkitTapHighlightColor: 'transparent',
-        touchAction: 'manipulation',
+        touchAction: 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
     }
 }
 
@@ -130,6 +132,106 @@ function ensureHoldKeyframe() {
 
 // ── Component ───────────────────────────────────────────────────────────────────
 
+/**
+ * Touch-drag tracking for swipe mode.
+ * On iPad, pointerEnter doesn't fire during a touch drag. Instead, we
+ * track touchmove → elementFromPoint to detect which button the finger
+ * is hovering, then programmatically trigger hover/expand.
+ *
+ * Also handles pointermove for CDP-based testing (Chromium converts
+ * touch to pointer events).
+ */
+function useTouchSwipe(
+    containerRef: React.RefObject<HTMLDivElement | null>,
+    activationMode: SwipeButtonsActivation,
+) {
+    const lastHitRef = useRef<string | null>(null)
+    const activePointerRef = useRef<number | null>(null)
+
+    useEffect(() => {
+        const container = containerRef.current
+        if (!container || activationMode !== 'swipe') return
+
+        // ── Shared hit-test logic ──
+        function hitTest(x: number, y: number) {
+            const el = document.elementFromPoint(x, y) as HTMLElement | null
+            if (!el) return
+            const btn = el.closest('[data-testid]') as HTMLElement | null
+            const testId = btn?.getAttribute('data-testid') || null
+
+            if (testId !== lastHitRef.current) {
+                lastHitRef.current = testId
+                if (btn) {
+                    btn.dispatchEvent(new PointerEvent('pointerenter', {
+                        bubbles: true, clientX: x, clientY: y,
+                    }))
+                }
+            }
+        }
+
+        function hitClick(x: number, y: number) {
+            const el = document.elementFromPoint(x, y) as HTMLElement | null
+            const btn = el?.closest('[data-testid]') as HTMLElement | null
+            if (btn) btn.click()
+            lastHitRef.current = null
+        }
+
+        // ── Touch events (real iPad) ──
+        const handleTouchStart = (e: TouchEvent) => {
+            e.preventDefault()
+        }
+
+        const handleTouchMove = (e: TouchEvent) => {
+            e.preventDefault()
+            const touch = e.touches[0]
+            if (touch) hitTest(touch.clientX, touch.clientY)
+        }
+
+        const handleTouchEnd = (e: TouchEvent) => {
+            const touch = e.changedTouches[0]
+            if (touch) hitClick(touch.clientX, touch.clientY)
+        }
+
+        // ── Pointer events (CDP touch → pointer conversion) ──
+        const handlePointerDown = (e: PointerEvent) => {
+            if (e.pointerType === 'touch') {
+                activePointerRef.current = e.pointerId
+                e.preventDefault()
+            }
+        }
+
+        const handlePointerMove = (e: PointerEvent) => {
+            if (e.pointerType === 'touch' && activePointerRef.current === e.pointerId) {
+                e.preventDefault()
+                hitTest(e.clientX, e.clientY)
+            }
+        }
+
+        const handlePointerUp = (e: PointerEvent) => {
+            if (e.pointerType === 'touch' && activePointerRef.current === e.pointerId) {
+                hitClick(e.clientX, e.clientY)
+                activePointerRef.current = null
+            }
+        }
+
+        document.addEventListener('touchstart', handleTouchStart, { passive: false })
+        document.addEventListener('touchmove', handleTouchMove, { passive: false })
+        document.addEventListener('touchend', handleTouchEnd, { passive: false })
+        document.addEventListener('pointerdown', handlePointerDown)
+        document.addEventListener('pointermove', handlePointerMove)
+        document.addEventListener('pointerup', handlePointerUp)
+
+        return () => {
+            document.removeEventListener('touchstart', handleTouchStart)
+            document.removeEventListener('touchmove', handleTouchMove)
+            document.removeEventListener('touchend', handleTouchEnd)
+            document.removeEventListener('pointerdown', handlePointerDown)
+            document.removeEventListener('pointermove', handlePointerMove)
+            document.removeEventListener('pointerup', handlePointerUp)
+        }
+    }, [containerRef, activationMode])
+}
+
 export function SwipeButtons(props: SwipeButtonsProps) {
     const {
         nodeId, currentLabel, activationMode = 'click',
@@ -145,7 +247,11 @@ export function SwipeButtons(props: SwipeButtonsProps) {
     const [renaming, setRenaming] = useState(false)
     const [renameValue, setRenameValue] = useState(currentLabel)
     const inputRef = useRef<HTMLInputElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
     const [nodeRect, setNodeRect] = useState<DOMRect | null>(null)
+
+    // Touch-drag tracking for swipe mode
+    useTouchSwipe(containerRef, activationMode)
 
     const resetSubs = useCallback(() => {
         setJobExpanded(null); setScriptExpanded(null); setAiExpanded(null); setAttachExpanded(false)
@@ -215,8 +321,12 @@ export function SwipeButtons(props: SwipeButtonsProps) {
     }
 
     return (
-        <div data-testid="swipe-buttons-menu"
-            style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, zIndex: 1000, pointerEvents: 'none' }}>
+        <div ref={containerRef} data-testid="swipe-buttons-menu"
+            style={{
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                zIndex: 1000, pointerEvents: 'none',
+                touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none',
+            }}>
 
             <AnimatePresence>
                 {/* ── Config (top) — orange ── */}
