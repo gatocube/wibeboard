@@ -178,7 +178,7 @@ function BuilderSimpleInner() {
         if (nodes.length !== prevCountRef.current) {
             prevCountRef.current = nodes.length
             if (nodes.length > 1) {
-                const t = setTimeout(() => fitView({ padding: FIT_VIEW_PADDING }), 100)
+                const t = setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 100)
                 return () => clearTimeout(t)
             }
         }
