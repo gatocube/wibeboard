@@ -50,6 +50,9 @@ const SCRIPT_TYPES: SubButton[] = [
     { key: 'py', label: 'PY', icon: FileType, color: '#3b82f6' },
 ]
 
+// Virtual tile grid — all button positions snap to multiples of TILE
+const TILE = 56
+
 // ── Props ───────────────────────────────────────────────────────────────────────
 
 export interface ExtendedNodeButtonsMenuProps {
@@ -176,7 +179,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`cfg-${sub.key}`}
                         testId={`ext-cfg-${sub.key}`}
-                        pos={{ x: positions.top.x + (i - 1) * 56, y: positions.top.y - 58 }}
+                        pos={{ x: positions.top.x + (i - 1) * TILE, y: positions.top.y - TILE }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
@@ -213,7 +216,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`after-${sub.key}`}
                         testId={`ext-after-${sub.key}`}
-                        pos={{ x: positions.right.x + 58, y: positions.right.y + (i - 1) * 56 }}
+                        pos={{ x: positions.right.x + TILE, y: positions.right.y + (i - 1) * TILE }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
@@ -237,16 +240,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* After → Script sub-types: orbit around the Script button */}
+                {/* After → Script sub-types: grid around the Script button */}
                 {expanded === 'after' && scriptExpanded === 'after' && (() => {
-                    // Script button is at index 0 in WIDGET_TYPES → y offset = (0-1)*56 = -56
-                    const scriptBtnX = positions.right.x + 58
-                    const scriptBtnY = positions.right.y + (0 - 1) * 56
-                    // Place sub-types: above, right, below the Script button
+                    const scriptBtnX = positions.right.x + TILE
+                    const scriptBtnY = positions.right.y - TILE
                     const subPositions = [
-                        { x: scriptBtnX, y: scriptBtnY - 50 },        // above
-                        { x: scriptBtnX + 50, y: scriptBtnY },        // right
-                        { x: scriptBtnX, y: scriptBtnY + 50 },        // below
+                        { x: scriptBtnX, y: scriptBtnY - TILE },       // above
+                        { x: scriptBtnX + TILE, y: scriptBtnY },       // right
+                        { x: scriptBtnX, y: scriptBtnY + TILE },       // below (same row as AI)
                     ]
                     return SCRIPT_TYPES.map((st, i) => (
                         <MotionButton
@@ -256,23 +257,20 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                             icon={st.icon}
                             label={st.label}
                             color={st.color}
-                            size={38}
                             delay={i * 0.03}
                             onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                         />
                     ))
                 })()}
 
-                {/* After → AI roles: orbit around the AI button */}
+                {/* After → AI roles: grid around the AI button */}
                 {expanded === 'after' && aiExpanded === 'after' && (() => {
-                    // AI button is at index 1 (center) → y offset = 0
-                    const aiBtnX = positions.right.x + 58
+                    const aiBtnX = positions.right.x + TILE
                     const aiBtnY = positions.right.y
-                    // Place sub-types diagonally to avoid overlapping Script (above) and User (below)
                     const subPositions = [
-                        { x: aiBtnX + 44, y: aiBtnY - 44 },   // top-right
-                        { x: aiBtnX + 58, y: aiBtnY },         // right
-                        { x: aiBtnX + 44, y: aiBtnY + 44 },   // bottom-right
+                        { x: aiBtnX + TILE, y: aiBtnY - TILE },  // top-right
+                        { x: aiBtnX + TILE, y: aiBtnY },          // right
+                        { x: aiBtnX + TILE, y: aiBtnY + TILE },  // bottom-right
                     ]
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
@@ -282,7 +280,6 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                             icon={role.icon}
                             label={role.label}
                             color={role.color}
-                            size={38}
                             delay={i * 0.03}
                             onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                         />
@@ -322,7 +319,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     <MotionButton
                         key={`before-${sub.key}`}
                         testId={`ext-before-${sub.key}`}
-                        pos={{ x: positions.left.x - 58, y: positions.left.y + (i - 1) * 56 }}
+                        pos={{ x: positions.left.x - TILE, y: positions.left.y + (i - 1) * TILE }}
                         icon={sub.icon}
                         label={sub.label}
                         color={sub.color}
@@ -346,14 +343,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* Before → Script sub-types: orbit around the Script button */}
+                {/* Before → Script sub-types: grid around the Script button */}
                 {expanded === 'before' && scriptExpanded === 'before' && (() => {
-                    const scriptBtnX = positions.left.x - 58
-                    const scriptBtnY = positions.left.y + (0 - 1) * 56
+                    const scriptBtnX = positions.left.x - TILE
+                    const scriptBtnY = positions.left.y - TILE
                     const subPositions = [
-                        { x: scriptBtnX, y: scriptBtnY - 50 },
-                        { x: scriptBtnX - 50, y: scriptBtnY },
-                        { x: scriptBtnX, y: scriptBtnY + 50 },
+                        { x: scriptBtnX, y: scriptBtnY - TILE },       // above
+                        { x: scriptBtnX - TILE, y: scriptBtnY },       // left
+                        { x: scriptBtnX, y: scriptBtnY + TILE },       // below (same row as AI)
                     ]
                     return SCRIPT_TYPES.map((st, i) => (
                         <MotionButton
@@ -363,22 +360,20 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                             icon={st.icon}
                             label={st.label}
                             color={st.color}
-                            size={38}
                             delay={i * 0.03}
                             onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                         />
                     ))
                 })()}
 
-                {/* Before → AI roles: orbit around the AI button */}
+                {/* Before → AI roles: grid around the AI button */}
                 {expanded === 'before' && aiExpanded === 'before' && (() => {
-                    const aiBtnX = positions.left.x - 58
+                    const aiBtnX = positions.left.x - TILE
                     const aiBtnY = positions.left.y
-                    // Place sub-types diagonally to avoid overlapping Script (above) and User (below)
                     const subPositions = [
-                        { x: aiBtnX - 44, y: aiBtnY - 44 },   // top-left
-                        { x: aiBtnX - 58, y: aiBtnY },         // left
-                        { x: aiBtnX - 44, y: aiBtnY + 44 },   // bottom-left
+                        { x: aiBtnX - TILE, y: aiBtnY - TILE },  // top-left
+                        { x: aiBtnX - TILE, y: aiBtnY },          // left
+                        { x: aiBtnX - TILE, y: aiBtnY + TILE },  // bottom-left
                     ]
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
@@ -388,7 +383,6 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                             icon={role.icon}
                             label={role.label}
                             color={role.color}
-                            size={38}
                             delay={i * 0.03}
                             onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                         />
