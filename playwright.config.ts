@@ -1,17 +1,20 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const isHuman = process.env.TEST_RUNNER_HUMAN === '1'
+
 export default defineConfig({
     testDir: './tests',
     testMatch: '**/*.e2e.ts',
-    fullyParallel: true,
+    fullyParallel: !isHuman,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
-    workers: process.env.CI ? 1 : undefined,
+    workers: isHuman ? 1 : process.env.CI ? 1 : undefined,
     reporter: 'list',
     use: {
         baseURL: 'http://localhost:5173/wibeboard/',
         trace: 'on-first-retry',
-        ...(process.env.TEST_RUNNER_HUMAN === '1' ? { cursor: 'css' } : {}),
+        headless: !isHuman,
+        ...(isHuman ? { cursor: 'css' } : {}),
     },
     projects: [
         {
