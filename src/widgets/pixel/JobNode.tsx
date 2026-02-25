@@ -64,16 +64,16 @@ function JobNodeInner({ data, subType }: { data: any; subType: string }) {
         : {}
 
     if (isAI) {
-        return <AgentVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} hasKnock={hasKnock} knockAnimation={knockAnimation} knockTransition={knockTransition} />
+        return <AgentVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} knockAnimation={knockAnimation} knockTransition={knockTransition} />
     }
-    return <ScriptVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} hasKnock={hasKnock} knockAnimation={knockAnimation} knockTransition={knockTransition} />
+    return <ScriptVariant data={data} status={status} w={w} h={h} isCompact={isCompact} logs={logs} pixelFont={pixelFont} knockAnimation={knockAnimation} knockTransition={knockTransition} />
 }
 
 // ── Agent variant ───────────────────────────────────────────────────────────
 
-function AgentVariant({ data, status, w, h, isCompact, logs, pixelFont, hasKnock, knockAnimation, knockTransition }: {
+function AgentVariant({ data, status, w, h, isCompact, logs, pixelFont, knockAnimation, knockTransition }: {
     data: any; status: string; w: number; h: number; isCompact: boolean
-    logs: string[]; pixelFont: string; hasKnock: boolean; knockAnimation: any; knockTransition: any
+    logs: string[]; pixelFont: string; knockAnimation: any; knockTransition: any
 }) {
     const isLarge = w >= 280
     const statusConfig: Record<string, { label: string; color: string }> = {
@@ -195,9 +195,9 @@ function AgentVariant({ data, status, w, h, isCompact, logs, pixelFont, hasKnock
 
 // ── Script variant ──────────────────────────────────────────────────────────
 
-function ScriptVariant({ data, status, w, h, isCompact, logs, pixelFont, hasKnock, knockAnimation, knockTransition }: {
+function ScriptVariant({ data, status, w, h, isCompact, logs, pixelFont, knockAnimation, knockTransition }: {
     data: any; status: string; w: number; h: number; isCompact: boolean
-    logs: string[]; pixelFont: string; hasKnock: boolean; knockAnimation: any; knockTransition: any
+    logs: string[]; pixelFont: string; knockAnimation: any; knockTransition: any
 }) {
     const lang = data.language || 'sh'
     const langColor = LANG_COLORS[lang] || '#22c55e'

@@ -66,7 +66,6 @@ function AgentVariant({ data }: { data: any }) {
     const secondaryColor = isActive ? '#06b6d4' : '#06b6d488'
     const tertiaryColor = isActive ? '#f59e0b' : '#f59e0b66'
     const knockOut = data.knockSide === 'out'
-    const knockIn = data.knockSide === 'in'
     const hasKnock = !!(data.knockSide)
     const kColor = data.knockColor || '#f97316'
 
@@ -191,7 +190,7 @@ function AgentVariant({ data }: { data: any }) {
                                 {isWaking ? (
                                     <SplittingText text={data.label || 'Agent'} />
                                 ) : isRunning ? (
-                                    <ShimmeringText color={color}>{data.label || 'Agent'}</ShimmeringText>
+                                    <ShimmeringText text={data.label || 'Agent'} color={color} />
                                 ) : (
                                     data.label || 'Agent'
                                 )}

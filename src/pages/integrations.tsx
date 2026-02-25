@@ -89,7 +89,7 @@ export function IntegrationsPage() {
                     // Just doing a simple fetch to see if the host is reachable.
                     // Adding mode: 'no-cors' so we don't fail immediately on CORS for simple reachability tests
                     // Note: no-cors produces an opaque response (status 0), which means we reached the server but can't see the body.
-                    const res = await fetch(key, { method: 'GET', mode: 'no-cors' })
+                    await fetch(key, { method: 'GET', mode: 'no-cors' })
                     setTestStatuses(prev => ({
                         ...prev,
                         [id]: { loading: false, success: true, message: 'Success: Host is reachable' }

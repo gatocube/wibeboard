@@ -68,12 +68,6 @@ function loadWorkflows(): { workflows: Workflow[]; activeId: string } {
     return { workflows: [wf], activeId: wf.id }
 }
 
-function saveWorkflows(workflows: Workflow[], activeId: string) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows))
-        localStorage.setItem(ACTIVE_KEY, activeId)
-    } catch (e) { /* ignore */ }
-}
 
 const api = new FlowStudioApi()
 
