@@ -236,7 +236,7 @@ function AgentVariant({ data }: { data: any }) {
                     {/* ── Current task row ── */}
                     <div style={{
                         padding: '0 10px 3px',
-                        fontSize: 9, color: '#94a3b8',
+                        fontSize: 11, color: '#94a3b8',
                         fontFamily: 'Inter',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         flexShrink: 0,
