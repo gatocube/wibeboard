@@ -18,68 +18,87 @@ wibeboard/
 │   │   └── template-registry.ts   # 3 visual themes: pixel, ghub, wibeglow
 │   │
 │   ├── widgets/
-│   │   ├── BaseNode.tsx            # Foundational wrapper (type, subType, ctx via React context)
+│   │   ├── BaseNode.tsx            # Foundational wrapper (type, subType, ctx)
 │   │   ├── StatusDot.tsx           # Animated status indicator
-│   │   └── wibeglow/              # WibeGlow template components
+│   │   ├── widget-registry.ts      # Widget definitions (mirrors engine/)
+│   │   └── wibeglow/               # WibeGlow template components
 │   │       ├── JobNode.tsx         # Unified job node (subType='ai' | 'script')
-│   │       ├── AgentNode.tsx       # Thin wrapper → JobNode subType='ai'
-│   │       ├── ScriptNode.tsx      # Thin wrapper → JobNode subType='script'
-│   │       ├── NoteNode.tsx        # Annotation node (subType='sticker' | 'group' | 'label')
-│   │       ├── GroupNode.tsx       # Container node
+│   │       ├── StartingNode.tsx    # 60×60 starting node (center at origin)
 │   │       ├── UserNode.tsx        # Human review / approval node
-│   │       ├── ArtifactNode.tsx    # Artifact display node
+│   │       ├── SubFlowNode.tsx     # Sub-workflow container
+│   │       ├── NoteNode.tsx        # Annotation node
+│   │       ├── GroupNode.tsx       # Container node
 │   │       ├── ExpectationNode.tsx # Expected-outcome node
 │   │       └── PlaceholderNode.tsx # Placeholder during widget selection
 │   │
 │   ├── engine/
-│   │   ├── NodeContext.ts         # NodeContext type + React context (useNodeCtx hook)
-│   │   ├── AgentMessenger.ts      # Contact management + messaging for agent nodes
-│   │   ├── widget-registry.ts     # Widget definitions (type, category, sizes, templates)
-│   │   ├── ConnectorFlow.tsx      # Click-based connection drawing (position → size → pick)
-│   │   ├── automerge-store.ts     # Step-based state store (Automerge CRDT)
-│   │   ├── step-player.tsx        # Step player UI (play/pause/next/prev/reset)
-│   │   └── workflow-store.ts      # Persistent workflow save/load (IndexedDB)
+│   │   ├── widget-registry.ts     # Widget definitions (GRID_CELL, MIN_GRID, sizes)
+│   │   ├── node-factory.ts        # Node creation API (positioning, spacing, delete)
+│   │   ├── NodeContext.ts         # NodeContext type + React context
+│   │   ├── AgentMessenger.ts      # Contact management + messaging for agents
+│   │   ├── ConnectorFlow.tsx      # Click-based connection drawing
+│   │   ├── automerge-store.ts     # CRDT state store
+│   │   ├── step-player.tsx        # Step player UI
+│   │   └── workflow-store.ts      # Persistent workflow save/load
+│   │
+│   ├── flow-studio/
+│   │   ├── FlowStudio.tsx         # Main ReactFlow wrapper (drag-drop, themes, edit mode)
+│   │   ├── FlowStudioStore.tsx    # MobX store (theme, size, node selection)
+│   │   ├── WidgetPicker.tsx       # Sidebar widget picker
+│   │   ├── NodeButtonsMenu.tsx    # Radial menu for node actions
+│   │   ├── NodeConfigPanel.tsx    # Node configuration panel
+│   │   ├── StudioSettings.tsx     # Settings panel (theme, grid)
+│   │   ├── ZoomAutosize.tsx       # Zoom-based node resizing
+│   │   ├── resolve-collisions.ts  # Collision detection + auto-spacing
+│   │   ├── types.ts               # Shared types
+│   │   └── index.ts               # Barrel exports
+│   │
+│   ├── kit/
+│   │   ├── SwipeButtons.tsx       # Radial action menu (After, Before, Configure)
+│   │   ├── ExtendedNodeButtonsMenu.tsx  # Extended button menu
+│   │   ├── NodeSettingsPanel.tsx  # Settings panel for node configuration
+│   │   ├── CodeEditor.tsx         # CodeMirror 6 editor (JSON, JS, TS, Python)
+│   │   └── IconSelector.tsx       # Icon picker
 │   │
 │   ├── components/
-│   │   ├── FlowBuilder.tsx        # Core ReactFlow wrapper (drag-drop, zoom, grid, settings)
-│   │   ├── WidgetSelector.tsx     # Categorized widget picker (search, categories, recent)
 │   │   ├── PreviewCanvas.tsx      # Minimap-style preview canvas
-│   │   ├── TimelineDots.tsx       # Timeline dot navigation
 │   │   ├── WidgetIcon.tsx         # Widget type icon renderer
-│   │   ├── AnimatedNumber.tsx     # Animated number transition
-│   │   ├── FpsMeter.tsx           # FPS performance meter
-│   │   ├── TechIcons.tsx          # Technology brand icons
-│   │   └── animate-ui/index.tsx   # Animation primitives
+│   │   └── ...                    # Other UI components
 │   │
 │   ├── hooks/
-│   │   └── useIntegrations.ts     # API key management (env → localStorage fallback)
+│   │   └── useIntegrations.ts     # API key management
 │   │
 │   └── pages/
-│       ├── test-builder.tsx       # Builder demo (Agent → Script → Group)
+│       ├── builder-simple.tsx     # Simple flow builder (start → chain nodes)
+│       ├── test-builder.tsx       # Complex builder demo
 │       ├── test-widgets.tsx       # Widget gallery with template switcher
-│       ├── test-icons.tsx         # Icon showcase
-│       ├── ai-script-scenario.tsx # Step-driven AI coding scenario (Agent → Tests → Review → Deploy)
-│       ├── two-node-scenario.tsx  # Minimal two-node scenario
-│       ├── four-node-concurrent.tsx # Four-node concurrent execution demo
-│       └── integrations.tsx       # API key management UI (GitHub, Cursor, OpenHands, OpenAI, ClaudeCode)
+│       ├── ai-script-scenario.tsx # Step-driven AI coding scenario
+│       ├── integrations.tsx       # API key management UI
+│       └── ...                    # Other demo pages
 │
 ├── tests/
-│   ├── flowbuilder.e2e.ts         # Builder drag-drop + ConnectorFlow E2E
-│   ├── integrations.e2e.ts        # Integrations page E2E (token test, localStorage)
-│   ├── two-node.scenario.e2e.ts   # Two-node scenario E2E
-│   ├── four-node.scenario.e2e.ts  # Four-node concurrent scenario E2E
-│   ├── gallery.scenario.e2e.ts    # Widget gallery E2E
-│   └── pages-smoke.scenario.e2e.ts # Smoke tests for all pages
+│   ├── builder-simple.e2e.ts      # Simple builder: add, delete, reconnect, spacing
+│   ├── flow-studio.e2e.ts         # FlowStudio: drag-drop, edit toggle, script run
+│   ├── pages-smoke.scenario.e2e.ts # Smoke tests for all pages
+│   ├── swipe-buttons.e2e.ts       # SwipeButtons radial menu
+│   └── ...                        # Scenario + integration tests
 │
-├── packages/
-│   └── test-runner/              # CLI test runner utility
+├── public/
+│   └── stats/
+│       ├── index.html             # Test stats dashboard (auto-updated by CI)
+│       └── test-results.json      # JSON test results (populated by CI)
 │
-├── agents/
-│   └── testing-strategy.md      # Testing conventions
+├── docs/
+│   ├── ARCHITECTURE.md            # ← You are here
+│   ├── grid-sizing.md             # Grid units, spacing rules, collision avoidance
+│   ├── simple-demo.md             # Builder Simple page specification
+│   ├── flow-studio.md             # FlowStudio component documentation
+│   ├── swipe-buttons-menu.md      # SwipeButtons menu specification
+│   └── ...                        # Other feature docs
 │
 └── .github/workflows/
-    ├── deploy.yml                # Build + deploy to GitHub Pages on push to main
-    └── test.yml                  # Run E2E tests on pull requests
+    ├── deploy.yml                 # Build + deploy to GitHub Pages on push to main
+    └── test.yml                   # CI: smoke + full tests, publish stats
 ```
 
 ## Key Design Decisions
@@ -120,6 +139,26 @@ Click-based node creation pipeline:
 
 Also supports drag-and-drop from the WidgetSelector sidebar (via `onWidgetDrop`).
 
+### FlowStudio
+Self-contained ReactFlow wrapper providing:
+- **Theme management** (wibeglow, pixel, ghub)
+- **Edit mode** with WidgetPicker sidebar
+- **Drag-and-drop** node creation from picker
+- **Collision avoidance** — auto-spacing on drag-stop (O(n²) algorithm)
+- **SwipeButtons** radial menu for node actions (Add After/Before, Configure)
+
+See [docs/flow-studio.md](flow-studio.md) for full component documentation.
+
+### Node Factory (`engine/node-factory.ts`)
+Centralized API for node creation with correct positioning:
+- `createStartNode()` — center at (0, 0)
+- `positionAfter(source)` — 5 grid units right, Y center-aligned
+- `positionBefore(target)` — left of target, Y center-aligned
+- `deleteNodeWithReconnect()` — bridge-reconnection (A→B→C → A→C)
+- `makeEdge()` — styled edge factory
+
+See [docs/grid-sizing.md](grid-sizing.md) for grid sizing guidelines.
+
 ### Step-Based Scenarios
 Pages like `ai-script-scenario` use `StepStore` (Automerge CRDT) to drive
 node state changes step-by-step with play/pause/next/prev controls.
@@ -133,20 +172,34 @@ GitHub tokens are validated via the `X-OAuth-Scopes` header.
 Instead of React Cosmos, we use regular React components as testing pages.
 Navigate between them via the top nav bar.
 
-## Data Flow
+## CI / CD
 
-```
-Widget Registry → WidgetSelector → ConnectorFlow → React Flow nodes
-                                                         ↓
-Template Registry → Node components render per active template
-```
+### Deploy (`deploy.yml`)
+On push to `main`, builds the Vite app and deploys to GitHub Pages.
+
+### Tests (`test.yml`)
+Triggers on push to `main` and pull requests. Runs 2 parallel jobs:
+- **Smoke** — `pages-smoke.scenario.e2e.ts` (fast gate, ~5s)
+- **Full** — complete test suite
+
+A third job (`publish-stats`) merges JSON results and deploys a stats dashboard to
+[gatocube.github.io/wibeboard/stats/](https://gatocube.github.io/wibeboard/stats/).
+
+## Related Documentation
+
+- [Grid Sizing Guidelines](grid-sizing.md) — spacing, collision avoidance, minimum sizes
+- [FlowStudio](flow-studio.md) — FlowStudio component API
+- [SwipeButtons Menu](swipe-buttons-menu.md) — radial action menu
+- [Simple Demo](simple-demo.md) — builder-simple page specification
+- [Testing Strategy](../agents/testing-strategy.md) — E2E testing conventions
 
 ## Stack
 
 - **React 19** + TypeScript
 - **@xyflow/react** (React Flow v12) — canvas, nodes, edges
+- **MobX** — observable state for FlowStudio
 - **framer-motion** — animations (wibeglow template)
 - **lucide-react** — icons
-- **elkjs** — auto-layout (planned)
+- **CodeMirror 6** — code editing in configurator
 - **Vite 7** — dev server and build
 - **Playwright** — E2E testing

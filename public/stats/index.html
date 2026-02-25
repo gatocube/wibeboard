@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wibeboard — Test Stats</title>
+    <style>
+        :root {
+            --bg: #0a0a14;
+            --surface: #1e1e3a;
+            --border: #2d2d5a;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --pass: #22c55e;
+            --fail: #ef4444;
+            --skip: #f59e0b;
+            --accent: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .card .label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card.pass .value {
+            color: var(--pass);
+        }
+
+        .card.fail .value {
+            color: var(--fail);
+        }
+
+        .card.skip .value {
+            color: var(--skip);
+        }
+
+        .card.time .value {
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            text-align: left;
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid #1a1a30;
+        }
+
+        tr:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status.passed {
+            background: var(--pass);
+        }
+
+        .status.failed {
+            background: var(--fail);
+        }
+
+        .status.skipped {
+            background: var(--skip);
+        }
+
+        .duration {
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+
+        .error {
+            color: var(--fail);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <a class="back-link" href="../">← Back to Wibeboard</a>
+        <h1>Test Stats</h1>
+        <div class="meta" id="meta">Loading results…</div>
+        <div class="cards" id="cards"></div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function loadStats() {
+            const meta = document.getElementById('meta')
+            const cards = document.getElementById('cards')
+            const results = document.getElementById('results')
+
+            try {
+                const res = await fetch('./test-results.json')
+                if (!res.ok) {
+                    meta.textContent = 'No test results available yet. Stats will appear after the first CI run on main.'
+                    return
+                }
+                const data = await res.json()
+
+                // Meta line
+                const date = new Date(data.timestamp)
+                meta.innerHTML = `Last run: <strong>${date.toLocaleString()}</strong> · Commit: <a href="https://github.com/gatocube/wibeboard/commit/${data.commit}" target="_blank"><code>${data.commit}</code></a>`
+
+                // Aggregate stats
+                const allTests = []
+                function collectTests(suites) {
+                    for (const suite of (suites || [])) {
+                        for (const spec of (suite.specs || [])) {
+                            for (const test of (spec.tests || [])) {
+                                const result = test.results?.[0]
+                                allTests.push({
+                                    title: `${suite.title} › ${spec.title}`,
+                                    status: test.status || result?.status || 'unknown',
+                                    duration: result?.duration || 0,
+                                })
+                            }
+                        }
+                        if (suite.suites) collectTests(suite.suites)
+                    }
+                }
+                collectTests(data.smoke?.suites || [])
+                collectTests(data.full?.suites || [])
+
+                const passed = allTests.filter(t => t.status === 'expected' || t.status === 'passed').length
+                const failed = allTests.filter(t => t.status === 'unexpected' || t.status === 'failed').length
+                const skipped = allTests.filter(t => t.status === 'skipped').length
+                const totalMs = allTests.reduce((s, t) => s + t.duration, 0)
+
+                cards.innerHTML = `
+                    <div class="card pass"><div class="value">${passed}</div><div class="label">Passed</div></div>
+                    <div class="card fail"><div class="value">${failed}</div><div class="label">Failed</div></div>
+                    <div class="card skip"><div class="value">${skipped}</div><div class="label">Skipped</div></div>
+                    <div class="card time"><div class="value">${(totalMs / 1000).toFixed(1)}s</div><div class="label">Total Time</div></div>
+                `
+
+                // Render tables for smoke and full
+                function renderSection(title, suites) {
+                    const tests = []
+                    function collect(ss) {
+                        for (const s of (ss || [])) {
+                            for (const spec of (s.specs || [])) {
+                                for (const t of (spec.tests || [])) {
+                                    const r = t.results?.[0]
+                                    tests.push({
+                                        title: `${s.title} › ${spec.title}`,
+                                        status: t.status || r?.status || 'unknown',
+                                        duration: r?.duration || 0,
+                                    })
+                                }
+                            }
+                            if (s.suites) collect(s.suites)
+                        }
+                    }
+                    collect(suites)
+
+                    if (tests.length === 0) return ''
+
+                    const statusMap = {
+                        expected: 'passed', passed: 'passed',
+                        unexpected: 'failed', failed: 'failed',
+                        skipped: 'skipped',
+                    }
+
+                    let rows = tests.map(t => {
+                        const st = statusMap[t.status] || 'skipped'
+                        return `<tr>
+                            <td><span class="status ${st}"></span>${t.title}</td>
+                            <td class="duration">${(t.duration / 1000).toFixed(2)}s</td>
+                        </tr>`
+                    }).join('')
+
+                    return `
+                        <div class="section-title">${title}</div>
+                        <table>
+                            <thead><tr><th>Test</th><th>Duration</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    `
+                }
+
+                results.innerHTML =
+                    renderSection('🔥 Smoke Tests', data.smoke?.suites) +
+                    renderSection('🧪 Full Suite', data.full?.suites)
+
+            } catch (e) {
+                meta.textContent = 'No test results available yet. Stats will appear after the first CI run on main.'
+            }
+        }
+
+        loadStats()
+    </script>
+</body>
+
+</html>
