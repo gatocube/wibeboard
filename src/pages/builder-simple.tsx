@@ -1,13 +1,19 @@
 /**
- * BuilderSimplePage — minimal flow builder with a single StartingNode.
+ * BuilderSimplePage — minimal flow builder with workflow selector.
  *
- * Shows a centered StartingNode on a React Flow canvas.
- * Use the SwipeButtons radial menu to add nodes after the starting point.
+ * Shows a workflow selector bar at the top and a React Flow canvas.
+ * Supports multiple workflows persisted to localStorage.
+ * Start node is positioned on the left so new nodes grow to the right.
+ *
+ * Optimized for iPad:
+ *  - 44px touch targets on selector bar
+ *  - Default zoom 0.85 for landscape fit
+ *  - fitView padding 0.3 for breathing room
  *
  * Supports:
  *  - Add After / Add Before via SwipeButtons
  *  - Delete via Config → Delete
- *  - Undo / Redo via Cmd+Z / Cmd+Shift+Z
+ *  - Undo / Redo via Cmd+Z / Cmd+Shift+Z and on-screen buttons
  */
 
 import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
@@ -27,23 +33,68 @@ const nodeTypes = {
     subflow: SubFlowNode,
 }
 
-// ── Initial state: single Starting node ──
-const INITIAL_NODES: Node[] = [
-    {
+// ── iPad-friendly constants ──
+const START_NODE_X = 80
+const START_NODE_Y = 300
+const DEFAULT_ZOOM = 0.85
+const FIT_VIEW_PADDING = 0.3
+
+// ── Workflow data model ──
+interface Workflow {
+    id: string
+    name: string
+    nodes: Node[]
+    edges: Edge[]
+}
+
+function createStartNode(): Node {
+    return {
         id: 'start-1',
         type: 'starting',
-        position: { x: 200, y: 200 },
+        position: { x: START_NODE_X, y: START_NODE_Y },
         data: { label: 'Start', color: '#22c55e' },
-    },
-]
+    }
+}
 
-const INITIAL_EDGES: Edge[] = []
+function createWorkflow(name: string): Workflow {
+    return {
+        id: `wf-${Date.now()}`,
+        name,
+        nodes: [createStartNode()],
+        edges: [],
+    }
+}
+
+// ── Persistence ──
+const STORAGE_KEY = 'flowstudio_workflows'
+const ACTIVE_KEY = 'flowstudio_active_workflow'
+
+function loadWorkflows(): { workflows: Workflow[]; activeId: string } {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+        if (raw) {
+            const workflows = JSON.parse(raw) as Workflow[]
+            if (workflows.length > 0) {
+                const activeId = localStorage.getItem(ACTIVE_KEY) || workflows[0].id
+                return { workflows, activeId }
+            }
+        }
+    } catch (e) { /* ignore */ }
+    const wf = createWorkflow('Workflow 1')
+    return { workflows: [wf], activeId: wf.id }
+}
+
+function saveWorkflows(workflows: Workflow[], activeId: string) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows))
+        localStorage.setItem(ACTIVE_KEY, activeId)
+    } catch (e) { /* ignore */ }
+}
 
 const studioStore = new FlowStudioStore()
 
 // ── Resolve widgetType string to { type, data } ──
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
-    // e.g. 'user' → user widget, 'script:js' → job with subType js, 'ai:worker' → job with subType ai
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
         const tpl = def?.templates[0]
@@ -100,34 +151,72 @@ export default function BuilderSimplePage() {
 
 // ── Inner component (uses hooks that need ReactFlowProvider) ──
 function BuilderSimpleInner() {
-    const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES)
-    const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES)
+    const [workflows, setWorkflows] = useState<Workflow[]>(() => loadWorkflows().workflows)
+    const [activeId, setActiveId] = useState<string>(() => loadWorkflows().activeId)
     const [settingsNodeId, setSettingsNodeId] = useState<string | null>(null)
 
-    // ── Undo / Redo ──
-    const historyRef = useRef<HistoryEntry[]>([{ nodes: INITIAL_NODES, edges: INITIAL_EDGES }])
-    const historyIndexRef = useRef(0)
-    const skipPushRef = useRef(false) // suppress history push during undo/redo
-    const { fitView } = useReactFlow()
+    const activeWorkflow = workflows.find(w => w.id === activeId) || workflows[0]
+    const nodes = activeWorkflow?.nodes || []
+    const edges = activeWorkflow?.edges || []
 
-    // ── Auto-fit when node count changes ──
+    // ── Undo / Redo ──
+    const historyRef = useRef<HistoryEntry[]>([{ nodes, edges }])
+    const historyIndexRef = useRef(0)
+    const skipPushRef = useRef(false)
+    const { fitView, setViewport } = useReactFlow()
+    const [canUndo, setCanUndo] = useState(false)
+    const [canRedo, setCanRedo] = useState(false)
+
+    const updateUndoRedoState = useCallback(() => {
+        setCanUndo(historyIndexRef.current > 0)
+        setCanRedo(historyIndexRef.current < historyRef.current.length - 1)
+    }, [])
+
+    // ── Auto-fit when node count changes (skip for single-node initial state) ──
     const prevCountRef = useRef(nodes.length)
     useEffect(() => {
         if (nodes.length !== prevCountRef.current) {
             prevCountRef.current = nodes.length
-            const t = setTimeout(() => fitView({ padding: 0.2 }), 100)
-            return () => clearTimeout(t)
+            if (nodes.length > 1) {
+                const t = setTimeout(() => fitView({ padding: FIT_VIEW_PADDING }), 100)
+                return () => clearTimeout(t)
+            }
         }
     }, [nodes.length, fitView])
+
+    // ── Persist workflows to localStorage ──
+    useEffect(() => {
+        saveWorkflows(workflows, activeId)
+    }, [workflows, activeId])
+
+    // ── Reset history when switching workflows ──
+    const prevActiveIdRef = useRef(activeId)
+    useEffect(() => {
+        if (activeId !== prevActiveIdRef.current) {
+            prevActiveIdRef.current = activeId
+            const wf = workflows.find(w => w.id === activeId)
+            if (wf) {
+                historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
+                historyIndexRef.current = 0
+                updateUndoRedoState()
+            }
+        }
+    }, [activeId, workflows, updateUndoRedoState])
+
+    const updateWorkflow = useCallback((updatedNodes: Node[], updatedEdges: Edge[]) => {
+        setWorkflows(prev => prev.map(w =>
+            w.id === activeId ? { ...w, nodes: updatedNodes, edges: updatedEdges } : w
+        ))
+    }, [activeId])
 
     const pushHistory = useCallback((nextNodes: Node[], nextEdges: Edge[]) => {
         if (skipPushRef.current) { skipPushRef.current = false; return }
         const idx = historyIndexRef.current
-        // Trim any future entries if we branched
         historyRef.current = historyRef.current.slice(0, idx + 1)
         historyRef.current.push({ nodes: nextNodes, edges: nextEdges })
         historyIndexRef.current = historyRef.current.length - 1
-    }, [])
+        updateUndoRedoState()
+    }, [updateUndoRedoState])
 
     const undo = useCallback(() => {
         const idx = historyIndexRef.current
@@ -135,9 +224,9 @@ function BuilderSimpleInner() {
         historyIndexRef.current = idx - 1
         const entry = historyRef.current[idx - 1]
         skipPushRef.current = true
-        setNodes(entry.nodes)
-        setEdges(entry.edges)
-    }, [])
+        updateWorkflow(entry.nodes, entry.edges)
+        updateUndoRedoState()
+    }, [updateWorkflow, updateUndoRedoState])
 
     const redo = useCallback(() => {
         const idx = historyIndexRef.current
@@ -145,11 +234,11 @@ function BuilderSimpleInner() {
         historyIndexRef.current = idx + 1
         const entry = historyRef.current[idx + 1]
         skipPushRef.current = true
-        setNodes(entry.nodes)
-        setEdges(entry.edges)
-    }, [])
+        updateWorkflow(entry.nodes, entry.edges)
+        updateUndoRedoState()
+    }, [updateWorkflow, updateUndoRedoState])
 
-    // Keyboard shortcuts: Cmd+Z / Cmd+Shift+Z
+    // Keyboard shortcuts
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
@@ -172,14 +261,20 @@ function BuilderSimpleInner() {
         fn: (nodes: Node[], edges: Edge[]) => { nodes: Node[]; edges: Edge[] },
     ) => {
         const result = fn(nodesRef.current, edgesRef.current)
-        setNodes(result.nodes)
-        setEdges(result.edges)
+        updateWorkflow(result.nodes, result.edges)
         pushHistory(result.nodes, result.edges)
-    }, [pushHistory])
+    }, [pushHistory, updateWorkflow])
 
     const onNodesChange = useCallback(
-        (changes: NodeChange[]) => setNodes(nds => applyNodeChanges(changes, nds)),
-        [],
+        (changes: NodeChange[]) => {
+            const wf = workflows.find(w => w.id === activeId)
+            if (!wf) return
+            const updated = applyNodeChanges(changes, wf.nodes)
+            setWorkflows(prev => prev.map(w =>
+                w.id === activeId ? { ...w, nodes: updated } : w
+            ))
+        },
+        [workflows, activeId],
     )
 
     const memoNodeTypes = useMemo(() => nodeTypes, [])
@@ -190,7 +285,7 @@ function BuilderSimpleInner() {
         const newNodeId = `node-${Date.now()}`
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
         const newX = sourceNode ? sourceNode.position.x + 260 : 460
-        const newY = sourceNode ? sourceNode.position.y : 200
+        const newY = sourceNode ? sourceNode.position.y : START_NODE_Y
 
         mutateState((prevNodes, prevEdges) => ({
             nodes: [...prevNodes, {
@@ -225,7 +320,7 @@ function BuilderSimpleInner() {
                 : targetNode
                     ? targetNode.position.x - 260
                     : 0
-            const newY = targetNode ? targetNode.position.y : 200
+            const newY = targetNode ? targetNode.position.y : START_NODE_Y
 
             const newNodes = [...prevNodes, {
                 id: newNodeId,
@@ -234,7 +329,6 @@ function BuilderSimpleInner() {
                 data: { ...data, width: data.width || 200, height: data.height || 120 },
             }]
 
-            // Rewire: source → newNode → target
             let newEdges = prevEdges
             if (sourceId && incomingEdge) {
                 newEdges = prevEdges.map(e =>
@@ -255,7 +349,7 @@ function BuilderSimpleInner() {
         })
     }, [mutateState])
 
-    // ── Configure handler (delete, settings, etc.) ──
+    // ── Configure handler ──
     const handleConfigure = useCallback((nodeId: string, action: string) => {
         if (action === 'delete') {
             mutateState((prevNodes, prevEdges) => ({
@@ -289,34 +383,168 @@ function BuilderSimpleInner() {
         }))
     }, [mutateState])
 
-    // ── Hide "Before" button on starting nodes ──
+    // ── Hide \"Before\" button on starting nodes ──
     const hideBeforeButton = useCallback((nodeId: string) => {
         const node = nodesRef.current.find(n => n.id === nodeId)
         return node?.type === 'starting'
     }, [])
 
+    // ── Workflow actions ──
+    const handleNewWorkflow = useCallback(() => {
+        const wf = createWorkflow(`Workflow ${workflows.length + 1}`)
+        setWorkflows(prev => [...prev, wf])
+        setActiveId(wf.id)
+        // Reset history for the new workflow
+        historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
+        historyIndexRef.current = 0
+        updateUndoRedoState()
+        // Position viewport so start node (at x=80, y=300) is on the left
+        setTimeout(() => setViewport({ x: 40, y: -100, zoom: DEFAULT_ZOOM }), 150)
+    }, [workflows.length, setViewport, updateUndoRedoState])
+
+    const handleSelectWorkflow = useCallback((id: string) => {
+        setActiveId(id)
+        setTimeout(() => fitView({ padding: FIT_VIEW_PADDING }), 150)
+    }, [fitView])
+
     return (
-        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-            <FlowStudio
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={memoNodeTypes}
-                onNodesChange={onNodesChange}
-                editMode
-                fitView
-                onAddAfter={handleAddAfter}
-                onAddBefore={handleAddBefore}
-                onConfigure={handleConfigure}
-                onRename={handleRename}
-                hideBeforeButton={hideBeforeButton}
-            />
-            {settingsNode && (
-                <NodeSettingsPanel
-                    node={settingsNode}
-                    onClose={() => setSettingsNodeId(null)}
-                    onUpdate={handleSettingsUpdate}
-                />
-            )}
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* ── Workflow Selector Bar ── */}
+            <div
+                data-testid="workflow-selector"
+                style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px',
+                    background: 'rgba(15,15,30,0.95)',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    flexShrink: 0,
+                    overflowX: 'auto',
+                }}
+            >
+                {workflows.map(wf => (
+                    <button
+                        key={wf.id}
+                        data-testid={`workflow-tab-${wf.id}`}
+                        onClick={() => handleSelectWorkflow(wf.id)}
+                        style={{
+                            minHeight: 44, minWidth: 44,
+                            padding: '6px 16px',
+                            borderRadius: 8,
+                            border: activeId === wf.id
+                                ? '1px solid rgba(139,92,246,0.4)'
+                                : '1px solid rgba(255,255,255,0.06)',
+                            background: activeId === wf.id
+                                ? 'rgba(139,92,246,0.15)'
+                                : 'rgba(255,255,255,0.03)',
+                            color: activeId === wf.id ? '#c084fc' : '#94a3b8',
+                            fontSize: 12, fontWeight: 600,
+                            fontFamily: 'Inter, sans-serif',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.15s',
+                        }}
+                    >
+                        {wf.name}
+                    </button>
+                ))}
+                <button
+                    data-testid="workflow-new-btn"
+                    onClick={handleNewWorkflow}
+                    style={{
+                        minHeight: 44, minWidth: 44,
+                        padding: '6px 16px',
+                        borderRadius: 8,
+                        border: '1px solid rgba(34,197,94,0.3)',
+                        background: 'rgba(34,197,94,0.08)',
+                        color: '#22c55e',
+                        fontSize: 12, fontWeight: 600,
+                        fontFamily: 'Inter, sans-serif',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        transition: 'all 0.15s',
+                    }}
+                >
+                    + New
+                </button>
+            </div>
+
+            {/* ── Canvas area ── */}
+            <div style={{ flex: 1, position: 'relative' }}>
+                <FlowStudio
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={memoNodeTypes}
+                    onNodesChange={onNodesChange}
+                    editMode
+                    fitView
+                    defaultViewport={{ x: 0, y: 0, zoom: DEFAULT_ZOOM }}
+                    onAddAfter={handleAddAfter}
+                    onAddBefore={handleAddBefore}
+                    onConfigure={handleConfigure}
+                    onRename={handleRename}
+                    hideBeforeButton={hideBeforeButton}
+                >
+                    {/* Undo/Redo buttons — left edge */}
+                    <div
+                        data-testid="undo-redo-bar"
+                        style={{
+                            position: 'absolute', left: 16, top: '50%',
+                            transform: 'translateY(-50%)',
+                            display: 'flex', flexDirection: 'column', gap: 6,
+                            zIndex: 10,
+                        }}
+                    >
+                        <button
+                            data-testid="undo-btn"
+                            onClick={undo}
+                            disabled={!canUndo}
+                            title="Undo (Cmd+Z)"
+                            style={{
+                                width: 44, height: 44,
+                                borderRadius: 10,
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                background: canUndo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
+                                color: canUndo ? '#e2e8f0' : '#334155',
+                                cursor: canUndo ? 'pointer' : 'not-allowed',
+                                fontSize: 18,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backdropFilter: 'blur(8px)',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            ↩
+                        </button>
+                        <button
+                            data-testid="redo-btn"
+                            onClick={redo}
+                            disabled={!canRedo}
+                            title="Redo (Cmd+Shift+Z)"
+                            style={{
+                                width: 44, height: 44,
+                                borderRadius: 10,
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                background: canRedo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
+                                color: canRedo ? '#e2e8f0' : '#334155',
+                                cursor: canRedo ? 'pointer' : 'not-allowed',
+                                fontSize: 18,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backdropFilter: 'blur(8px)',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            ↪
+                        </button>
+                    </div>
+                </FlowStudio>
+                {settingsNode && (
+                    <NodeSettingsPanel
+                        node={settingsNode}
+                        onClose={() => setSettingsNodeId(null)}
+                        onUpdate={handleSettingsUpdate}
+                    />
+                )}
+            </div>
         </div>
     )
 }

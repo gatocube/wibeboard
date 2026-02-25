@@ -40,7 +40,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
+        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -64,7 +64,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
+            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')

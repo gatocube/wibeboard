@@ -19,8 +19,13 @@ test.setTimeout(90_000)
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Navigate to builder-simple page */
+/** Navigate to builder-simple page with clean localStorage */
 async function openPage(page: Page) {
+    // Inject cleanup script that runs BEFORE any page JS
+    await page.addInitScript(() => {
+        localStorage.removeItem('flowstudio_workflows')
+        localStorage.removeItem('flowstudio_active_workflow')
+    })
     await page.goto('?page=builder-simple')
     await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
     await expect(page.locator('.react-flow__node').first()).toBeVisible({ timeout: 5_000 })
@@ -175,6 +180,41 @@ test.describe('Builder Demo Simple — flow construction', () => {
         await expect(settingsPanel).toBeVisible({ timeout: 5_000 })
         const rawBtn = page.getByTestId('settings-mode-raw')
         await expect(rawBtn).toBeVisible()
+        await breath()
+    })
+
+    test('new workflow creation positions start node on the left', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Verify workflow selector is visible ──
+        await expect(page.getByTestId('workflow-selector')).toBeVisible()
+
+        // ── Click "+ New" button ──
+        await page.getByTestId('workflow-new-btn').click()
+        await page.waitForTimeout(600)
+
+        // ── Verify exactly 1 node (start node) in the new workflow ──
+        expect(await nodeCount(page)).toBe(1)
+
+        // ── Verify undo/redo bar is visible ──
+        await expect(page.getByTestId('undo-redo-bar')).toBeVisible()
+
+        // ── Verify the start node is in the left third of the viewport ──
+        const startNode = page.locator('.react-flow__node').first()
+        await expect(startNode).toBeVisible()
+
+        const nodeBox = await startNode.boundingBox()
+        const viewport = page.viewportSize()
+        expect(nodeBox).toBeTruthy()
+        expect(viewport).toBeTruthy()
+
+        if (nodeBox && viewport) {
+            // The start node's left edge should be within the left third
+            const leftThird = viewport.width / 3
+            expect(nodeBox.x).toBeLessThan(leftThird)
+        }
+
         await breath()
     })
 })
