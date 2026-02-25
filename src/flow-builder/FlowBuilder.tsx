@@ -137,10 +137,10 @@ export function FlowBuilder({
                 clearTimeout(longPressTimerRef.current)
                 longPressTimerRef.current = null
             }
-            // Restore node scale
+            // Restore node visual
             if (pressedNodeRef.current) {
-                pressedNodeRef.current.el.style.transition = 'transform 0.2s ease-out'
-                pressedNodeRef.current.el.style.transform = ''
+                pressedNodeRef.current.el.style.transition = 'filter 0.2s ease-out'
+                pressedNodeRef.current.el.style.filter = ''
                 pressedNodeRef.current = null
             }
         }
@@ -158,17 +158,17 @@ export function FlowBuilder({
             didLongPressRef.current = false
             pressedNodeRef.current = { id: nodeId, el: nodeEl }
 
-            // Animate press-down effect
-            nodeEl.style.transition = 'transform 0.15s ease-out'
-            nodeEl.style.transform = 'scale(0.95)'
+            // Animate press-down effect (use filter to avoid clobbering React Flow's transform)
+            nodeEl.style.transition = 'filter 0.15s ease-out'
+            nodeEl.style.filter = 'brightness(0.85)'
 
             // Start long-press timer
             longPressTimerRef.current = setTimeout(() => {
                 didLongPressRef.current = true
                 setSelectedNodeId(prev => prev === nodeId ? null : nodeId)
-                // Release scale
-                nodeEl.style.transition = 'transform 0.2s ease-out'
-                nodeEl.style.transform = ''
+                // Release effect
+                nodeEl.style.transition = 'filter 0.2s ease-out'
+                nodeEl.style.filter = ''
                 pressedNodeRef.current = null
                 longPressTimerRef.current = null
             }, 500)
