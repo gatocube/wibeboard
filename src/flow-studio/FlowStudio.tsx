@@ -13,7 +13,7 @@
  */
 
 import {
-    ReactFlow, Background, Panel,
+    ReactFlow, Background, Panel, Controls, MiniMap,
     useReactFlow,
 } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -293,6 +293,24 @@ export const FlowStudio = observer(function FlowStudio({
                         enabled={store.zoomAutosize}
                         onSizeChange={handleSizeChange}
                     />
+
+                    {/* React Flow Built-in Controls (Zoom/Lock) */}
+                    <Controls position="bottom-left" style={{ margin: 16 }} />
+
+                    {/* Conditional Minimap */}
+                    {store.showMinimap && (
+                        <MiniMap
+                            position="bottom-right"
+                            style={{
+                                background: 'rgba(15,15,26,0.9)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                borderRadius: 8,
+                                margin: 16
+                            }}
+                            nodeColor="rgba(139,92,246,0.5)"
+                            maskColor="rgba(0,0,0,0.5)"
+                        />
+                    )}
 
                     {/* Settings gear + edit toggle — top-right */}
                     <Panel position="top-right">

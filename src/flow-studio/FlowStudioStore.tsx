@@ -17,6 +17,7 @@ export class FlowStudioStore {
     mode: ThemeMode = 'dark'
     zoomAutosize: boolean = false
     currentSize: NodeSize = 'M'
+    showMinimap: boolean = false
 
     // ── Node selection (player buttons / SwipeButtons menu) ──
     selectedNodeId: string | null = null
@@ -24,11 +25,19 @@ export class FlowStudioStore {
     constructor(initialTheme?: ThemeKey, initialSize?: NodeSize) {
         if (initialTheme) this.theme = initialTheme
         if (initialSize) this.currentSize = initialSize
+
+        try {
+            const savedMinimap = localStorage.getItem('flowstudio_show_minimap')
+            if (savedMinimap === '1') this.showMinimap = true
+            if (savedMinimap === '0') this.showMinimap = false
+        } catch (e) { }
+
         makeAutoObservable(this, {
             setTheme: action,
             setMode: action,
             setZoomAutosize: action,
             setCurrentSize: action,
+            setShowMinimap: action,
             setSelectedNodeId: action,
             toggleSelectedNode: action,
             clearSelectedNode: action,
@@ -51,6 +60,13 @@ export class FlowStudioStore {
 
     setCurrentSize(size: NodeSize) {
         this.currentSize = size
+    }
+
+    setShowMinimap(show: boolean) {
+        this.showMinimap = show
+        try {
+            localStorage.setItem('flowstudio_show_minimap', show ? '1' : '0')
+        } catch (e) { }
     }
 
     setSelectedNodeId(nodeId: string | null) {
@@ -78,8 +94,8 @@ export function FlowStudioStoreProvider({
     children: React.ReactNode
 }) {
     return (
-        <FlowStudioContext.Provider value= { store } >
-        { children }
+        <FlowStudioContext.Provider value={store} >
+            {children}
         </FlowStudioContext.Provider>
     )
 }

@@ -125,6 +125,41 @@ export const StudioSettings = observer(function StudioSettings({
                         <ZoomIn size={12} />
                         {zoomAutosize ? 'Enabled' : 'Disabled'}
                     </button>
+
+                    <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '6px 0' }} />
+
+                    {/* Minimap toggle */}
+                    <div style={{ padding: '4px 12px', fontSize: 9, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                        Minimap
+                    </div>
+                    <label
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                            padding: '6px 12px', cursor: 'pointer',
+                        }}
+                    >
+                        <span style={{ color: store.showMinimap ? '#e2e8f0' : '#94a3b8', fontSize: 11, fontFamily: 'Inter' }}>Show Minimap</span>
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
+                                checked={store.showMinimap}
+                                onChange={(e) => store.setShowMinimap(e.target.checked)}
+                            />
+                            <div style={{
+                                width: 28, height: 16,
+                                background: store.showMinimap ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
+                                borderRadius: 12, transition: 'background 0.2s', position: 'relative'
+                            }}>
+                                <div style={{
+                                    width: 12, height: 12, background: '#fff', borderRadius: '50%',
+                                    position: 'absolute', top: 2, left: store.showMinimap ? 14 : 2,
+                                    transition: 'left 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                }} />
+                            </div>
+                        </div>
+                    </label>
                 </div>
             )}
         </div>
