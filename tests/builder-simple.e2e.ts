@@ -363,3 +363,70 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
         await breath()
     })
 })
+
+// ── JS Script Execution ─────────────────────────────────────────────────────
+
+test.describe('Builder Demo Simple — JS execution in browser', () => {
+
+    test('create 2 JS nodes, run scripts, verify events panel', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Create a new workflow ──
+        await page.getByTestId('workflow-new-btn').click()
+        await page.waitForTimeout(600)
+        expect(await nodeCount(page)).toBe(1)
+
+        // ── Add first JS node (After → Job on start node) ──
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+        expect(await nodeCount(page)).toBe(2)
+
+        const nodeAId = await getLastNodeId(page)
+
+        // ── Add second JS node (After → Job on first JS node) ──
+        await clickNode(page, nodeAId)
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+        expect(await nodeCount(page)).toBe(3)
+
+        const nodeBId = await getLastNodeId(page)
+
+        // ── Verify events panel exists and is empty ──
+        const eventsPanel = page.getByTestId('events-panel')
+        await expect(eventsPanel).toBeVisible()
+        await expect(page.getByTestId('events-list')).toBeVisible()
+
+        // ── Run script on first JS node ──
+        // The Run button is inside the node — find it by data-id + inside
+        const nodeA = page.locator(`.react-flow__node[data-id="${nodeAId}"]`)
+        const runBtnA = nodeA.getByTestId('run-script-btn')
+        await expect(runBtnA).toBeVisible({ timeout: 5_000 })
+        await runBtnA.click()
+        await page.waitForTimeout(500)
+
+        // ── Run script on second JS node ──
+        const nodeB = page.locator(`.react-flow__node[data-id="${nodeBId}"]`)
+        const runBtnB = nodeB.getByTestId('run-script-btn')
+        await expect(runBtnB).toBeVisible({ timeout: 5_000 })
+        await runBtnB.click()
+        await page.waitForTimeout(500)
+
+        // ── Verify events panel shows 2 "Hello from" messages ──
+        const eventsList = page.getByTestId('events-list')
+        await expect(eventsList).toBeVisible()
+
+        // Each script sends "Hello from <nodeName>" via messenger
+        const eventItems = eventsList.locator('[data-testid^="event-"]')
+        await expect(eventItems).toHaveCount(2, { timeout: 5_000 })
+
+        // Check both messages contain "Hello from"
+        const text = await eventsList.textContent()
+        expect(text).toContain('Hello from')
+
+        await breath()
+    })
+})

@@ -22,6 +22,9 @@ import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { widgetRegistry } from '@/engine/widget-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
+import { AgentMessenger } from '@/engine/AgentMessenger'
+import { runScriptInBrowser } from '@/engine/script-runner'
+import { EventsPanel, type FlowEvent } from '@/flow-studio/EventsPanel'
 import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
@@ -104,29 +107,35 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         const def = widgetRegistry.get('job')
         const subType = prefix === 'ai' ? 'ai' : variant
         const tpl = def?.templates.find(t => t.defaultData.subType === subType) || def?.templates[0]
+        const label = tpl?.defaultData.label || `${variant} Script`
         return {
             nodeType: 'job',
             data: {
                 ...tpl?.defaultData,
                 subType,
-                label: tpl?.defaultData.label || `${variant} Script`,
+                label,
                 width: def?.defaultWidth || 200,
                 height: def?.defaultHeight || 120,
                 configured: true,
+                sandbox: 'browser',
+                code: `// ${label}\nmessenger.send('system', 'text', 'Hello from ${label}')`,
             },
         }
     }
     // Fallback: treat as job with default JS script
     const def = widgetRegistry.get('job')
     const tpl = def?.templates.find(t => t.defaultData.subType === 'js') || def?.templates[0]
+    const label = tpl?.defaultData.label || 'Script'
     return {
         nodeType: 'job',
         data: {
             ...tpl?.defaultData,
-            label: tpl?.defaultData.label || 'Script',
+            label,
             width: def?.defaultWidth || 200,
             height: def?.defaultHeight || 120,
             configured: true,
+            sandbox: 'browser',
+            code: `// ${label}\nmessenger.send('system', 'text', 'Hello from ${label}')`,
         },
     }
 }
@@ -147,13 +156,16 @@ export default function BuilderSimplePage() {
 
 // ── Inner component (uses hooks that need ReactFlowProvider) ──
 function BuilderSimpleInner() {
-    const [workflows, setWorkflows] = useState<Workflow[]>(() => loadWorkflows().workflows)
-    const [activeId, setActiveId] = useState<string>(() => loadWorkflows().activeId)
+    const { workflows: loadedWorkflows, activeId: loadedActiveId } = loadWorkflows()
+    const [workflows, setWorkflows] = useState<Workflow[]>(loadedWorkflows)
+    const [activeId, setActiveId] = useState<string>(loadedActiveId)
+    const [events, setEvents] = useState<FlowEvent[]>([])
+    const messengersRef = useRef<Map<string, AgentMessenger>>(new Map())
     const [settingsNodeId, setSettingsNodeId] = useState<string | null>(null)
 
-    const activeWorkflow = workflows.find(w => w.id === activeId) || workflows[0]
-    const nodes = activeWorkflow?.nodes || []
-    const edges = activeWorkflow?.edges || []
+    const active = workflows.find(w => w.id === activeId) || workflows[0]
+    const nodes = active?.nodes || []
+    const edges = active?.edges || []
 
     // ── Undo / Redo ──
     const historyRef = useRef<HistoryEntry[]>([{ nodes, edges }])
@@ -342,6 +354,81 @@ function BuilderSimpleInner() {
         }
     }, [mutateState])
 
+    // ── Script execution ──
+    const getMessenger = useCallback((nodeId: string): AgentMessenger => {
+        let m = messengersRef.current.get(nodeId)
+        if (!m) {
+            m = new AgentMessenger(nodeId)
+            messengersRef.current.set(nodeId, m)
+        }
+        return m
+    }, [])
+
+    const handleRunScript = useCallback((nodeId: string) => {
+        const node = nodesRef.current.find(n => n.id === nodeId)
+        if (!node) return
+        const code = String(node.data?.code || '')
+        const nodeName = String(node.data?.label || nodeId)
+        const messenger = getMessenger(nodeId)
+
+        // Listen for messages sent during execution
+        const unsub = messenger.onMessage((msg) => {
+            setEvents(prev => [...prev, {
+                id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                timestamp: msg.timestamp,
+                nodeId,
+                nodeName,
+                type: 'message',
+                content: String(msg.payload ?? ''),
+            }])
+        })
+
+        // Update status to running
+        mutateState((prevNodes, prevEdges) => ({
+            nodes: prevNodes.map(n =>
+                n.id === nodeId ? { ...n, data: { ...n.data, status: 'running', logs: ['> Running...'] } } : n
+            ),
+            edges: prevEdges,
+        }))
+
+        // Execute after a brief delay to show running state
+        setTimeout(() => {
+            const result = runScriptInBrowser(code, messenger, nodeName)
+            unsub()
+
+            mutateState((prevNodes, prevEdges) => ({
+                nodes: prevNodes.map(n =>
+                    n.id === nodeId ? { ...n, data: { ...n.data, status: result.status, logs: result.logs } } : n
+                ),
+                edges: prevEdges,
+            }))
+        }, 300)
+    }, [getMessenger, mutateState])
+
+    const handleSaveScript = useCallback((nodeId: string, code: string) => {
+        mutateState((prevNodes, prevEdges) => ({
+            nodes: prevNodes.map(n =>
+                n.id === nodeId ? { ...n, data: { ...n.data, code } } : n
+            ),
+            edges: prevEdges,
+        }))
+    }, [mutateState])
+
+    // ── Decorate nodes with script callbacks ──
+    const decoratedNodes = useMemo(() => {
+        return nodes.map(n => {
+            if (n.type !== 'job') return n
+            return {
+                ...n,
+                data: {
+                    ...n.data,
+                    onRunScript: () => handleRunScript(n.id),
+                    onSaveScript: (code: string) => handleSaveScript(n.id, code),
+                },
+            }
+        })
+    }, [nodes, handleRunScript, handleSaveScript])
+
     // ── Update node data from settings panel ──
     const handleSettingsUpdate = useCallback((nodeId: string, data: Record<string, any>) => {
         mutateState((prevNodes, prevEdges) => ({
@@ -453,7 +540,7 @@ function BuilderSimpleInner() {
             {/* ── Canvas area ── */}
             <div style={{ flex: 1, position: 'relative' }}>
                 <FlowStudio
-                    nodes={nodes}
+                    nodes={decoratedNodes}
                     edges={edges}
                     nodeTypes={memoNodeTypes}
                     onNodesChange={onNodesChange}
@@ -517,6 +604,7 @@ function BuilderSimpleInner() {
                             ↪
                         </button>
                     </div>
+                    <EventsPanel events={events} />
                 </FlowStudio>
                 {settingsNode && (
                     <NodeSettingsPanel

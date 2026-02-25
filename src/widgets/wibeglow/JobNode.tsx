@@ -568,6 +568,7 @@ function ScriptVariant({ data }: { data: any }) {
                     </div>
                     <div className="nodrag nopan" style={{ display: 'flex', gap: 3 }}>
                         <button
+                            data-testid="run-script-btn"
                             onClick={() => data.onRunScript?.()}
                             title="Run"
                             style={{
