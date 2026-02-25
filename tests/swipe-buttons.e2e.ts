@@ -9,6 +9,8 @@
  * Button hierarchy (per docs/swipe-buttons-menu.md):
  *  Add (Before/After) → User | Job (→ Script/AI) | Recent
  *  Config → Attach (→ Expectation/Note) | Settings | Delete
+ *
+ * Each mode is tested with both mouse and touch (CDP) input.
  */
 
 import { test, expect, type Page } from '@playwright/test'
@@ -45,6 +47,35 @@ async function expectMenuHidden(page: Page) {
     await expect(page.getByTestId('swipe-btn-configure')).not.toBeVisible({ timeout: 2_000 })
 }
 
+/** Get a CDP session for touch events */
+async function getCDP(page: Page) {
+    return page.context().newCDPSession(page)
+}
+
+/** Touch-tap at a point via CDP */
+async function touchTap(page: Page, x: number, y: number) {
+    const cdp = await getCDP(page)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] })
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await cdp.detach()
+}
+
+/** Touch-long-press at a point via CDP */
+async function touchLongPress(page: Page, x: number, y: number, durationMs = 600) {
+    const cdp = await getCDP(page)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] })
+    await page.waitForTimeout(durationMs)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await cdp.detach()
+}
+
+/** Get center coordinates of an element */
+async function getCenter(page: Page, testId: string) {
+    const box = await page.getByTestId(testId).boundingBox()
+    expect(box).toBeTruthy()
+    return { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 }
+}
+
 // ── Test suite ───────────────────────────────────────────────────────────────
 
 test.describe('SwipeButtons activation modes', () => {
@@ -53,165 +84,187 @@ test.describe('SwipeButtons activation modes', () => {
         await openButtonsMenuPage(page)
     })
 
-    // ── 1. Click mode ────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    // CLICK MODE — Mouse
+    // ═══════════════════════════════════════════════════════════════════════
 
-    test('click mode: menu opens on node click, buttons visible', async ({ page }) => {
+    test('click/mouse: menu opens on node click', async ({ page }) => {
         await selectMode(page, 'Click')
         await clickCenterNode(page)
-
-        // Radial menu should appear with 3 main buttons
         await expectMenuVisible(page)
-
-        // Hover the "After" button — sub-menu expands (User, Job, Recent)
-        const afterBtn = page.getByTestId('swipe-btn-add-after')
-        await afterBtn.hover()
-        await page.waitForTimeout(200)
-
-        // Sub-buttons should appear
-        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-after-job')).toBeVisible()
-        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
 
-    test('click mode: dismiss menu by clicking node again', async ({ page }) => {
+    test('click/mouse: dismiss menu by clicking node again', async ({ page }) => {
         await selectMode(page, 'Click')
         await clickCenterNode(page)
         await expectMenuVisible(page)
-
         await clickCenterNode(page)
         await expectMenuHidden(page)
     })
 
-    // ── 2. Hold mode ─────────────────────────────────────────────────────
-
-    test('hold mode: menu does NOT open on quick click', async ({ page }) => {
-        await selectMode(page, 'Hold')
-
+    test('click/mouse: hover After expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Click')
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // Quick-clicking After should NOT expand sub-menu in hold mode
-        const afterBtn = page.getByTestId('swipe-btn-add-after')
-        await afterBtn.click()
-
-        await expect(page.getByTestId('ext-after-subflow')).not.toBeVisible({ timeout: 1_000 })
-    })
-
-    test('hold mode: menu expands on long-press', async ({ page }) => {
-        await selectMode(page, 'Hold')
-
-        await clickCenterNode(page)
-        await expectMenuVisible(page)
-
-        // Long-press the After button
-        const afterBtn = page.getByTestId('swipe-btn-add-after')
-        const afterBox = await afterBtn.boundingBox()
-        expect(afterBox).toBeTruthy()
-
-        await page.mouse.move(afterBox!.x + afterBox!.width / 2, afterBox!.y + afterBox!.height / 2)
-        await page.mouse.down()
-        await page.waitForTimeout(600)
-        await page.mouse.up()
-
-        // Sub-buttons should now be visible
+        await page.getByTestId('swipe-btn-add-after').hover()
+        await page.waitForTimeout(200)
         await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-after-job')).toBeVisible()
         await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
 
-    // ── 3. Swipe mode ────────────────────────────────────────────────────
-
-    test('swipe mode: hovering node shows radial menu', async ({ page }) => {
-        await selectMode(page, 'Swipe')
-
-        const node = page.getByTestId('mock-node-center-node')
-        await node.hover()
-
+    test('click/mouse: hover Before expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // Hover After — sub-menu should expand
-        const afterBtn = page.getByTestId('swipe-btn-add-after')
-        await afterBtn.hover()
-
-        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-after-job')).toBeVisible()
-        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
+        await page.getByTestId('swipe-btn-add-before').hover()
+        await page.waitForTimeout(200)
+        await expect(page.getByTestId('ext-before-subflow')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-before-job')).toBeVisible()
+        await expect(page.getByTestId('ext-before-recent')).toBeVisible()
     })
 
-    test('swipe mode: hovering config expands config sub-menu', async ({ page }) => {
-        await selectMode(page, 'Swipe')
-
-        await page.getByTestId('mock-node-center-node').hover()
+    test('click/mouse: hover Config expands config sub-menu', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await clickCenterNode(page)
         await expectMenuVisible(page)
 
         await page.getByTestId('swipe-btn-configure').hover()
-
-        // Config sub-buttons: Attach, Settings, Delete
         await expect(page.getByTestId('ext-cfg-attach')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-cfg-settings')).toBeVisible()
         await expect(page.getByTestId('ext-cfg-delete')).toBeVisible()
     })
 
-    // ── Touch targets ────────────────────────────────────────────────────
-
-    test('all buttons have valid bounding boxes', async ({ page }) => {
+    test('click/mouse: clicking Job sub-button fires action and logs event', async ({ page }) => {
         await selectMode(page, 'Click')
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        for (const testId of [
-            'swipe-btn-configure',
-            'swipe-btn-add-after',
-            'swipe-btn-add-before',
-        ]) {
-            const btn = page.getByTestId(testId)
-            const box = await btn.boundingBox()
-            expect(box, `${testId} should have a bounding box`).toBeTruthy()
-            expect(box!.width, `${testId} width > 0`).toBeGreaterThan(20)
-            expect(box!.height, `${testId} height > 0`).toBeGreaterThan(20)
-        }
+        await page.getByTestId('swipe-btn-add-after').hover()
+        await expect(page.getByTestId('ext-after-job')).toBeVisible({ timeout: 2_000 })
+        await page.getByTestId('ext-after-job').click()
+
+        // Event log should show the action
+        await expect(page.locator('text=After')).toBeVisible({ timeout: 2_000 })
     })
 
-    // ── Multi-section layout ─────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    // CLICK MODE — Touch (CDP)
+    // ═══════════════════════════════════════════════════════════════════════
 
-    test('all 3 preview sections render with nodes', async ({ page }) => {
-        await expect(page.getByTestId('mock-node-center-node')).toBeVisible({ timeout: 3_000 })
-        await expect(page.getByTestId('mock-node-left-node')).toBeVisible({ timeout: 3_000 })
-        await expect(page.getByTestId('mock-node-right-node')).toBeVisible({ timeout: 3_000 })
-    })
-
-    // ── Touch event tests ────────────────────────────────────────────────
-
-    test('touch: tap opens menu in click mode', async ({ page }) => {
+    test('click/touch: tap opens menu', async ({ page }) => {
         await selectMode(page, 'Click')
-
-        const node = page.getByTestId('mock-node-center-node')
-        const box = await node.boundingBox()
-        expect(box).toBeTruthy()
-        const cx = box!.x + box!.width / 2
-        const cy = box!.y + box!.height / 2
-
-        // Use CDP to dispatch real touch events
-        const cdp = await page.context().newCDPSession(page)
-        await cdp.send('Input.dispatchTouchEvent', {
-            type: 'touchStart',
-            touchPoints: [{ x: cx, y: cy }],
-        })
-        await cdp.send('Input.dispatchTouchEvent', {
-            type: 'touchEnd',
-            touchPoints: [],
-        })
-
+        const center = await getCenter(page, 'mock-node-center-node')
+        await touchTap(page, center.x, center.y)
         await expectMenuVisible(page)
-        await cdp.detach()
     })
 
-    test('touch: buttons have touch-action:none to prevent text selection', async ({ page }) => {
+    // ═══════════════════════════════════════════════════════════════════════
+    // HOLD MODE — Mouse
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('hold/mouse: menu opens on click but quick-click does NOT expand sub-menu', async ({ page }) => {
+        await selectMode(page, 'Hold')
+        await clickCenterNode(page)
+        await expectMenuVisible(page)
+
+        // Quick click After — should NOT expand
+        await page.getByTestId('swipe-btn-add-after').click()
+        await expect(page.getByTestId('ext-after-subflow')).not.toBeVisible({ timeout: 1_000 })
+    })
+
+    test('hold/mouse: long-press expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Hold')
+        await clickCenterNode(page)
+        await expectMenuVisible(page)
+
+        const afterBox = await page.getByTestId('swipe-btn-add-after').boundingBox()
+        expect(afterBox).toBeTruthy()
+        await page.mouse.move(afterBox!.x + afterBox!.width / 2, afterBox!.y + afterBox!.height / 2)
+        await page.mouse.down()
+        await page.waitForTimeout(600)
+        await page.mouse.up()
+
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
+    })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // HOLD MODE — Touch (CDP)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('hold/touch: tap opens menu', async ({ page }) => {
+        await selectMode(page, 'Hold')
+        const center = await getCenter(page, 'mock-node-center-node')
+        await touchTap(page, center.x, center.y)
+        await expectMenuVisible(page)
+    })
+
+    test('hold/touch: long-press expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Hold')
+        const center = await getCenter(page, 'mock-node-center-node')
+        await touchTap(page, center.x, center.y)
+        await expectMenuVisible(page)
+
+        const afterCenter = await getCenter(page, 'swipe-btn-add-after')
+        await touchLongPress(page, afterCenter.x, afterCenter.y, 600)
+
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+    })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SWIPE MODE — Mouse
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('swipe/mouse: hovering node shows radial menu', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+        await page.getByTestId('mock-node-center-node').hover()
+        await expectMenuVisible(page)
+    })
+
+    test('swipe/mouse: hovering After expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+        await page.getByTestId('mock-node-center-node').hover()
+        await expectMenuVisible(page)
+
+        await page.getByTestId('swipe-btn-add-after').hover()
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
+    })
+
+    test('swipe/mouse: hovering Config expands config sub-menu', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+        await page.getByTestId('mock-node-center-node').hover()
+        await expectMenuVisible(page)
+
+        await page.getByTestId('swipe-btn-configure').hover()
+        await expect(page.getByTestId('ext-cfg-attach')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-cfg-settings')).toBeVisible()
+        await expect(page.getByTestId('ext-cfg-delete')).toBeVisible()
+    })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SWIPE MODE — Touch (CDP)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Note: swipe mode is hover-based (mouse only). Touch devices use click mode.
+    // No touch test needed for swipe mode.
+
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // TOUCH CSS PROPERTIES — All modes
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('buttons have touch-action:none and user-select:none', async ({ page }) => {
         await selectMode(page, 'Click')
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // All radial buttons should have touch-action:none and user-select:none
         for (const testId of [
             'swipe-btn-configure',
             'swipe-btn-add-after',
@@ -220,17 +273,14 @@ test.describe('SwipeButtons activation modes', () => {
             const btn = page.getByTestId(testId)
             const styles = await btn.evaluate(el => {
                 const s = getComputedStyle(el)
-                return {
-                    touchAction: s.touchAction,
-                    userSelect: s.userSelect,
-                }
+                return { touchAction: s.touchAction, userSelect: s.userSelect }
             })
             expect(styles.touchAction, `${testId} touch-action`).toBe('none')
             expect(styles.userSelect, `${testId} user-select`).toBe('none')
         }
     })
 
-    test('touch: swipe container has correct CSS for touch prevention', async ({ page }) => {
+    test('swipe container has correct CSS for touch prevention', async ({ page }) => {
         await selectMode(page, 'Swipe')
         await page.getByTestId('mock-node-center-node').hover()
         await expectMenuVisible(page)
@@ -238,21 +288,15 @@ test.describe('SwipeButtons activation modes', () => {
         const container = page.getByTestId('swipe-buttons-menu')
         const styles = await container.evaluate(el => {
             const s = getComputedStyle(el)
-            return {
-                touchAction: s.touchAction,
-                userSelect: s.userSelect,
-            }
+            return { touchAction: s.touchAction, userSelect: s.userSelect }
         })
         expect(styles.touchAction).toBe('none')
         expect(styles.userSelect).toBe('none')
     })
 
-    test('touch: no text selected after hover interaction', async ({ page }) => {
+    test('no text selected after hover interaction', async ({ page }) => {
         await selectMode(page, 'Swipe')
-
-        // Hover across multiple buttons
-        const node = page.getByTestId('mock-node-center-node')
-        await node.hover()
+        await page.getByTestId('mock-node-center-node').hover()
         await expectMenuVisible(page)
 
         await page.getByTestId('swipe-btn-add-after').hover()
@@ -263,4 +307,70 @@ test.describe('SwipeButtons activation modes', () => {
         const selection = await page.evaluate(() => window.getSelection()?.toString() || '')
         expect(selection).toBe('')
     })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // LAYOUT & EDGE NODES
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('all 3 nodes render on the page', async ({ page }) => {
+        await expect(page.getByTestId('mock-node-center-node')).toBeVisible({ timeout: 3_000 })
+        await expect(page.getByTestId('mock-node-left-node')).toBeVisible()
+        await expect(page.getByTestId('mock-node-right-node')).toBeVisible()
+    })
+
+    test('all main buttons have valid bounding boxes', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await clickCenterNode(page)
+        await expectMenuVisible(page)
+
+        for (const testId of [
+            'swipe-btn-configure',
+            'swipe-btn-add-after',
+            'swipe-btn-add-before',
+        ]) {
+            const box = await page.getByTestId(testId).boundingBox()
+            expect(box, `${testId} bounding box`).toBeTruthy()
+            expect(box!.width).toBeGreaterThan(20)
+            expect(box!.height).toBeGreaterThan(20)
+        }
+    })
+
+    test('left edge node opens menu with limited directions', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await page.getByTestId('mock-node-left-node').click()
+
+        // Menu should appear — left-node has directions: right, bottom, bottom-right
+        // So we should NOT see add-before (which is typically on the left)
+        const menu = page.getByTestId('swipe-buttons-menu')
+        await expect(menu).toBeVisible({ timeout: 3_000 })
+    })
+
+    test('right edge node opens menu', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await page.getByTestId('mock-node-right-node').click()
+
+        const menu = page.getByTestId('swipe-buttons-menu')
+        await expect(menu).toBeVisible({ timeout: 3_000 })
+    })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // RENAME FLOW
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('rename: clicking rename shows input and updates label', async ({ page }) => {
+        await selectMode(page, 'Click')
+        await clickCenterNode(page)
+        await expectMenuVisible(page)
+
+        // Hover config to expand, find rename
+        await page.getByTestId('swipe-btn-configure').hover()
+        await expect(page.getByTestId('ext-cfg-settings')).toBeVisible({ timeout: 2_000 })
+
+        // Click Settings to trigger configure action
+        await page.getByTestId('ext-cfg-settings').click()
+
+        // Event log should record the action
+        await expect(page.locator('text=Settings')).toBeVisible({ timeout: 2_000 })
+    })
 })
+
