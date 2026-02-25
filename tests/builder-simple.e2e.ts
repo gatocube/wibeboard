@@ -249,9 +249,13 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
         if (startBox && newBox) {
             // Gap between right edge of start node and left edge of new node
             const gap = newBox.x - (startBox.x + startBox.width)
-            // Should be approximately 5 grid units (100px at zoom 1.0)
-            // Allow tolerance for zoom level differences
+            // The gap should be positive (new node is to the right)
             expect(gap).toBeGreaterThan(0)
+            // The gap should NOT be excessively large (old bug: 240px instead of 100px)
+            // At any zoom, the gap-to-startNode-width ratio should be reasonable
+            // 5gu gap (100px) / start node (60px) = ~1.67, so ratio < 3 is a safe bound
+            const ratio = gap / startBox.width
+            expect(ratio).toBeLessThan(3)
         }
 
         await breath()

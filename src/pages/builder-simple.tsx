@@ -279,9 +279,15 @@ function BuilderSimpleInner() {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
-        const nodeWidth = (data.width || 200)
-        const gap = GRID_CELL * 5 // 5 grid units
-        const newX = sourceNode ? sourceNode.position.x + nodeWidth + gap : 460
+        // Use the SOURCE node's width for offset, not the new node's width
+        const sourceWidth = sourceNode
+            ? (typeof (sourceNode.style as any)?.width === 'number' ? (sourceNode.style as any).width : null)
+            ?? sourceNode.data?.width
+            ?? widgetRegistry.get(sourceNode.type || '')?.defaultWidth
+            ?? 200
+            : 200
+        const gap = GRID_CELL * 5 // 5 grid units = 100px
+        const newX = sourceNode ? sourceNode.position.x + sourceWidth + gap : 460
         const newY = sourceNode ? sourceNode.position.y : START_NODE_Y
 
         mutateState((prevNodes, prevEdges) => ({
@@ -305,8 +311,8 @@ function BuilderSimpleInner() {
     const handleAddBefore = useCallback((targetNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
-        const nodeWidth = (data.width || 200)
-        const gap = GRID_CELL * 5 // 5 grid units
+        const newNodeWidth = (data.width || 200)
+        const gap = GRID_CELL * 5 // 5 grid units = 100px
 
         mutateState((prevNodes, prevEdges) => {
             const targetNode = prevNodes.find(n => n.id === targetNodeId)
@@ -317,7 +323,7 @@ function BuilderSimpleInner() {
             const newX = sourceNode && targetNode
                 ? (sourceNode.position.x + targetNode.position.x) / 2
                 : targetNode
-                    ? targetNode.position.x - nodeWidth - gap
+                    ? targetNode.position.x - newNodeWidth - gap
                     : 0
             const newY = targetNode ? targetNode.position.y : START_NODE_Y
 
