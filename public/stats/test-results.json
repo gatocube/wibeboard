@@ -1,12 +1,2120 @@
 {
-    "timestamp": "2026-02-26T00:00:00Z",
-    "commit": "pending",
-    "smoke": {
-        "suites": [],
-        "stats": {}
-    },
-    "full": {
-        "suites": [],
-        "stats": {}
+  "timestamp": "2026-02-25T22:45:31.027Z",
+  "commit": "91b0f88",
+  "smoke": {
+    "suites": [
+      {
+        "title": "pages-smoke.scenario.e2e.ts",
+        "file": "pages-smoke.scenario.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Pages smoke check",
+            "file": "pages-smoke.scenario.e2e.ts",
+            "line": 9,
+            "column": 6,
+            "specs": [
+              {
+                "title": "navigate all pages without errors",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2351,
+                        "errors": [],
+                        "stdout": [
+                          {
+                            "text": "Visited 5 pages:\n"
+                          },
+                          {
+                            "text": "  ✓ builder\n"
+                          },
+                          {
+                            "text": "  ✓ widgets\n"
+                          },
+                          {
+                            "text": "  ✓ widgets/themes-visible\n"
+                          },
+                          {
+                            "text": "  ✓ home\n"
+                          },
+                          {
+                            "text": "  ✓ builder (return)\n"
+                          }
+                        ],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:37.242Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "83c56c27fb3a62099959-3e8691dc690f7e385d25",
+                "file": "pages-smoke.scenario.e2e.ts",
+                "line": 10,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "stats": {
+      "startTime": "2026-02-25T22:43:34.832Z",
+      "duration": 6718.7029999999995,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
     }
+  },
+  "full": {
+    "suites": [
+      {
+        "title": "builder-simple.e2e.ts",
+        "file": "builder-simple.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Builder Demo Simple — flow construction",
+            "file": "builder-simple.e2e.ts",
+            "line": 96,
+            "column": 6,
+            "specs": [
+              {
+                "title": "full flow: add nodes, delete, and undo",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 10820,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:27.249Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-ac08bc06a135496b2fc9",
+                "file": "builder-simple.e2e.ts",
+                "line": 98,
+                "column": 5
+              },
+              {
+                "title": "new workflow creation positions start node on the left",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1362,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:39.373Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-fa391e60d6c5e6e553da",
+                "file": "builder-simple.e2e.ts",
+                "line": 186,
+                "column": 5
+              }
+            ]
+          },
+          {
+            "title": "Builder Demo Simple — grid sizing guidelines",
+            "file": "builder-simple.e2e.ts",
+            "line": 222,
+            "column": 6,
+            "specs": [
+              {
+                "title": "add-after positions new node with 5 grid unit gap",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2595,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:40.768Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-714122bd8a080786ff4c",
+                "file": "builder-simple.e2e.ts",
+                "line": 224,
+                "column": 5
+              },
+              {
+                "title": "starting node center is at origin (0, 0)",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 659,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:43.381Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-35dd9eb819817bebd6a3",
+                "file": "builder-simple.e2e.ts",
+                "line": 271,
+                "column": 5
+              },
+              {
+                "title": "delete middle node reconnects neighbors (bridge reconnection)",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 6253,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:44.053Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-f75c3ecc86c973ff1fcb",
+                "file": "builder-simple.e2e.ts",
+                "line": 300,
+                "column": 5
+              },
+              {
+                "title": "new workflow shows start node visible in viewport",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1246,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:50.318Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-c4652278d2d6dfd0e0d0",
+                "file": "builder-simple.e2e.ts",
+                "line": 334,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "flow-studio.e2e.ts",
+        "file": "flow-studio.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "FlowStudio — node creation",
+            "file": "flow-studio.e2e.ts",
+            "line": 32,
+            "column": 6,
+            "specs": [
+              {
+                "title": "initial canvas has 3 nodes and widget selector",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 770,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:51.586Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-ab856cad6d46ac965bc1",
+                "file": "flow-studio.e2e.ts",
+                "line": 40,
+                "column": 5
+              },
+              {
+                "title": "drag-and-drop: drop widget from picker creates node immediately",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1510,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:52.372Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-4c44aa34a8610850d2d9",
+                "file": "flow-studio.e2e.ts",
+                "line": 60,
+                "column": 5
+              },
+              {
+                "title": "edit mode toggle hides/shows widget picker",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1457,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:53.896Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-baee2610f71b9918dc69",
+                "file": "flow-studio.e2e.ts",
+                "line": 87,
+                "column": 5
+              },
+              {
+                "title": "script Run button executes and shows logs",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1211,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:55.366Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-76656b4ef2d9353d8c95",
+                "file": "flow-studio.e2e.ts",
+                "line": 110,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "four-node.scenario.e2e.ts",
+        "file": "four-node.scenario.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Four-node concurrent scenario",
+            "file": "four-node.scenario.e2e.ts",
+            "line": 13,
+            "column": 6,
+            "specs": [
+              {
+                "title": "play through all steps, verify concurrency, no errors",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 10470,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:43:56.599Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2a995ecaa5f1ba7de79b-fbc80dac9121d07ee92a",
+                "file": "four-node.scenario.e2e.ts",
+                "line": 14,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "gallery.scenario.e2e.ts",
+        "file": "gallery.scenario.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Widget Gallery compliance",
+            "file": "gallery.scenario.e2e.ts",
+            "line": 15,
+            "column": 6,
+            "specs": [
+              {
+                "title": "every compact node has a status indicator dot",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 4573,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:07.105Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-00d52e52b33e1c0d6607",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 21,
+                "column": 5
+              },
+              {
+                "title": "knocking activates animated dashed edge toward node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 3324,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:11.694Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-e424c0e38821a58e505e",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 43,
+                "column": 5
+              },
+              {
+                "title": "communicating animation flows away from node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 3242,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:15.032Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-95a134ab5473ebcd6ea0",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 66,
+                "column": 5
+              },
+              {
+                "title": "compact mode nodes show name below",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1725,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:18.288Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-e2c888d8d0cda3c6172a",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 84,
+                "column": 5
+              },
+              {
+                "title": "thinking toggle shows agent thoughts",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2804,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:20.025Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-7f79c8ae51b18c6a8ca6",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 95,
+                "column": 5
+              },
+              {
+                "title": "non-compact agent nodes display name, time, calls, and progress",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2960,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:22.848Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-0e35ff3d9f59b18c46d4",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 110,
+                "column": 5
+              },
+              {
+                "title": "non-compact script nodes display time, calls, and status text",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 3104,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:25.831Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "3193a6443dc3337f3bef-73f390cf9360ca66490c",
+                "file": "gallery.scenario.e2e.ts",
+                "line": 136,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "integrations.e2e.ts",
+        "file": "integrations.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Integrations Page",
+            "file": "integrations.e2e.ts",
+            "line": 3,
+            "column": 6,
+            "specs": [
+              {
+                "title": "GitHub token from .env is read-only and tested successfully",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 30000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "No VITE_GITHUB_TOKEN in .env — skipping",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/integrations.e2e.ts",
+                          "line": 15,
+                          "column": 18
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "skipped",
+                        "duration": 491,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:28.960Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "No VITE_GITHUB_TOKEN in .env — skipping",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/integrations.e2e.ts",
+                              "line": 15,
+                              "column": 18
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "398a8be455863c2b5776-0acea4d7a2cd4bf7bcef",
+                "file": "integrations.e2e.ts",
+                "line": 8,
+                "column": 5
+              },
+              {
+                "title": "Mock integration (Cursor) tests format validation",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 30000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1637,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:29.466Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "398a8be455863c2b5776-2e89b041f32716b4cdd0",
+                "file": "integrations.e2e.ts",
+                "line": 37,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "node-buttons-menu.e2e.ts",
+        "file": "node-buttons-menu.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "NodeButtonsMenu",
+            "file": "node-buttons-menu.e2e.ts",
+            "line": 55,
+            "column": 6,
+            "specs": [
+              {
+                "title": "shows 4 action buttons when node is clicked in edit mode",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-a55919ecae05d6c50c58",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 69,
+                "column": 5
+              },
+              {
+                "title": "does not show menu when edit mode is off",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-0d47c2311747884c796e",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 84,
+                "column": 5
+              },
+              {
+                "title": "dismisses menu when clicking on empty canvas",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-294ebf99b78ba74573a0",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 95,
+                "column": 5
+              },
+              {
+                "title": "rename: shows input, accepts new name on Enter",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-ba664b6d72463e01d1e5",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 108,
+                "column": 5
+              },
+              {
+                "title": "add before: inserts a new placeholder node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-ad62e64a8979ed7e4eb9",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 129,
+                "column": 5
+              },
+              {
+                "title": "add after: starts connector from the node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-f40dbe49b04d12108b17",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 144,
+                "column": 5
+              },
+              {
+                "title": "buttons have minimum 48px touch targets",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                          "line": 60,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.116Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
+                              "line": 60,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "8ddaf3c84982edb6f57d-0e1ddcaf432d2edd838e",
+                "file": "node-buttons-menu.e2e.ts",
+                "line": 161,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "pages-smoke.scenario.e2e.ts",
+        "file": "pages-smoke.scenario.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Pages smoke check",
+            "file": "pages-smoke.scenario.e2e.ts",
+            "line": 9,
+            "column": 6,
+            "specs": [
+              {
+                "title": "navigate all pages without errors",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1819,
+                        "errors": [],
+                        "stdout": [
+                          {
+                            "text": "Visited 5 pages:\n"
+                          },
+                          {
+                            "text": "  ✓ builder\n"
+                          },
+                          {
+                            "text": "  ✓ widgets\n"
+                          },
+                          {
+                            "text": "  ✓ widgets/themes-visible\n"
+                          },
+                          {
+                            "text": "  ✓ home\n"
+                          },
+                          {
+                            "text": "  ✓ builder (return)\n"
+                          }
+                        ],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:31.127Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "83c56c27fb3a62099959-3e8691dc690f7e385d25",
+                "file": "pages-smoke.scenario.e2e.ts",
+                "line": 10,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "swipe-buttons.e2e.ts",
+        "file": "swipe-buttons.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "SwipeButtons activation modes",
+            "file": "swipe-buttons.e2e.ts",
+            "line": 50,
+            "column": 6,
+            "specs": [
+              {
+                "title": "click mode: menu opens on node click, buttons visible",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1143,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:32.971Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-a7d8db32271aa5400802",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 58,
+                "column": 5
+              },
+              {
+                "title": "click mode: dismiss menu by clicking node again",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 726,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:34.127Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-6488a4784629eda7db69",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 76,
+                "column": 5
+              },
+              {
+                "title": "hold mode: menu does NOT open on quick click",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 919,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:34.868Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-dc9dd30aee3ae7a7111e",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 87,
+                "column": 5
+              },
+              {
+                "title": "hold mode: menu expands on long-press",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1297,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:35.802Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-5ed9032b83355740c652",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 100,
+                "column": 5
+              },
+              {
+                "title": "swipe mode: hovering node shows radial menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 631,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:37.114Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-36055d07caf050ffb687",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 124,
+                "column": 5
+              },
+              {
+                "title": "swipe mode: hovering config expands config sub-menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 853,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:37.761Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-71ec669ad58fe748ae60",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 141,
+                "column": 5
+              },
+              {
+                "title": "all buttons have valid bounding boxes",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 729,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:38.627Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-692aac66ef816f51ae34",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 157,
+                "column": 5
+              },
+              {
+                "title": "all 3 preview sections render with nodes",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 469,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:39.370Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-7fa60f44532597957189",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 177,
+                "column": 5
+              },
+              {
+                "title": "touch: tap opens menu in click mode",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 677,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:39.852Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-b3730819ef8c6e4b9b4e",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 185,
+                "column": 5
+              },
+              {
+                "title": "touch: buttons have touch-action:none to prevent text selection",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 685,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:40.543Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-7dda59b6ab2d0cb15d2c",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 209,
+                "column": 5
+              },
+              {
+                "title": "touch: swipe container has correct CSS for touch prevention",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 603,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:41.242Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-f58cd5b3c3382bbabe93",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 233,
+                "column": 5
+              },
+              {
+                "title": "touch: no text selected after hover interaction",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 975,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:41.856Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-3f10fcd63bf5bb7c81c0",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 250,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "two-node.scenario.e2e.ts",
+        "file": "two-node.scenario.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [],
+        "suites": [
+          {
+            "title": "Two-node scenario with Automerge player",
+            "file": "two-node.scenario.e2e.ts",
+            "line": 13,
+            "column": 6,
+            "specs": [
+              {
+                "title": "play through all steps, verify tool calls and artifacts, no errors",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 10294,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:42.855Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-55db8c52cdb60a9b7ea2",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 14,
+                "column": 5
+              },
+              {
+                "title": "active borders never appear on A-left or B-right during communication",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 4793,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:53.158Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-93e0891573d452ab4fce",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 115,
+                "column": 5
+              },
+              {
+                "title": "size switcher changes node size correctly",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2635,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:44:57.961Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-05faa6ca21ef8e38934b",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 219,
+                "column": 5
+              },
+              {
+                "title": "thoughts display below non-large nodes",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2785,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:45:00.607Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-c6d29e99b370e85a1ed4",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 246,
+                "column": 5
+              },
+              {
+                "title": "no active green/orange borders during solo agent work",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2765,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:45:03.401Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-351f857b0b8c7e5ca65f",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 274,
+                "column": 5
+              },
+              {
+                "title": "artifact node is compact 3×3 size",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 2821,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:45:06.177Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-3792b133ea31db92ae09",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 315,
+                "column": 5
+              },
+              {
+                "title": "all large job nodes have PreviewCanvas with terminal output",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 0,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 5931,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:45:09.009Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "2b7149691ad94c9cf4c4-15429c578cde8e317fc0",
+                "file": "two-node.scenario.e2e.ts",
+                "line": 349,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "verify-integrations.e2e.ts",
+        "file": "verify-integrations.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "custom integrations",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chromium",
+                "projectName": "chromium",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 1325,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-02-25T22:45:14.957Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "3a12bfb241b5a3d53627-926f726cf2898d3c2e59",
+            "file": "verify-integrations.e2e.ts",
+            "line": 3,
+            "column": 1
+          }
+        ]
+      },
+      {
+        "title": "verify-minimap.e2e.ts",
+        "file": "verify-minimap.e2e.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "minimap toggle and controls",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chromium",
+                "projectName": "chromium",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 1692,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-02-25T22:45:16.302Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "e05a0fdb8661b3b78bad-555b82c7b0a2167708a6",
+            "file": "verify-minimap.e2e.ts",
+            "line": 3,
+            "column": 1
+          }
+        ]
+      }
+    ],
+    "stats": {
+      "startTime": "2026-02-25T22:43:24.259Z",
+      "duration": 113808.17499999999,
+      "expected": 41,
+      "skipped": 8,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  }
 }
