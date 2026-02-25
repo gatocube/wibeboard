@@ -124,11 +124,17 @@ function AgentVariant({ data }: { data: any }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
             <motion.div
-                animate={hasKnock ? (knockOut
-                    ? { boxShadow: [`4px 0 0 0 ${kColor}`, `4px 0 0 0 transparent`] }
-                    : { boxShadow: [`-4px 0 0 0 ${kColor}`, `-4px 0 0 0 transparent`] }
-                ) : {}}
-                transition={hasKnock ? { repeat: Infinity, duration: 0.5, ease: 'easeOut' } : {}}
+                animate={{
+                    ...(hasKnock ? (knockOut
+                        ? { boxShadow: [`4px 0 0 0 ${kColor}`, `4px 0 0 0 transparent`] }
+                        : { boxShadow: [`-4px 0 0 0 ${kColor}`, `-4px 0 0 0 transparent`] }
+                    ) : {}),
+                    ...(isActive ? { y: [0, -3, 0] } : { y: 0 }),
+                }}
+                transition={{
+                    ...(hasKnock ? { boxShadow: { repeat: Infinity, duration: 0.5, ease: 'easeOut' } } : {}),
+                    ...(isActive ? { y: { repeat: Infinity, duration: 2, ease: 'easeInOut' } } : {}),
+                }}
                 style={{
                     width: w, height: h,
                     padding: 1.5,

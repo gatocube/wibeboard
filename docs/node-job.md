@@ -107,7 +107,7 @@ Non-compact nodes render as a card with these fields:
 ├──────────────────────────────┤
 │ Agent name                 ⚡3|<- Agent name (AI) like: Reviewer: Claude 3.5 or Lang (Script) like: TS: hello-world.ts
 │ Current task                 |<- Current task (AI) or Code last Output line
-│ 1.3s  ████████░░░░░░░░░░ 55% │<- Total running time and Progress bar
+│ ████████░░░░░░░░░░  55% 1.3s │<- Total running time and Progress bar
 └──────────────────────────────┘
   Some AI thoughts or script output line here
 ```
@@ -128,6 +128,7 @@ WibeGlow is the default theme. It uses a **colored gradient border** for AI Agen
 background: linear-gradient(135deg, primary, secondary, tertiary)
 padding: 1px  (the gradient shows through as a border)
 inner: #0f0f1a background with border-radius - 1
+while working uses floating animation
 ```
 
 This gradient border is applied consistently across **all sizes** (S, M, L).
