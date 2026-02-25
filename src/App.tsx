@@ -7,10 +7,11 @@ import { IconsGalleryPage } from '@/pages/test-icons'
 import { AIScriptScenarioPage } from '@/pages/ai-script-scenario'
 import { IntegrationsPage } from '@/pages/integrations'
 import { UIKitPage } from '@/pages/ui-kit'
+import { ButtonsMenuPage } from '@/pages/buttons-menu'
 import { FpsMeter } from '@/components/FpsMeter'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit'
+type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu'
 
 interface NavItem {
     id: Page
@@ -29,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
     { id: 'icons', label: 'Icon Reference', icon: <Palette size={14} />, description: 'All icons used in wibeboard' },
     { id: 'ui-kit', label: 'UI Kit', icon: <Layers size={14} />, description: 'Reusable components & demos' },
+    { id: 'buttons-menu', label: 'Buttons Menu', icon: <Layers size={14} />, description: 'Node action menus' },
 ]
 
 export function App() {
@@ -36,7 +38,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit'].includes(p)) {
+        if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -60,7 +62,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit'].includes(p)) {
+            if (p && ['home', 'builder', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -243,6 +245,7 @@ export function App() {
                     {page === 'icons' && <IconsGalleryPage />}
                     {page === 'integrations' && <IntegrationsPage />}
                     {page === 'ui-kit' && <UIKitPage />}
+                    {page === 'buttons-menu' && <ButtonsMenuPage />}
                 </div>
             </div>
         </div>
