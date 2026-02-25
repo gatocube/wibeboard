@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-02-25T23:07:26.728Z",
-  "commit": "69fbc0d",
+  "timestamp": "2026-02-25T23:15:04.024Z",
+  "commit": "738eafd",
   "smoke": {
     "suites": [],
     "stats": {}
@@ -36,12 +36,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10813,
+                        "duration": 10872,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:05:28.875Z",
+                        "startTime": "2026-02-25T23:12:59.283Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -70,12 +70,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1373,
+                        "duration": 1409,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:05:41.158Z",
+                        "startTime": "2026-02-25T23:13:11.756Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -111,18 +111,67 @@
                       {
                         "workerIndex": 0,
                         "parallelIndex": 0,
-                        "status": "passed",
-                        "duration": 2566,
-                        "errors": [],
+                        "status": "failed",
+                        "duration": 2536,
+                        "error": {
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:237:39",
+                          "location": {
+                            "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                            "column": 39,
+                            "line": 237
+                          },
+                          "snippet": "\u001b[0m \u001b[90m 235 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m600\u001b[39m)\n \u001b[90m 236 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 237 |\u001b[39m         expect(\u001b[36mawait\u001b[39m nodeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m2\u001b[39m)\n \u001b[90m     |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 238 |\u001b[39m\n \u001b[90m 239 |\u001b[39m         \u001b[90m// ── Get both node bounding boxes ──\u001b[39m\n \u001b[90m 240 |\u001b[39m         \u001b[36mconst\u001b[39m startNode \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'.react-flow__node[data-id=\"start-1\"]'\u001b[39m)\u001b[0m"
+                        },
+                        "errors": [
+                          {
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                              "column": 39,
+                              "line": 237
+                            },
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  235 |         await page.waitForTimeout(600)\n  236 |\n> 237 |         expect(await nodeCount(page)).toBe(2)\n      |                                       ^\n  238 |\n  239 |         // ── Get both node bounding boxes ──\n  240 |         const startNode = page.locator('.react-flow__node[data-id=\"start-1\"]')\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:237:39"
+                          }
+                        ],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:05:42.546Z",
+                        "startTime": "2026-02-25T23:13:13.179Z",
                         "annotations": [],
-                        "attachments": []
+                        "attachments": [
+                          {
+                            "name": "error-context",
+                            "contentType": "text/markdown",
+                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-242f7-w-node-with-5-grid-unit-gap-chromium/error-context.md"
+                          }
+                        ],
+                        "errorLocation": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                          "column": 39,
+                          "line": 237
+                        }
+                      },
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 3299,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 1,
+                        "startTime": "2026-02-25T23:13:16.811Z",
+                        "annotations": [],
+                        "attachments": [
+                          {
+                            "name": "trace",
+                            "contentType": "application/zip",
+                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-242f7-w-node-with-5-grid-unit-gap-chromium-retry1/trace.zip"
+                          }
+                        ]
                       }
                     ],
-                    "status": "expected"
+                    "status": "flaky"
                   }
                 ],
                 "id": "16470303892dd33bf49c-714122bd8a080786ff4c",
@@ -143,15 +192,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 659,
+                        "duration": 683,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:05:45.130Z",
+                        "startTime": "2026-02-25T23:13:20.333Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -177,69 +226,20 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
-                        "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 4409,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:318:39",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
-                            "column": 39,
-                            "line": 318
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 316 |\u001b[39m\n \u001b[90m 317 |\u001b[39m         \u001b[90m// Now have: Start → A → B (3 nodes, 2 edges)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 318 |\u001b[39m         expect(\u001b[36mawait\u001b[39m nodeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m3\u001b[39m)\n \u001b[90m     |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 319 |\u001b[39m         expect(\u001b[36mawait\u001b[39m edgeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m2\u001b[39m)\n \u001b[90m 320 |\u001b[39m\n \u001b[90m 321 |\u001b[39m         \u001b[90m// ── Delete middle node A ──\u001b[39m\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
-                              "column": 39,
-                              "line": 318
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  316 |\n  317 |         // Now have: Start → A → B (3 nodes, 2 edges)\n> 318 |         expect(await nodeCount(page)).toBe(3)\n      |                                       ^\n  319 |         expect(await edgeCount(page)).toBe(2)\n  320 |\n  321 |         // ── Delete middle node A ──\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:318:39"
-                          }
-                        ],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T23:05:45.819Z",
-                        "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-b1ad6-ghbors-bridge-reconnection--chromium/error-context.md"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
-                          "column": 39,
-                          "line": 318
-                        }
-                      },
-                      {
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 7441,
+                        "duration": 6340,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
-                        "retry": 1,
-                        "startTime": "2026-02-25T23:05:51.374Z",
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:13:21.037Z",
                         "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "trace",
-                            "contentType": "application/zip",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-b1ad6-ghbors-bridge-reconnection--chromium-retry1/trace.zip"
-                          }
-                        ]
+                        "attachments": []
                       }
                     ],
-                    "status": "flaky"
+                    "status": "expected"
                   }
                 ],
                 "id": "16470303892dd33bf49c-f75c3ecc86c973ff1fcb",
@@ -263,12 +263,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1269,
+                        "duration": 1272,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:05:59.266Z",
+                        "startTime": "2026-02-25T23:13:27.394Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -297,12 +297,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1273,
+                        "duration": 1275,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:00.548Z",
+                        "startTime": "2026-02-25T23:13:28.681Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -348,12 +348,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 772,
+                        "duration": 781,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:01.849Z",
+                        "startTime": "2026-02-25T23:13:29.984Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -382,12 +382,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1454,
+                        "duration": 1446,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:02.635Z",
+                        "startTime": "2026-02-25T23:13:30.779Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -416,12 +416,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1463,
+                        "duration": 1465,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:04.102Z",
+                        "startTime": "2026-02-25T23:13:32.240Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -450,12 +450,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1397,
+                        "duration": 1304,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:05.584Z",
+                        "startTime": "2026-02-25T23:13:33.722Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -507,7 +507,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -561,7 +561,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -615,7 +615,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -669,7 +669,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -723,7 +723,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -777,7 +777,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.040Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -831,7 +831,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:06.998Z",
+                        "startTime": "2026-02-25T23:13:35.041Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -887,12 +887,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10649,
+                        "duration": 10598,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:07.007Z",
+                        "startTime": "2026-02-25T23:13:35.048Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -938,12 +938,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4384,
+                        "duration": 4429,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:17.683Z",
+                        "startTime": "2026-02-25T23:13:45.670Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -972,12 +972,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3255,
+                        "duration": 3275,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:22.082Z",
+                        "startTime": "2026-02-25T23:13:50.119Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1006,12 +1006,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3281,
+                        "duration": 3291,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:25.350Z",
+                        "startTime": "2026-02-25T23:13:53.410Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1040,12 +1040,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1734,
+                        "duration": 1739,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:28.650Z",
+                        "startTime": "2026-02-25T23:13:56.722Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1074,12 +1074,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2943,
+                        "duration": 2927,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:30.403Z",
+                        "startTime": "2026-02-25T23:13:58.477Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1108,12 +1108,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2927,
+                        "duration": 2955,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:33.363Z",
+                        "startTime": "2026-02-25T23:14:01.421Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1142,12 +1142,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3080,
+                        "duration": 3111,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:36.303Z",
+                        "startTime": "2026-02-25T23:14:04.395Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1193,12 +1193,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 517,
+                        "duration": 533,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:39.403Z",
+                        "startTime": "2026-02-25T23:14:07.527Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1227,12 +1227,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1640,
+                        "duration": 1645,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:39.933Z",
+                        "startTime": "2026-02-25T23:14:08.075Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1261,12 +1261,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 819,
+                        "duration": 865,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:41.590Z",
+                        "startTime": "2026-02-25T23:14:09.733Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1312,7 +1312,7 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1836,
+                        "duration": 1858,
                         "errors": [],
                         "stdout": [
                           {
@@ -1336,7 +1336,7 @@
                         ],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:42.432Z",
+                        "startTime": "2026-02-25T23:14:10.617Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1363,11 +1363,11 @@
           {
             "title": "SwipeButtons activation modes",
             "file": "swipe-buttons.e2e.ts",
-            "line": 50,
+            "line": 81,
             "column": 6,
             "specs": [
               {
-                "title": "click mode: menu opens on node click, buttons visible",
+                "title": "click/mouse: menu opens on node click",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1382,12 +1382,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1154,
+                        "duration": 686,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:44.295Z",
+                        "startTime": "2026-02-25T23:14:12.503Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1395,13 +1395,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-a7d8db32271aa5400802",
+                "id": "37e995ede621d717f2ff-5f667a482a279d1d3911",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 58,
+                "line": 91,
                 "column": 5
               },
               {
-                "title": "click mode: dismiss menu by clicking node again",
+                "title": "click/mouse: dismiss menu by clicking node again",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1416,12 +1416,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 712,
+                        "duration": 723,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:45.464Z",
+                        "startTime": "2026-02-25T23:14:13.202Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1429,13 +1429,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-6488a4784629eda7db69",
+                "id": "37e995ede621d717f2ff-0b8dd26cd179a0a581ad",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 76,
+                "line": 97,
                 "column": 5
               },
               {
-                "title": "hold mode: menu does NOT open on quick click",
+                "title": "click/mouse: hover After expands sub-menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1450,12 +1450,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 945,
+                        "duration": 1161,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:46.189Z",
+                        "startTime": "2026-02-25T23:14:13.938Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1463,13 +1463,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-dc9dd30aee3ae7a7111e",
+                "id": "37e995ede621d717f2ff-3ff95614e941b84317a1",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 87,
+                "line": 105,
                 "column": 5
               },
               {
-                "title": "hold mode: menu expands on long-press",
+                "title": "click/mouse: hover Before expands sub-menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1484,12 +1484,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1310,
+                        "duration": 919,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:47.166Z",
+                        "startTime": "2026-02-25T23:14:15.113Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1497,13 +1497,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-5ed9032b83355740c652",
+                "id": "37e995ede621d717f2ff-ffae3c50a0a8015387e2",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 100,
+                "line": 117,
                 "column": 5
               },
               {
-                "title": "swipe mode: hovering node shows radial menu",
+                "title": "click/mouse: hover Config expands config sub-menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1518,12 +1518,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 657,
+                        "duration": 850,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:48.492Z",
+                        "startTime": "2026-02-25T23:14:16.049Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1531,13 +1531,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-36055d07caf050ffb687",
+                "id": "37e995ede621d717f2ff-14853032d9cf7e6f0030",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 124,
+                "line": 129,
                 "column": 5
               },
               {
-                "title": "swipe mode: hovering config expands config sub-menu",
+                "title": "click/mouse: clicking Job sub-button fires action and logs event",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1552,12 +1552,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 871,
+                        "duration": 1248,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:49.163Z",
+                        "startTime": "2026-02-25T23:14:16.914Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1565,81 +1565,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-71ec669ad58fe748ae60",
+                "id": "37e995ede621d717f2ff-7fd5cdc9e9af9ca053bd",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 141,
+                "line": 140,
                 "column": 5
               },
               {
-                "title": "all buttons have valid bounding boxes",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [],
-                    "expectedStatus": "passed",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": 1,
-                        "parallelIndex": 0,
-                        "status": "passed",
-                        "duration": 704,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T23:06:50.047Z",
-                        "annotations": [],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "expected"
-                  }
-                ],
-                "id": "37e995ede621d717f2ff-692aac66ef816f51ae34",
-                "file": "swipe-buttons.e2e.ts",
-                "line": 157,
-                "column": 5
-              },
-              {
-                "title": "all 3 preview sections render with nodes",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [],
-                    "expectedStatus": "passed",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": 1,
-                        "parallelIndex": 0,
-                        "status": "passed",
-                        "duration": 491,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T23:06:50.765Z",
-                        "annotations": [],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "expected"
-                  }
-                ],
-                "id": "37e995ede621d717f2ff-7fa60f44532597957189",
-                "file": "swipe-buttons.e2e.ts",
-                "line": 177,
-                "column": 5
-              },
-              {
-                "title": "touch: tap opens menu in click mode",
+                "title": "click/touch: tap opens menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1659,7 +1591,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:51.270Z",
+                        "startTime": "2026-02-25T23:14:18.174Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1667,13 +1599,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-b3730819ef8c6e4b9b4e",
+                "id": "37e995ede621d717f2ff-7cf46722e56ae4a65380",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 185,
+                "line": 157,
                 "column": 5
               },
               {
-                "title": "touch: buttons have touch-action:none to prevent text selection",
+                "title": "hold/mouse: menu opens on click but quick-click does NOT expand sub-menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1688,12 +1620,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 720,
+                        "duration": 942,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:51.979Z",
+                        "startTime": "2026-02-25T23:14:18.882Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1701,13 +1633,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-7dda59b6ab2d0cb15d2c",
+                "id": "37e995ede621d717f2ff-8108a29da7ec21c10635",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 209,
+                "line": 168,
                 "column": 5
               },
               {
-                "title": "touch: swipe container has correct CSS for touch prevention",
+                "title": "hold/mouse: long-press expands sub-menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1722,12 +1654,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 612,
+                        "duration": 1340,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:52.713Z",
+                        "startTime": "2026-02-25T23:14:19.840Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1735,13 +1667,13 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-f58cd5b3c3382bbabe93",
+                "id": "37e995ede621d717f2ff-90f9ff4b20d8cb6bad56",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 233,
+                "line": 178,
                 "column": 5
               },
               {
-                "title": "touch: no text selected after hover interaction",
+                "title": "hold/touch: tap opens menu",
                 "ok": true,
                 "tags": [],
                 "tests": [
@@ -1756,12 +1688,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 940,
+                        "duration": 708,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:53.340Z",
+                        "startTime": "2026-02-25T23:14:21.194Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1769,9 +1701,417 @@
                     "status": "expected"
                   }
                 ],
-                "id": "37e995ede621d717f2ff-3f10fcd63bf5bb7c81c0",
+                "id": "37e995ede621d717f2ff-d4562f5f62b946983506",
                 "file": "swipe-buttons.e2e.ts",
-                "line": 250,
+                "line": 199,
+                "column": 5
+              },
+              {
+                "title": "hold/touch: long-press expands sub-menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1357,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:21.916Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-836804ba4d5c821b02bb",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 206,
+                "column": 5
+              },
+              {
+                "title": "swipe/mouse: hovering node shows radial menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 603,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:23.288Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-4aee6410c9b50d00d1cf",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 223,
+                "column": 5
+              },
+              {
+                "title": "swipe/mouse: hovering After expands sub-menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 649,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:23.905Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-ada99e4fe7821df4d431",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 229,
+                "column": 5
+              },
+              {
+                "title": "swipe/mouse: hovering Config expands config sub-menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 871,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:24.565Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-9a6a3d948b29cd964f76",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 240,
+                "column": 5
+              },
+              {
+                "title": "buttons have touch-action:none and user-select:none",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 715,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:25.448Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-9ad96b5a9a8be4279260",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 263,
+                "column": 5
+              },
+              {
+                "title": "swipe container has correct CSS for touch prevention",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 649,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:26.178Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-7b42cc8d64d3133b4dcc",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 283,
+                "column": 5
+              },
+              {
+                "title": "no text selected after hover interaction",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 958,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:26.841Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-c45e97cfe139c4bd7487",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 297,
+                "column": 5
+              },
+              {
+                "title": "all 3 nodes render on the page",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 490,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:27.813Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-6da023a2425c6f91f09c",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 315,
+                "column": 5
+              },
+              {
+                "title": "all main buttons have valid bounding boxes",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 699,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:28.319Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-ceb91c1031f857609994",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 321,
+                "column": 5
+              },
+              {
+                "title": "left edge node opens menu with limited directions",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 665,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:29.032Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-4f0e57f333b4c6425689",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 338,
+                "column": 5
+              },
+              {
+                "title": "right edge node opens menu",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 652,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:29.709Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-ead9bb376196148e8fd4",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 348,
+                "column": 5
+              },
+              {
+                "title": "rename: clicking rename shows input and updates label",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1086,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T23:14:30.375Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "37e995ede621d717f2ff-a563afd8cec0fea6b510",
+                "file": "swipe-buttons.e2e.ts",
+                "line": 360,
                 "column": 5
               }
             ]
@@ -1807,12 +2147,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10296,
+                        "duration": 10323,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:06:54.305Z",
+                        "startTime": "2026-02-25T23:14:31.485Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1841,12 +2181,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4859,
+                        "duration": 4888,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:04.611Z",
+                        "startTime": "2026-02-25T23:14:41.817Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1875,12 +2215,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2673,
+                        "duration": 2666,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:09.479Z",
+                        "startTime": "2026-02-25T23:14:46.715Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1909,12 +2249,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2802,
+                        "duration": 2834,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:12.161Z",
+                        "startTime": "2026-02-25T23:14:49.395Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1943,12 +2283,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2807,
+                        "duration": 2782,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:14.973Z",
+                        "startTime": "2026-02-25T23:14:52.242Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1977,12 +2317,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2810,
+                        "duration": 2855,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:17.791Z",
+                        "startTime": "2026-02-25T23:14:55.033Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2011,12 +2351,12 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 5966,
+                        "duration": 5982,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T23:07:20.610Z",
+                        "startTime": "2026-02-25T23:14:57.898Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2035,9 +2375,9 @@
       }
     ],
     "stats": {
-      "startTime": "2026-02-25T23:05:25.936Z",
-      "duration": 120728.152,
-      "expected": 41,
+      "startTime": "2026-02-25T23:12:56.209Z",
+      "duration": 127750.72,
+      "expected": 51,
       "skipped": 7,
       "unexpected": 0,
       "flaky": 1
