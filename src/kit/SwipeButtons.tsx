@@ -73,6 +73,8 @@ export interface SwipeButtonsProps {
     activationMode?: SwipeButtonsActivation
     /** Which directions to show buttons (default: all 4 cardinal) */
     directions?: SwipeButtonsDirection[]
+    /** When true, buttons are pushed out so they never overlap the node */
+    noOverlap?: boolean
     onAddBefore: (nodeId: string, widgetType: string) => void
     onAddAfter: (nodeId: string, widgetType: string) => void
     onConfigure: (nodeId: string, action: string) => void
@@ -119,7 +121,7 @@ function ensureHoldKeyframe() {
 export function SwipeButtons(props: SwipeButtonsProps) {
     const {
         nodeId, currentLabel, activationMode = 'click',
-        directions,
+        directions, noOverlap = false,
         onAddBefore, onAddAfter, onConfigure, onRename,
     } = props
     const dirs = directions ?? ['top', 'right', 'bottom', 'left']
@@ -162,12 +164,18 @@ export function SwipeButtons(props: SwipeButtonsProps) {
     }, [handleRenameConfirm])
 
     // Button positions
+    const BTN_SIZE = 48
     const positions = useMemo(() => {
         if (!nodeRect) return null
         const cx = nodeRect.left + nodeRect.width / 2
         const cy = nodeRect.top + nodeRect.height / 2
-        const gapX = nodeRect.width / 2 + 16
-        const gapY = nodeRect.height / 2 + 16
+        // noOverlap: push buttons far enough that they don't cover the node
+        const gapX = noOverlap
+            ? nodeRect.width / 2 + BTN_SIZE / 2 + 4
+            : nodeRect.width / 2 + 16
+        const gapY = noOverlap
+            ? nodeRect.height / 2 + BTN_SIZE / 2 + 4
+            : nodeRect.height / 2 + 16
 
         return {
             top: { x: cx, y: cy - gapY },
@@ -176,7 +184,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
             left: { x: cx - gapX, y: cy },
             'bottom-right': { x: cx + gapX * 0.85, y: cy + gapY * 0.85 },
         }
-    }, [nodeRect])
+    }, [nodeRect, noOverlap])
 
     if (!nodeRect || !positions) return null
 

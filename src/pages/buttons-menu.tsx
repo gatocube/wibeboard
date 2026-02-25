@@ -260,6 +260,7 @@ export function ButtonsMenuPage() {
                     currentLabel={currentLabel}
                     activationMode={mode}
                     directions={selectedId === 'left-node' ? ['right', 'bottom', 'bottom-right'] : undefined}
+                    noOverlap={selectedId === 'left-node' || selectedId === 'right-node'}
                     onAddBefore={(id, type) => { addLog(`⬅ Before ${type}: ${id}`); setSelectedId(null) }}
                     onAddAfter={(id, type) => { addLog(`➡ After ${type}: ${id}`); setSelectedId(null) }}
                     onConfigure={(id, action) => {
