@@ -26,6 +26,7 @@ import { StudioSettings } from './StudioSettings'
 import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { WidgetPicker } from './WidgetPicker'
 import { SwipeButtons } from '@/kit/SwipeButtons'
+import { resolveCollisions, findNonOverlappingPosition } from './resolve-collisions'
 
 // ── Theme backgrounds ───────────────────────────────────────────────────────────
 
@@ -215,12 +216,38 @@ export const FlowStudio = observer(function FlowStudio({
     ) => {
         const defaultW = MIN_GRID * 4 * GRID_CELL
         const defaultH = MIN_GRID * 2 * GRID_CELL
-        const rect = { x: position.x, y: position.y, width: defaultW, height: defaultH }
+
+        // Auto-space: find a non-overlapping position (3 grid units from nearest)
+        const safePos = findNonOverlappingPosition(nodes, defaultW, defaultH, position)
+
+        const rect = { x: safePos.x, y: safePos.y, width: defaultW, height: defaultH }
         const nodeId = `node-${Date.now()}`
 
         onNodeCreatedRef.current?.(nodeId, widgetType, template, rect, sourceNodeId)
         widgetRegistry.markUsed(widgetType)
-    }, [])
+    }, [nodes])
+
+    // ── Collision resolution on drag stop ────────────────────────────────────────
+    const handleNodeDragStop = useCallback((_event: React.MouseEvent, draggedNode: { id: string }) => {
+        if (!onNodesChange) return
+        const resolved = resolveCollisions(nodes, { anchorId: draggedNode.id })
+
+        // Dispatch position changes for any node that moved
+        const changes = resolved
+            .filter((n, i) =>
+                n.position.x !== nodes[i].position.x ||
+                n.position.y !== nodes[i].position.y
+            )
+            .map(n => ({
+                type: 'position' as const,
+                id: n.id,
+                position: n.position,
+            }))
+
+        if (changes.length > 0) {
+            onNodesChange(changes)
+        }
+    }, [nodes, onNodesChange])
 
     // ── Sidebar widget pick handler ─────────────────────────────────────────────
     const handleSidebarSelect = useCallback((_widget: { type: string }, template: WidgetTemplate) => {
@@ -255,6 +282,7 @@ export const FlowStudio = observer(function FlowStudio({
                     edges={edges}
                     nodeTypes={nodeTypes}
                     onNodesChange={onNodesChange}
+                    onNodeDragStop={editMode ? handleNodeDragStop : undefined}
                     nodesDraggable={nodesDraggable}
                     nodesConnectable={nodesConnectable}
                     panOnDrag={panOnDrag}
