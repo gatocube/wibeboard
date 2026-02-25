@@ -6,12 +6,13 @@
  *  2. NodeButtonsMenu — click a mock node to see action buttons appear
  *  3. ExtendedNodeButtonsMenu — with sub-menu fans for widget type selection
  *  4. DragToPlace — press & drag to position, release to show widget picker
+ *  5. ConstructionNode — all states of the placeholder/construction node
  */
 
 import { useState, useCallback, useRef } from 'react'
 import { IconButton, ICON_BUTTON_COLORS, type IconButtonColor, type IconButtonSize, ExtendedNodeButtonsMenu } from '@/kit'
 import { NodeButtonsMenu } from '@/flow-builder/NodeButtonsMenu'
-import { Plus, Settings, Pencil, ArrowRight, Code, Cpu, Zap, Star, Heart, Globe, Shield, UserCircle } from 'lucide-react'
+import { Plus, Settings, Pencil, ArrowRight, Code, Cpu, Zap, Star, Heart, Globe, Shield, UserCircle, Construction } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ── Icon list for demo ──────────────────────────────────────────────────────────
@@ -51,6 +52,10 @@ export function UIKitPage() {
             <div style={{ height: 32 }} />
 
             <DragToPlaceSection />
+
+            <div style={{ height: 32 }} />
+
+            <ConstructionNodeSection />
         </div>
     )
 }
@@ -738,3 +743,230 @@ function DragToPlaceSection() {
         </section>
     )
 }
+
+// ── 5. Construction Node states ─────────────────────────────────────────────────
+
+const CONSTRUCTION_STATES = [
+    {
+        label: 'Positioning',
+        desc: 'Just placed, waiting for interaction',
+        sizing: false,
+        resizable: false,
+        showSelector: false,
+        hoveredWidget: null,
+        w: 160, h: 100,
+    },
+    {
+        label: 'Resizing',
+        desc: 'User dragging to set size',
+        sizing: true,
+        resizable: false,
+        showSelector: false,
+        hoveredWidget: null,
+        w: 200, h: 120,
+    },
+    {
+        label: 'Configuring',
+        desc: 'Size confirmed, awaiting widget pick',
+        sizing: false,
+        resizable: true,
+        showSelector: true,
+        hoveredWidget: null,
+        w: 160, h: 100,
+    },
+    {
+        label: 'Widget Preview',
+        desc: 'Hovering a widget in the picker',
+        sizing: false,
+        resizable: true,
+        showSelector: true,
+        hoveredWidget: { name: 'AI Agent', type: 'agent', description: 'An AI agent that executes tasks autonomously' },
+        w: 160, h: 100,
+    },
+] as const
+
+function ConstructionNodeSection() {
+    return (
+        <section>
+            <h2 style={{
+                fontSize: 13, fontWeight: 700, color: '#e2e8f0',
+                marginBottom: 16,
+                display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+                <span style={{
+                    width: 20, height: 20, borderRadius: 5,
+                    background: 'rgba(139,92,246,0.15)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10,
+                }}>🚧</span>
+                Construction Node States
+            </h2>
+
+            <p style={{ fontSize: 10, color: '#64748b', marginBottom: 16 }}>
+                The placeholder node transitions through these visual states during node creation:
+                <strong style={{ color: '#94a3b8' }}> Positioning</strong> →
+                <strong style={{ color: '#94a3b8' }}> Resizing</strong> →
+                <strong style={{ color: '#94a3b8' }}> Configuring</strong> →
+                <strong style={{ color: '#94a3b8' }}> Widget Preview</strong>
+            </p>
+
+            <div style={{
+                display: 'flex', gap: 24, flexWrap: 'wrap',
+            }}>
+                {CONSTRUCTION_STATES.map((state) => (
+                    <div key={state.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                        {/* State label */}
+                        <div style={{
+                            fontSize: 9, fontWeight: 700, color: '#8b5cf6',
+                            textTransform: 'uppercase', letterSpacing: 0.5,
+                            fontFamily: "'JetBrains Mono', monospace",
+                        }}>{state.label}</div>
+
+                        {/* Mock node */}
+                        <MockConstructionNode
+                            w={state.w}
+                            h={state.h}
+                            sizing={state.sizing}
+                            resizable={state.resizable}
+                            showSelector={state.showSelector}
+                            hoveredWidget={state.hoveredWidget}
+                        />
+
+                        {/* Description */}
+                        <div style={{
+                            fontSize: 8, color: '#64748b', textAlign: 'center',
+                            maxWidth: state.w, fontFamily: 'Inter',
+                        }}>{state.desc}</div>
+                    </div>
+                ))}
+            </div>
+        </section>
+    )
+}
+
+function MockConstructionNode({ w, h, sizing, resizable, showSelector, hoveredWidget }: {
+    w: number; h: number; sizing: boolean; resizable: boolean
+    showSelector: boolean; hoveredWidget: { name: string; type: string; description: string } | null
+}) {
+    const showPreview = !!hoveredWidget && !sizing
+    const gridCols = Math.round(w / 40)
+    const gridRows = Math.round(h / 40)
+
+    return (
+        <div style={{
+            position: 'relative',
+            width: w, height: h,
+            border: `2px dashed ${showPreview ? 'rgba(139,92,246,0.7)' : 'rgba(139,92,246,0.5)'}`,
+            borderRadius: 10,
+            background: showPreview
+                ? 'rgba(139,92,246,0.08)'
+                : sizing
+                    ? 'rgba(139,92,246,0.04)'
+                    : 'rgba(139,92,246,0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            transition: sizing ? 'none' : 'all 0.15s ease',
+            userSelect: 'none',
+            overflow: 'hidden',
+        }}>
+            {/* Handle dots */}
+            <div style={{
+                position: 'absolute', left: -4, top: '50%', transform: 'translateY(-50%)',
+                width: 8, height: 8, borderRadius: '50%',
+                background: '#8b5cf6', border: '2px solid rgba(139,92,246,0.3)',
+            }} />
+            <div style={{
+                position: 'absolute', right: -4, top: '50%', transform: 'translateY(-50%)',
+                width: 8, height: 8, borderRadius: '50%',
+                background: '#64748b', border: '2px solid rgba(100,116,139,0.3)',
+            }} />
+
+            {showPreview ? (
+                <>
+                    <Cpu size={24} style={{ color: 'rgba(139,92,246,0.7)' }} />
+                    <div style={{
+                        fontSize: 11, fontWeight: 600, color: '#8b5cf6',
+                        fontFamily: 'Inter', textAlign: 'center', padding: '0 8px',
+                    }}>
+                        {hoveredWidget.name}
+                    </div>
+                    <div style={{
+                        fontSize: 8, color: 'rgba(139,92,246,0.6)', fontFamily: 'Inter',
+                        textAlign: 'center', padding: '0 12px', lineHeight: 1.3,
+                        maxHeight: h - 60, overflow: 'hidden',
+                    }}>
+                        {hoveredWidget.description}
+                    </div>
+                    <div style={{
+                        fontSize: 8, color: 'rgba(139,92,246,0.4)',
+                        fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, marginTop: 2,
+                    }}>
+                        {gridCols}×{gridRows}
+                    </div>
+                </>
+            ) : (
+                <>
+                    <Construction size={sizing ? 16 : 20} style={{ color: 'rgba(139,92,246,0.5)' }} />
+                    <div style={{
+                        fontSize: 10, color: 'rgba(139,92,246,0.7)',
+                        fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+                    }}>
+                        {gridCols}×{gridRows}
+                    </div>
+                    <div style={{
+                        fontSize: 8, color: 'rgba(139,92,246,0.4)',
+                        fontFamily: 'Inter', fontWeight: 500,
+                        letterSpacing: 0.5, textTransform: 'uppercase',
+                    }}>
+                        {sizing ? 'sizing...' : resizable ? 'drag corner to resize' : showSelector ? 'select widget' : 'select widget'}
+                    </div>
+                </>
+            )}
+
+            {/* Corner markers (sizing state) */}
+            {sizing && (
+                <>
+                    {[
+                        { top: 4, left: 4 }, { top: 4, right: 4 },
+                        { bottom: 4, left: 4 }, { bottom: 4, right: 4 },
+                    ].map((pos, i) => (
+                        <div key={i} style={{
+                            position: 'absolute', ...pos, width: 6, height: 6,
+                            borderTop: 'top' in pos ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                            borderBottom: 'bottom' in pos ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                            borderLeft: 'left' in pos ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                            borderRight: 'right' in pos ? '1.5px solid rgba(139,92,246,0.4)' : 'none',
+                        }} />
+                    ))}
+                </>
+            )}
+
+            {/* Resize handle (configuring states) */}
+            {resizable && (
+                <div style={{
+                    position: 'absolute', bottom: -4, right: -4,
+                    width: 12, height: 12, borderRadius: 2,
+                    background: '#8b5cf6', border: '1.5px solid rgba(139,92,246,0.6)',
+                    cursor: 'nwse-resize', zIndex: 10,
+                    boxShadow: '0 0 4px rgba(139,92,246,0.3)',
+                }} />
+            )}
+
+            {/* Configuring indicator badge */}
+            {showSelector && !showPreview && (
+                <div style={{
+                    position: 'absolute', top: -8, right: -8,
+                    width: 16, height: 16, borderRadius: '50%',
+                    background: '#8b5cf6',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 8, color: '#fff', fontWeight: 700,
+                    boxShadow: '0 2px 6px rgba(139,92,246,0.4)',
+                }}>⚡</div>
+            )}
+        </div>
+    )
+}
+
