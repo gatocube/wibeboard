@@ -10,9 +10,10 @@
  */
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
-import type { Node } from '@xyflow/react'
 import { widgetRegistry, type WidgetDefinition } from '@/widgets/widget-registry'
 import { WidgetIcon } from '@/components/WidgetIcon'
+import { CodeEditor } from '@/kit'
+import type { CodeLanguage } from '@/kit'
 
 // ── Manifest generator ──────────────────────────────────────────────────────────
 
@@ -244,12 +245,6 @@ export function NodeConfiguratorPage() {
         setNodeData(initData())
     }, [initData])
 
-    const node: Node = useMemo(() => ({
-        id: 'preview-node',
-        type: widgetDef.type,
-        position: { x: 0, y: 0 },
-        data: nodeData,
-    }), [widgetDef.type, nodeData])
 
     const manifest = useMemo(() => generateManifest(widgetDef), [widgetDef])
 
@@ -466,16 +461,24 @@ export function NodeConfiguratorPage() {
 
                             {mode === 'raw' && (
                                 <div>
-                                    <textarea
-                                        style={S.textarea(!!parseError)}
+                                    <CodeEditor
                                         value={rawJson}
-                                        onChange={e => handleRawChange(e.target.value)}
-                                        spellCheck={false}
-                                        data-testid="raw-editor"
+                                        onChange={handleRawChange}
+                                        language="json"
+                                        minHeight={320}
+                                        maxHeight={500}
+                                        testId="raw-editor"
                                     />
                                     {parseError && (
-                                        <div style={{ color: '#ef4444', fontSize: 10, marginTop: 4 }}>
-                                            {parseError}
+                                        <div style={{
+                                            color: '#ef4444', fontSize: 10, marginTop: 6,
+                                            padding: '6px 10px',
+                                            background: 'rgba(239,68,68,0.08)',
+                                            borderRadius: 6,
+                                            border: '1px solid rgba(239,68,68,0.2)',
+                                            fontFamily: "'JetBrains Mono', monospace",
+                                        }}>
+                                            ⚠ {parseError}
                                         </div>
                                     )}
                                     <button
@@ -504,11 +507,13 @@ export function NodeConfiguratorPage() {
                                     }}>
                                         Full manifest with JSON schema, metadata, templates, and dimensions.
                                     </div>
-                                    <textarea
-                                        style={S.textarea(false)}
+                                    <CodeEditor
                                         value={JSON.stringify(manifest, null, 2)}
+                                        language="json"
                                         readOnly
-                                        data-testid="manifest-editor"
+                                        minHeight={320}
+                                        maxHeight={600}
+                                        testId="manifest-editor"
                                     />
                                 </div>
                             )}
@@ -559,10 +564,42 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     widgetDef: WidgetDefinition
     onChange: (key: string, value: any) => void
 }) {
+    const [error, setError] = useState<string | null>(null)
     const t = typeof value
 
     // Check if this field has enum options (subType)
     const isEnum = fieldKey === 'subType' && widgetDef.subTypes && widgetDef.subTypes.length > 0
+
+    // Detect code language from sibling data
+    const isCode = fieldKey === 'code'
+    const codeLanguage: CodeLanguage = useMemo(() => {
+        if (!isCode) return 'text'
+        // Check widget subType for language detection
+        const lang = widgetDef.templates[0]?.defaultData?.language
+            || widgetDef.templates[0]?.defaultData?.subType
+        if (lang === 'ts') return 'typescript'
+        if (lang === 'js') return 'javascript'
+        if (lang === 'py') return 'python'
+        if (lang === 'sh') return 'shell'
+        return 'javascript'
+    }, [isCode, widgetDef])
+
+    // Required field check
+    const isRequired = fieldKey === 'label'
+
+    const validate = useCallback((val: any) => {
+        if (isRequired && (val === '' || val === null || val === undefined)) {
+            setError('This field is required')
+            return false
+        }
+        setError(null)
+        return true
+    }, [isRequired])
+
+    const handleChange = useCallback((val: any) => {
+        validate(val)
+        onChange(fieldKey, val)
+    }, [fieldKey, onChange, validate])
 
     // Boolean → toggle
     if (t === 'boolean') {
@@ -572,7 +609,7 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
                     <label style={S.fieldLabel}>{fieldKey}</label>
                     <button
                         style={S.toggle(value)}
-                        onClick={() => onChange(fieldKey, !value)}
+                        onClick={() => handleChange(!value)}
                         data-testid={`field-${fieldKey}`}
                     >
                         <div style={S.toggleDot(value)} />
@@ -591,7 +628,7 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
                 <select
                     style={S.fieldSelect}
                     value={String(value ?? '')}
-                    onChange={e => onChange(fieldKey, e.target.value)}
+                    onChange={e => handleChange(e.target.value)}
                     data-testid={`field-${fieldKey}`}
                 >
                     {widgetDef.subTypes!.map(st => (
@@ -605,15 +642,37 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
         )
     }
 
-    // Multi-line string → textarea
-    if (t === 'string' && (String(value).includes('\n') || fieldKey === 'code' || fieldKey === 'content' || fieldKey === 'reviewBody')) {
+    // Code field → CodeEditor with syntax highlighting
+    if (isCode && t === 'string') {
+        return (
+            <div style={S.fieldRow}>
+                <label style={S.fieldLabel}>
+                    {fieldKey}
+                    <span style={{ fontSize: 8, color: '#8b5cf6', marginLeft: 6, fontWeight: 400 }}>
+                        {codeLanguage}
+                    </span>
+                </label>
+                <CodeEditor
+                    value={String(value)}
+                    onChange={v => handleChange(v)}
+                    language={codeLanguage}
+                    minHeight={120}
+                    maxHeight={300}
+                    testId={`field-${fieldKey}`}
+                />
+            </div>
+        )
+    }
+
+    // Multi-line string → textarea (content, reviewBody, etc.)
+    if (t === 'string' && (String(value).includes('\n') || fieldKey === 'content' || fieldKey === 'reviewBody')) {
         return (
             <div style={S.fieldRow}>
                 <label style={S.fieldLabel}>{fieldKey}</label>
                 <textarea
                     style={S.fieldTextarea}
                     value={String(value)}
-                    onChange={e => onChange(fieldKey, e.target.value)}
+                    onChange={e => handleChange(e.target.value)}
                     data-testid={`field-${fieldKey}`}
                 />
                 <div style={S.fieldHint}>string (multiline)</div>
@@ -625,14 +684,28 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     if (t === 'string') {
         return (
             <div style={S.fieldRow}>
-                <label style={S.fieldLabel}>{fieldKey}</label>
+                <label style={{
+                    ...S.fieldLabel,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                }}>
+                    {fieldKey}
+                    {isRequired && <span style={{ color: '#ef4444', fontSize: 8 }}>*</span>}
+                </label>
                 <input
-                    style={S.fieldInput}
+                    style={{
+                        ...S.fieldInput,
+                        borderColor: error ? '#ef4444' : 'rgba(255,255,255,0.1)',
+                    }}
                     value={String(value)}
-                    onChange={e => onChange(fieldKey, e.target.value)}
+                    onChange={e => handleChange(e.target.value)}
+                    onBlur={() => validate(value)}
                     data-testid={`field-${fieldKey}`}
                 />
-                <div style={S.fieldHint}>string</div>
+                {error ? (
+                    <div style={{ fontSize: 8, color: '#ef4444' }}>{error}</div>
+                ) : (
+                    <div style={S.fieldHint}>string</div>
+                )}
             </div>
         )
     }
@@ -646,7 +719,7 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
                     style={S.fieldInput}
                     type="number"
                     value={value}
-                    onChange={e => onChange(fieldKey, Number(e.target.value))}
+                    onChange={e => handleChange(Number(e.target.value))}
                     data-testid={`field-${fieldKey}`}
                 />
                 <div style={S.fieldHint}>number</div>
@@ -654,22 +727,31 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
         )
     }
 
-    // Object/Array → JSON textarea
+    // Object/Array → JSON CodeEditor
     return (
         <div style={S.fieldRow}>
             <label style={S.fieldLabel}>{fieldKey}</label>
-            <textarea
-                style={S.fieldTextarea}
+            <CodeEditor
                 value={JSON.stringify(value, null, 2)}
-                onChange={e => {
+                onChange={v => {
                     try {
-                        const parsed = JSON.parse(e.target.value)
+                        const parsed = JSON.parse(v)
+                        setError(null)
                         onChange(fieldKey, parsed)
-                    } catch { /* ignore parse errors while typing */ }
+                    } catch (e: any) {
+                        setError(e.message)
+                    }
                 }}
-                data-testid={`field-${fieldKey}`}
+                language="json"
+                minHeight={100}
+                maxHeight={250}
+                testId={`field-${fieldKey}`}
             />
-            <div style={S.fieldHint}>{Array.isArray(value) ? 'array' : 'object'}</div>
+            {error ? (
+                <div style={{ fontSize: 8, color: '#ef4444' }}>{error}</div>
+            ) : (
+                <div style={S.fieldHint}>{Array.isArray(value) ? 'array' : 'object'}</div>
+            )}
         </div>
     )
 }
