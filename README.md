@@ -1,7 +1,6 @@
 # Wideboard
 
-[![Build & Deploy](https://github.com/gatocube/wibeboard/actions/workflows/deploy.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/deploy.yml)
-[![Tests](https://github.com/gatocube/wibeboard/actions/workflows/test.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/test.yml)
+[![CI](https://github.com/gatocube/wibeboard/actions/workflows/ci.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/ci.yml)
 
 Interactive widget-based flow builder with customizable visual themes.
 
