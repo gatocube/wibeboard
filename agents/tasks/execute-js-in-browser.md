@@ -1,4 +1,4 @@
-[] isDone
+[x] isDone
 
 We should have an assertion that checks that we can execute js in browser
 Each js node can have a "sandbox" option. Right now we should support only "In browser (no sandbox)". 
