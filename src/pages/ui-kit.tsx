@@ -37,6 +37,10 @@ export function UIKitPage() {
                 Reusable components for wibeboard
             </p>
 
+            <IconSelectorSection />
+
+            <div style={{ height: 32 }} />
+
             <IconButtonSection />
 
             <div style={{ height: 32 }} />
@@ -46,10 +50,6 @@ export function UIKitPage() {
             <div style={{ height: 32 }} />
 
             <ConstructionNodeSection />
-
-            <div style={{ height: 32 }} />
-
-            <IconSelectorSection />
         </div>
     )
 }

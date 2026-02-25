@@ -1,21 +1,50 @@
 /**
- * IconSelector — reusable icon picker component.
+ * IconSelector — unified searchable icon picker.
  *
- * Displays all icons from the WidgetIcon registry in a searchable,
- * categorized grid. Click an icon to select it.
+ * Includes ALL icons from the icon registry:
+ *  - Widget type icons (Lucide)
+ *  - Status icons
+ *  - UI icons
+ *  - Animated icons (framer-motion)
+ *  - Tech logo icons (custom SVG)
+ *  - Animated tech icons (custom SVG + motion)
  *
  * Features:
- *  - Search by name, type, or tags
- *  - Category filter tabs
- *  - Highlighted selection with color preview
+ *  - Search by name or tags
+ *  - Quick filter tabs: All, Animated, SVG, Widget, Status, Action
+ *  - Click to select
  *  - iPad-friendly 44px touch targets
  */
 
 import { useState, useMemo } from 'react'
 import { Search, X } from 'lucide-react'
-import { WidgetIcon, getAllIconEntries, type IconEntry } from '@/components/WidgetIcon'
+import {
+    WidgetIcon, getAllIconEntries, AnimatedIcon,
+    STATUS_ICONS, STATUS_COLORS,
+    type AnimatedIconName,
+} from '@/components/WidgetIcon'
+import {
+    TechIcon, AnimatedTechIcon,
+    ALL_TECH_ICONS, ALL_ANIMATED_TECH_ICONS,
+    TECH_COLORS, ANIMATED_TECH_COLORS,
+} from '@/components/TechIcons'
 
-// ── Tag mapping for improved search ─────────────────────────────────────────────
+// ── Unified icon entry ──────────────────────────────────────────────────────────
+
+interface UnifiedIcon {
+    id: string
+    label: string
+    color: string
+    /** 'svg' = custom SVG tech icon, 'lucide' = Lucide font icon, 'animated' = motion icon */
+    iconType: 'lucide' | 'svg' | 'animated'
+    category: string
+    tags: string[]
+    animated: boolean
+    /** Render function */
+    render: (size: number) => React.ReactNode
+}
+
+// ── Tag database ────────────────────────────────────────────────────────────────
 
 const ICON_TAGS: Record<string, string[]> = {
     'agent': ['ai', 'llm', 'sparkle', 'magic', 'bot'],
@@ -47,18 +76,120 @@ const ICON_TAGS: Record<string, string[]> = {
     'note': ['sticky', 'comment', 'annotation'],
 }
 
-// ── Category definitions for filter tabs ────────────────────────────────────────
+// ── Build unified icon list ─────────────────────────────────────────────────────
 
-const CATEGORIES = [
-    { key: 'all', label: 'All' },
-    { key: 'AI', label: 'AI' },
-    { key: 'Script', label: 'Script' },
-    { key: 'Widget', label: 'Widget' },
-    { key: 'Status', label: 'Status' },
-    { key: 'Action', label: 'Action' },
-]
+function buildAllIcons(): UnifiedIcon[] {
+    const icons: UnifiedIcon[] = []
 
-function getCategory(type: string): string {
+    // 1. Widget type icons (Lucide)
+    for (const entry of getAllIconEntries()) {
+        icons.push({
+            id: entry.type,
+            label: entry.type,
+            color: entry.color,
+            iconType: 'lucide',
+            category: getCat(entry.type),
+            tags: ICON_TAGS[entry.type] || [],
+            animated: false,
+            render: (size) => <WidgetIcon type={entry.type} size={size} />,
+        })
+    }
+
+    // 2. Status icons (Lucide)
+    for (const [key, Icon] of Object.entries(STATUS_ICONS)) {
+        if (icons.find(i => i.id === key)) continue // skip duplicates
+        icons.push({
+            id: `status-${key}`,
+            label: key,
+            color: STATUS_COLORS[key] || '#8b5cf6',
+            iconType: 'lucide',
+            category: 'Status',
+            tags: ['status', key],
+            animated: false,
+            render: (size) => <Icon size={size} color={STATUS_COLORS[key] || '#8b5cf6'} />,
+        })
+    }
+
+    // 3. Animated icons (framer-motion)
+    const animatedNames: AnimatedIconName[] = [
+        'spinner', 'pulse', 'thinking', 'loading-dots', 'processing', 'success', 'error-shake',
+        'radar', 'data-stream', 'heartbeat', 'orbit', 'wave', 'typing',
+        'sync', 'download', 'signal', 'hourglass', 'ripple', 'scan-line',
+        'progress-ring', 'progress-bar', 'loading-wave', 'bounce',
+        'progress-dots', 'pixel-load',
+        'alert-flash', 'check-bounce', 'traffic-light',
+        'gear-spin', 'upload-pulse', 'search-scan', 'clock-tick', 'terminal-blink', 'rewind',
+        'waveform', 'radio-wave', 'matrix-rain', 'stack-build',
+        'crossfade', 'dna-helix', 'fire-flicker', 'lightning-bolt', 'magnet-pull',
+        'sparkle-burst', 'morse-code', 'pendulum', 'ping-pong', 'satellite', 'telescope',
+    ]
+    const animColors: Record<string, string> = {
+        'spinner': '#3b82f6', 'pulse': '#22c55e', 'thinking': '#8b5cf6',
+        'loading-dots': '#f59e0b', 'processing': '#06b6d4', 'success': '#22c55e',
+        'error-shake': '#ef4444', 'radar': '#06b6d4', 'data-stream': '#8b5cf6',
+        'heartbeat': '#ef4444', 'orbit': '#f59e0b', 'wave': '#22c55e',
+        'typing': '#94a3b8', 'sync': '#06b6d4', 'download': '#22c55e',
+        'signal': '#8b5cf6', 'hourglass': '#f59e0b', 'ripple': '#3b82f6',
+        'scan-line': '#22c55e', 'progress-ring': '#3b82f6', 'progress-bar': '#8b5cf6',
+        'loading-wave': '#06b6d4', 'bounce': '#f59e0b', 'progress-dots': '#22c55e',
+        'pixel-load': '#8b5cf6', 'alert-flash': '#ef4444', 'check-bounce': '#22c55e',
+        'traffic-light': '#f59e0b', 'gear-spin': '#64748b', 'upload-pulse': '#3b82f6',
+        'search-scan': '#f59e0b', 'clock-tick': '#94a3b8', 'terminal-blink': '#22c55e',
+        'rewind': '#8b5cf6', 'waveform': '#06b6d4', 'radio-wave': '#8b5cf6',
+        'matrix-rain': '#22c55e', 'stack-build': '#f59e0b', 'crossfade': '#3b82f6',
+        'dna-helix': '#8b5cf6', 'fire-flicker': '#f97316', 'lightning-bolt': '#fbbf24',
+        'magnet-pull': '#ef4444', 'sparkle-burst': '#c084fc', 'morse-code': '#22c55e',
+        'pendulum': '#f59e0b', 'ping-pong': '#3b82f6', 'satellite': '#06b6d4',
+        'telescope': '#8b5cf6',
+    }
+    for (const name of animatedNames) {
+        const c = animColors[name] || '#8b5cf6'
+        icons.push({
+            id: `anim-${name}`,
+            label: name,
+            color: c,
+            iconType: 'animated',
+            category: 'Animated',
+            tags: ['animated', 'motion', name.replace(/-/g, ' ')],
+            animated: true,
+            render: (size) => <AnimatedIcon name={name} size={size} color={c} />,
+        })
+    }
+
+    // 4. Tech logos (custom SVG)
+    for (const name of ALL_TECH_ICONS) {
+        const c = TECH_COLORS[name] || '#8b5cf6'
+        icons.push({
+            id: `tech-${name}`,
+            label: name,
+            color: c,
+            iconType: 'svg',
+            category: 'Tech',
+            tags: ['tech', 'logo', 'svg', name],
+            animated: false,
+            render: (size) => <TechIcon name={name} size={size} />,
+        })
+    }
+
+    // 5. Animated tech icons (custom SVG + motion)
+    for (const icon of ALL_ANIMATED_TECH_ICONS) {
+        const c = ANIMATED_TECH_COLORS[icon.name] || icon.color
+        icons.push({
+            id: `atech-${icon.name}`,
+            label: icon.name,
+            color: c,
+            iconType: 'svg',
+            category: 'Tech',
+            tags: ['tech', 'animated', 'svg', 'motion', icon.name.replace(/-/g, ' '), icon.label.toLowerCase()],
+            animated: true,
+            render: (size) => <AnimatedTechIcon name={icon.name} size={size} color={c} />,
+        })
+    }
+
+    return icons
+}
+
+function getCat(type: string): string {
     if (type.startsWith('script-')) return 'Script'
     if (['agent', 'bot'].includes(type)) return 'AI'
     if (['play', 'starting', 'sleep', 'timer', 'clock'].includes(type)) return 'Status'
@@ -66,14 +197,26 @@ function getCategory(type: string): string {
     return 'Widget'
 }
 
+// ── Quick filter tabs ───────────────────────────────────────────────────────────
+
+const FILTERS = [
+    { key: 'all', label: 'All' },
+    { key: 'animated', label: '✦ Animated' },
+    { key: 'svg', label: 'SVG' },
+    { key: 'lucide', label: 'Lucide' },
+    { key: 'Widget', label: 'Widget' },
+    { key: 'Status', label: 'Status' },
+    { key: 'Action', label: 'Action' },
+    { key: 'Tech', label: 'Tech' },
+    { key: 'AI', label: 'AI' },
+    { key: 'Script', label: 'Script' },
+]
+
 // ── Props ────────────────────────────────────────────────────────────────────────
 
 interface IconSelectorProps {
-    /** Called when an icon is selected */
-    onSelect?: (type: string, color: string) => void
-    /** Currently selected icon type */
+    onSelect?: (id: string, color: string) => void
     selected?: string
-    /** Container height (default: 400) */
     height?: number
 }
 
@@ -81,23 +224,27 @@ interface IconSelectorProps {
 
 export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorProps) {
     const [query, setQuery] = useState('')
-    const [category, setCategory] = useState('all')
+    const [filter, setFilter] = useState('all')
 
-    const allIcons = useMemo(() => getAllIconEntries(), [])
+    const allIcons = useMemo(() => buildAllIcons(), [])
 
     const filtered = useMemo(() => {
         const q = query.toLowerCase().trim()
-        return allIcons.filter(entry => {
-            // Category filter
-            if (category !== 'all' && getCategory(entry.type) !== category) return false
+        return allIcons.filter(icon => {
+            // Filter by tab
+            if (filter === 'animated' && !icon.animated) return false
+            if (filter === 'svg' && icon.iconType !== 'svg') return false
+            if (filter === 'lucide' && icon.iconType !== 'lucide') return false
+            if (['Widget', 'Status', 'Action', 'Tech', 'AI', 'Script', 'Animated'].includes(filter)
+                && icon.category !== filter) return false
+
             // Text search
             if (!q) return true
-            if (entry.type.toLowerCase().includes(q)) return true
-            if (entry.name.toLowerCase().includes(q)) return true
-            const tags = ICON_TAGS[entry.type] || []
-            return tags.some(tag => tag.includes(q))
+            if (icon.id.toLowerCase().includes(q)) return true
+            if (icon.label.toLowerCase().includes(q)) return true
+            return icon.tags.some(tag => tag.includes(q))
         })
-    }, [allIcons, query, category])
+    }, [allIcons, query, filter])
 
     return (
         <div
@@ -128,7 +275,7 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
                     <input
                         data-testid="icon-search"
                         type="text"
-                        placeholder="Search icons..."
+                        placeholder="Search icons by name or tag..."
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         style={{
@@ -157,26 +304,26 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
                 </div>
             </div>
 
-            {/* Category tabs */}
+            {/* Filter tabs */}
             <div style={{
                 display: 'flex', gap: 4,
                 padding: '6px 12px',
                 borderBottom: '1px solid rgba(255,255,255,0.04)',
                 overflowX: 'auto',
             }}>
-                {CATEGORIES.map(cat => (
+                {FILTERS.map(f => (
                     <button
-                        key={cat.key}
-                        data-testid={`icon-cat-${cat.key}`}
-                        onClick={() => setCategory(cat.key)}
+                        key={f.key}
+                        data-testid={`icon-filter-${f.key}`}
+                        onClick={() => setFilter(f.key)}
                         style={{
                             padding: '4px 10px',
                             borderRadius: 6,
                             border: 'none',
-                            background: category === cat.key
+                            background: filter === f.key
                                 ? 'rgba(139,92,246,0.15)'
                                 : 'transparent',
-                            color: category === cat.key ? '#c084fc' : '#64748b',
+                            color: filter === f.key ? '#c084fc' : '#64748b',
                             fontSize: 10, fontWeight: 600,
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
@@ -185,7 +332,7 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
                             fontFamily: 'Inter, sans-serif',
                         }}
                     >
-                        {cat.label}
+                        {f.label}
                     </button>
                 ))}
             </div>
@@ -208,26 +355,29 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
                         gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))',
                         gap: 6,
                     }}>
-                        {filtered.map(entry => (
+                        {filtered.map(icon => (
                             <IconTile
-                                key={entry.type}
-                                entry={entry}
-                                isSelected={selected === entry.type}
-                                onSelect={() => onSelect?.(entry.type, entry.color)}
+                                key={icon.id}
+                                icon={icon}
+                                isSelected={selected === icon.id}
+                                onSelect={() => onSelect?.(icon.id, icon.color)}
                             />
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* Footer: count */}
+            {/* Footer */}
             <div style={{
                 padding: '6px 12px',
                 borderTop: '1px solid rgba(255,255,255,0.04)',
                 fontSize: 9, color: '#475569',
-                textAlign: 'center',
+                display: 'flex', justifyContent: 'space-between',
             }}>
-                {filtered.length} of {allIcons.length} icons
+                <span>{filtered.length} of {allIcons.length} icons</span>
+                <span>
+                    {allIcons.filter(i => i.animated).length} animated · {allIcons.filter(i => i.iconType === 'svg').length} SVG · {allIcons.filter(i => i.iconType === 'lucide').length} Lucide
+                </span>
             </div>
         </div>
     )
@@ -235,8 +385,8 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
 
 // ── Icon tile ───────────────────────────────────────────────────────────────────
 
-function IconTile({ entry, isSelected, onSelect }: {
-    entry: IconEntry
+function IconTile({ icon, isSelected, onSelect }: {
+    icon: UnifiedIcon
     isSelected: boolean
     onSelect: () => void
 }) {
@@ -245,7 +395,7 @@ function IconTile({ entry, isSelected, onSelect }: {
 
     return (
         <button
-            data-testid={`icon-tile-${entry.type}`}
+            data-testid={`icon-tile-${icon.id}`}
             onClick={onSelect}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
@@ -257,22 +407,42 @@ function IconTile({ entry, isSelected, onSelect }: {
                 minHeight: 56,
                 borderRadius: 8,
                 border: isSelected
-                    ? `1.5px solid ${entry.color}66`
+                    ? `1.5px solid ${icon.color}66`
                     : `1px solid ${active ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
                 background: isSelected
-                    ? `${entry.color}15`
+                    ? `${icon.color}15`
                     : active
                         ? 'rgba(255,255,255,0.04)'
                         : 'transparent',
                 cursor: 'pointer',
                 transition: 'all 0.12s',
                 fontFamily: 'Inter, sans-serif',
+                position: 'relative',
             }}
         >
-            <WidgetIcon type={entry.type} size={20} />
+            {/* Animated badge */}
+            {icon.animated && (
+                <div style={{
+                    position: 'absolute', top: 2, right: 2,
+                    width: 5, height: 5, borderRadius: '50%',
+                    background: '#22c55e',
+                    boxShadow: '0 0 4px rgba(34,197,94,0.5)',
+                }} />
+            )}
+            {/* SVG badge */}
+            {icon.iconType === 'svg' && !icon.animated && (
+                <div style={{
+                    position: 'absolute', top: 2, right: 2,
+                    fontSize: 5, fontWeight: 700, color: '#64748b',
+                    letterSpacing: 0.3,
+                }}>
+                    SVG
+                </div>
+            )}
+            {icon.render(20)}
             <span style={{
                 fontSize: 7, fontWeight: 500,
-                color: active ? entry.color : '#64748b',
+                color: active ? icon.color : '#64748b',
                 textAlign: 'center',
                 lineHeight: 1.2,
                 maxWidth: '100%',
@@ -280,7 +450,7 @@ function IconTile({ entry, isSelected, onSelect }: {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
             }}>
-                {entry.type}
+                {icon.label}
             </span>
         </button>
     )
