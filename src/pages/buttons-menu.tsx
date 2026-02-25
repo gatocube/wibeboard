@@ -217,7 +217,7 @@ export function ButtonsMenuPage() {
                 backgroundSize: '24px 24px',
             }} />
 
-            {/* ── Top-left node ── */}
+            {/* ── Top-left node (menu-button sized) ── */}
             <MockNode
                 id="left-node"
                 label="Start"
@@ -226,7 +226,7 @@ export function ButtonsMenuPage() {
                 selected={selectedId === 'left-node'}
                 onClick={() => selectNode('left-node')}
                 onMouseEnter={() => hoverNode('left-node')}
-                style={{ top: 32, left: 32 }}
+                style={{ top: 32, left: 32, width: 48, height: 48, padding: '0 6px', justifyContent: 'center' }}
             />
 
             {/* ── Center node ── */}
@@ -259,6 +259,7 @@ export function ButtonsMenuPage() {
                     nodeId={selectedId}
                     currentLabel={currentLabel}
                     activationMode={mode}
+                    directions={selectedId === 'left-node' ? ['right', 'bottom', 'bottom-right'] : undefined}
                     onAddBefore={(id, type) => { addLog(`⬅ Before ${type}: ${id}`); setSelectedId(null) }}
                     onAddAfter={(id, type) => { addLog(`➡ After ${type}: ${id}`); setSelectedId(null) }}
                     onConfigure={(id, action) => {

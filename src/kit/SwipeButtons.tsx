@@ -64,12 +64,15 @@ const TILE = 56
 // ── Props ───────────────────────────────────────────────────────────────────────
 
 export type SwipeButtonsActivation = 'click' | 'hold' | 'swipe'
+export type SwipeButtonsDirection = 'top' | 'right' | 'bottom' | 'left' | 'bottom-right'
 
 export interface SwipeButtonsProps {
     nodeId: string
     currentLabel: string
     /** Activation mode: click (default), hold (long-press), swipe (hover) */
     activationMode?: SwipeButtonsActivation
+    /** Which directions to show buttons (default: all 4 cardinal) */
+    directions?: SwipeButtonsDirection[]
     onAddBefore: (nodeId: string, widgetType: string) => void
     onAddAfter: (nodeId: string, widgetType: string) => void
     onConfigure: (nodeId: string, action: string) => void
@@ -114,7 +117,12 @@ function ensureHoldKeyframe() {
 // ── Component ───────────────────────────────────────────────────────────────────
 
 export function SwipeButtons(props: SwipeButtonsProps) {
-    const { nodeId, currentLabel, activationMode = 'click', onAddBefore, onAddAfter, onConfigure, onRename } = props
+    const {
+        nodeId, currentLabel, activationMode = 'click',
+        directions,
+        onAddBefore, onAddAfter, onConfigure, onRename,
+    } = props
+    const dirs = directions ?? ['top', 'right', 'bottom', 'left']
     const [expanded, setExpanded] = useState<null | 'before' | 'after' | 'config'>(null)
     const [scriptExpanded, setScriptExpanded] = useState<null | 'after' | 'before'>(null)
     const [aiExpanded, setAiExpanded] = useState<null | 'after' | 'before'>(null)
@@ -160,15 +168,19 @@ export function SwipeButtons(props: SwipeButtonsProps) {
         const cy = nodeRect.top + nodeRect.height / 2
         const gapX = nodeRect.width / 2 + 16
         const gapY = nodeRect.height / 2 + 16
+
         return {
             top: { x: cx, y: cy - gapY },
             right: { x: cx + gapX, y: cy },
             bottom: { x: cx, y: cy + gapY },
             left: { x: cx - gapX, y: cy },
+            'bottom-right': { x: cx + gapX * 0.85, y: cy + gapY * 0.85 },
         }
     }, [nodeRect])
 
     if (!nodeRect || !positions) return null
+
+    const show = (d: SwipeButtonsDirection) => dirs.includes(d)
 
     const stopEvents = {
         onClick: (e: React.MouseEvent) => e.stopPropagation(),
@@ -182,7 +194,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
 
             <AnimatePresence>
                 {/* ── Config (top) — orange ── */}
-                <MotionButton
+                {show('top') && <MotionButton
                     key="config"
                     testId="swipe-btn-configure"
                     pos={positions.top}
@@ -195,10 +207,10 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'config' ? null : 'config')}
                     onHover={() => setExpanded('config')}
-                />
+                />}
 
                 {/* Config sub-buttons: fan above */}
-                {expanded === 'config' && CONFIG_ACTIONS.map((sub, i) => (
+                {show('top') && expanded === 'config' && CONFIG_ACTIONS.map((sub, i) => (
                     <MotionButton
                         key={`cfg-${sub.key}`}
                         testId={`ext-cfg-${sub.key}`}
@@ -220,7 +232,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 ))}
 
                 {/* ── After (right) — purple ── */}
-                <MotionButton
+                {show('right') && <MotionButton
                     key="after"
                     testId="swipe-btn-add-after"
                     pos={positions.right}
@@ -233,10 +245,10 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
                     onHover={() => { setExpanded('after'); setAiExpanded(null) }}
-                />
+                />}
 
                 {/* After sub-buttons: fan right — Script (top), AI (center), User (bottom) */}
-                {expanded === 'after' && WIDGET_TYPES.map((sub, i) => (
+                {show('right') && expanded === 'after' && WIDGET_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`after-${sub.key}`}
                         testId={`ext-after-${sub.key}`}
@@ -265,7 +277,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 ))}
 
                 {/* After → Script sub-types: column to the right of Script button */}
-                {expanded === 'after' && scriptExpanded === 'after' && (() => {
+                {show('right') && expanded === 'after' && scriptExpanded === 'after' && (() => {
                     const scriptBtnX = positions.right.x + TILE
                     const scriptBtnY = positions.right.y - TILE
                     const subPositions = [
@@ -288,7 +300,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 })()}
 
                 {/* After → AI roles: grid around the AI button */}
-                {expanded === 'after' && aiExpanded === 'after' && (() => {
+                {show('right') && expanded === 'after' && aiExpanded === 'after' && (() => {
                     const aiBtnX = positions.right.x + TILE
                     const aiBtnY = positions.right.y
                     const subPositions = [
@@ -311,7 +323,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 })()}
 
                 {/* ── Rename (bottom) ── */}
-                <MotionButton
+                {show('bottom') && <MotionButton
                     key="rename"
                     testId="swipe-btn-rename"
                     pos={positions.bottom}
@@ -322,10 +334,10 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     dimmed={expanded !== null}
                     activationMode={activationMode}
                     onClick={() => { setRenaming(true); setExpanded(null) }}
-                />
+                />}
 
                 {/* ── Before (left) — purple ── */}
-                <MotionButton
+                {show('left') && <MotionButton
                     key="before"
                     testId="swipe-btn-add-before"
                     pos={positions.left}
@@ -338,10 +350,10 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     activationMode={activationMode}
                     onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
                     onHover={() => { setExpanded('before'); setAiExpanded(null) }}
-                />
+                />}
 
                 {/* Before sub-buttons: fan left — Script (top), AI (center), User (bottom) */}
-                {expanded === 'before' && WIDGET_TYPES.map((sub, i) => (
+                {show('left') && expanded === 'before' && WIDGET_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`before-${sub.key}`}
                         testId={`ext-before-${sub.key}`}
@@ -370,7 +382,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 ))}
 
                 {/* Before → Script sub-types: column to the left of Script button */}
-                {expanded === 'before' && scriptExpanded === 'before' && (() => {
+                {show('left') && expanded === 'before' && scriptExpanded === 'before' && (() => {
                     const scriptBtnX = positions.left.x - TILE
                     const scriptBtnY = positions.left.y - TILE
                     const subPositions = [
@@ -393,7 +405,7 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                 })()}
 
                 {/* Before → AI roles: grid around the AI button */}
-                {expanded === 'before' && aiExpanded === 'before' && (() => {
+                {show('left') && expanded === 'before' && aiExpanded === 'before' && (() => {
                     const aiBtnX = positions.left.x - TILE
                     const aiBtnY = positions.left.y
                     const subPositions = [
