@@ -8,7 +8,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react'
-import { IconButton, ICON_BUTTON_COLORS, type IconButtonColor, type IconButtonSize } from '@/kit'
+import { IconButton, ICON_BUTTON_COLORS, IconSelector, type IconButtonColor, type IconButtonSize } from '@/kit'
+import { WidgetIcon } from '@/components/WidgetIcon'
 import { Plus, Settings, Pencil, ArrowRight, Code, Cpu, Zap, Star, Heart, Globe, Shield, UserCircle, Construction } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -45,6 +46,10 @@ export function UIKitPage() {
             <div style={{ height: 32 }} />
 
             <ConstructionNodeSection />
+
+            <div style={{ height: 32 }} />
+
+            <IconSelectorSection />
         </div>
     )
 }
@@ -661,3 +666,95 @@ function MockConstructionNode({ w, h, sizing, resizable, showSelector, hoveredWi
     )
 }
 
+// ── 4. Icon Selector demo ───────────────────────────────────────────────────────
+
+function IconSelectorSection() {
+    const [selected, setSelected] = useState<string | null>(null)
+    const [selectedColor, setSelectedColor] = useState<string | null>(null)
+
+    return (
+        <section>
+            <h2 style={{
+                fontSize: 13, fontWeight: 700, color: '#e2e8f0',
+                marginBottom: 16,
+                display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+                <span style={{
+                    width: 20, height: 20, borderRadius: 5,
+                    background: 'rgba(139,92,246,0.15)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10,
+                }}>🎯</span>
+                Icon Selector
+            </h2>
+
+            <p style={{ fontSize: 10, color: '#64748b', marginBottom: 12 }}>
+                Searchable icon picker built from the icon registry.
+                Search by <strong style={{ color: '#94a3b8' }}>name</strong>,{' '}
+                <strong style={{ color: '#94a3b8' }}>type</strong>, or{' '}
+                <strong style={{ color: '#94a3b8' }}>tags</strong>. Click to select.
+            </p>
+
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+                <div style={{ width: 360 }}>
+                    <IconSelector
+                        selected={selected || undefined}
+                        onSelect={(type, color) => {
+                            setSelected(type)
+                            setSelectedColor(color)
+                        }}
+                        height={380}
+                    />
+                </div>
+
+                {/* Selected icon info panel */}
+                <div style={{
+                    width: 200, minHeight: 100,
+                    background: 'rgba(15,15,26,0.8)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 8,
+                    padding: '12px 16px',
+                }}>
+                    <div style={{
+                        fontSize: 8, fontWeight: 700, color: '#64748b',
+                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                        marginBottom: 8,
+                    }}>
+                        Selected Icon
+                    </div>
+                    {selected ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <div style={{
+                                width: 48, height: 48,
+                                borderRadius: 10,
+                                background: `${selectedColor}15`,
+                                border: `1.5px solid ${selectedColor}44`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <WidgetIcon type={selected} size={24} />
+                            </div>
+                            <div>
+                                <div style={{
+                                    fontSize: 11, fontWeight: 600, color: '#e2e8f0',
+                                }}>
+                                    {selected}
+                                </div>
+                                <div style={{
+                                    fontSize: 9, color: selectedColor || '#8b5cf6',
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                    marginTop: 2,
+                                }}>
+                                    {selectedColor}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{ fontSize: 9, color: '#334155', fontStyle: 'italic' }}>
+                            Click an icon to select it
+                        </div>
+                    )}
+                </div>
+            </div>
+        </section>
+    )
+}
