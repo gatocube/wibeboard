@@ -234,15 +234,14 @@ function AgentVariant({ data }: { data: any }) {
                     </div>
 
                     {/* ── Current task row ── */}
-                    {data.task && (
-                        <div style={{
-                            padding: '0 10px 3px',
-                            fontSize: 9, color: '#94a3b8',
-                            fontFamily: 'Inter',
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                            flexShrink: 0,
-                        }}>{data.task}</div>
-                    )}
+                    <div style={{
+                        padding: '0 10px 3px',
+                        fontSize: 9, color: '#94a3b8',
+                        fontFamily: 'Inter',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        opacity: data.task ? 1 : 0.5,
+                    }}>{data.task || 'Ready for task'}</div>
 
                     {/* ── Progress bar + percentage + time ── */}
                     <div style={{
