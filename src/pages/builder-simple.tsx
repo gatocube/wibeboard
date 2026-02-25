@@ -112,6 +112,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
                 label: tpl?.defaultData.label || `${variant} Script`,
                 width: def?.defaultWidth || 200,
                 height: def?.defaultHeight || 120,
+                configured: true,
             },
         }
     }
@@ -125,6 +126,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
             label: tpl?.defaultData.label || 'Script',
             width: def?.defaultWidth || 200,
             height: def?.defaultHeight || 120,
+            configured: true,
         },
     }
 }

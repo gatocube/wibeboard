@@ -206,3 +206,8 @@ A third job (`publish-stats`) merges JSON results and deploys a stats dashboard 
 - **CodeMirror 6** — code editing in configurator
 - **Vite 7** — dev server and build
 - **Playwright** — E2E testing
+
+## Inspiration
+
+- **n8n** — workflow automation platform with visual node-based editor
+

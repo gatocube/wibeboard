@@ -126,18 +126,14 @@ jobs:
                 stats: full.stats || {},
               },
             };
-            fs.mkdirSync('public/stats', { recursive: true });
             fs.writeFileSync('public/stats/test-results.json', JSON.stringify(stats, null, 2));
           "
 
-      - name: Build with stats
+      - name: Commit test results
         run: |
-          npm install
-          npm run build
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/stats/test-results.json
+          git diff --staged --quiet || git commit -m "ci: update test-results.json [skip ci]"
+          git push
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          destination_dir: .

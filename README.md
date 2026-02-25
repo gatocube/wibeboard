@@ -4,7 +4,6 @@
 [![Tests](https://github.com/gatocube/wibeboard/actions/workflows/test.yml/badge.svg)](https://github.com/gatocube/wibeboard/actions/workflows/test.yml)
 
 Interactive widget-based flow builder with customizable visual themes.
-Like [n8n](https://n8n.io) but with interactive widget nodes.
 
 **🌐 [Live Demo →](https://gatocube.github.io/wibeboard/)** · **📊 [Test Stats →](https://gatocube.github.io/wibeboard/stats/)**
 
