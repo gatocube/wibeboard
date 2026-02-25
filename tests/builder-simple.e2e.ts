@@ -183,7 +183,7 @@ test.describe('Builder Demo Simple — flow construction', () => {
         await breath()
     })
 
-    test('new workflow creation positions start node on the left', async ({ page }) => {
+    test('new workflow creation shows start node visible in viewport', async ({ page }) => {
         await openPage(page)
         await breath(1000)
 
@@ -200,7 +200,7 @@ test.describe('Builder Demo Simple — flow construction', () => {
         // ── Verify undo/redo bar is visible ──
         await expect(page.getByTestId('undo-redo-bar')).toBeVisible()
 
-        // ── Verify the start node is in the left third of the viewport ──
+        // ── Verify the start node is visible within the viewport ──
         const startNode = page.locator('.react-flow__node').first()
         await expect(startNode).toBeVisible()
 
@@ -210,9 +210,13 @@ test.describe('Builder Demo Simple — flow construction', () => {
         expect(viewport).toBeTruthy()
 
         if (nodeBox && viewport) {
-            // The start node's left edge should be within the left third
-            const leftThird = viewport.width / 3
-            expect(nodeBox.x).toBeLessThan(leftThird)
+            // Node center should be within the viewport bounds
+            const cx = nodeBox.x + nodeBox.width / 2
+            const cy = nodeBox.y + nodeBox.height / 2
+            expect(cx).toBeGreaterThanOrEqual(0)
+            expect(cx).toBeLessThanOrEqual(viewport.width)
+            expect(cy).toBeGreaterThanOrEqual(0)
+            expect(cy).toBeLessThanOrEqual(viewport.height)
         }
 
         await breath()
@@ -331,37 +335,6 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
         await breath()
     })
 
-    test('new workflow shows start node visible in viewport', async ({ page }) => {
-        await openPage(page)
-
-        // Click + New to create a second workflow
-        await page.click('[data-testid="workflow-new-btn"]')
-        await page.waitForTimeout(500)
-
-        // New workflow should have exactly 1 node (start node)
-        expect(await nodeCount(page)).toBe(1)
-
-        // The start node must be visible in the viewport (not off-screen)
-        const startNode = page.locator('.react-flow__node').first()
-        await expect(startNode).toBeVisible({ timeout: 3_000 })
-
-        // Verify the node has a real bounding box (not zero-area or off-screen)
-        const nodeBBox = await startNode.boundingBox()
-        expect(nodeBBox).not.toBeNull()
-        expect(nodeBBox!.width).toBeGreaterThan(0)
-        expect(nodeBBox!.height).toBeGreaterThan(0)
-
-        // Node center should be within the page viewport
-        const viewportSize = page.viewportSize()!
-        const nodeCenterX = nodeBBox!.x + nodeBBox!.width / 2
-        const nodeCenterY = nodeBBox!.y + nodeBBox!.height / 2
-        expect(nodeCenterX).toBeGreaterThanOrEqual(0)
-        expect(nodeCenterX).toBeLessThanOrEqual(viewportSize.width)
-        expect(nodeCenterY).toBeGreaterThanOrEqual(0)
-        expect(nodeCenterY).toBeLessThanOrEqual(viewportSize.height)
-
-        await breath()
-    })
 
     // ── Minimap toggle (merged from verify-minimap.e2e.ts) ──────────────
 

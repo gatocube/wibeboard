@@ -159,7 +159,7 @@ function BuilderSimpleInner() {
     const historyRef = useRef<HistoryEntry[]>([{ nodes, edges }])
     const historyIndexRef = useRef(0)
     const skipPushRef = useRef(false)
-    const { fitView, setViewport } = useReactFlow()
+    const { fitView } = useReactFlow()
     const [canUndo, setCanUndo] = useState(false)
     const [canRedo, setCanRedo] = useState(false)
 
@@ -379,9 +379,9 @@ function BuilderSimpleInner() {
         historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
         historyIndexRef.current = 0
         updateUndoRedoState()
-        // Position viewport so start node (at x=80, y=300) is on the left
-        setTimeout(() => setViewport({ x: 40, y: -100, zoom: DEFAULT_ZOOM }), 150)
-    }, [workflows.length, setViewport, updateUndoRedoState])
+        // Fit viewport to show the starting node (use longer timeout to ensure React re-rendered)
+        setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 200)
+    }, [workflows.length, fitView, updateUndoRedoState])
 
     const handleSelectWorkflow = useCallback((id: string) => {
         setActiveId(id)
