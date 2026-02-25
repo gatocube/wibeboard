@@ -21,7 +21,8 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
-import { widgetRegistry, GRID_CELL } from '@/engine/widget-registry'
+import { widgetRegistry } from '@/engine/widget-registry'
+import { createStartNode, positionAfter, positionBefore, deleteNodeWithReconnect, makeEdge } from '@/engine/node-factory'
 import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
@@ -34,9 +35,6 @@ const nodeTypes = {
 }
 
 // ── iPad-friendly constants ──
-// Start node center is at (0, 0) — position is top-left corner = (-width/2, -height/2)
-const START_NODE_X = -30  // -60/2 = center at x=0
-const START_NODE_Y = -30  // -60/2 = center at y=0
 const DEFAULT_ZOOM = 0.85
 const FIT_VIEW_PADDING = 0.3
 
@@ -46,15 +44,6 @@ interface Workflow {
     name: string
     nodes: Node[]
     edges: Edge[]
-}
-
-function createStartNode(): Node {
-    return {
-        id: 'start-1',
-        type: 'starting',
-        position: { x: START_NODE_X, y: START_NODE_Y },
-        data: { label: 'Start', color: '#22c55e' },
-    }
 }
 
 function createWorkflow(name: string): Workflow {
@@ -280,40 +269,18 @@ function BuilderSimpleInner() {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
-        // Use the SOURCE node's width for offset, not the new node's width
-        const sourceWidth = sourceNode
-            ? (typeof (sourceNode.style as any)?.width === 'number' ? (sourceNode.style as any).width : null)
-            ?? sourceNode.data?.width
-            ?? widgetRegistry.get(sourceNode.type || '')?.defaultWidth
-            ?? 200
-            : 200
-        const gap = GRID_CELL * 5 // 5 grid units = 100px
-        const newX = sourceNode ? sourceNode.position.x + sourceWidth + gap : 460
-        // Center-align Y so handles connect with a straight horizontal edge
-        const sourceHeight: number = sourceNode
-            ? (sourceNode.data?.height as number)
-            ?? widgetRegistry.get(sourceNode.type || '')?.defaultHeight
-            ?? 120
-            : 120
-        const newNodeHeight = data.height || 120
-        const newY = sourceNode
-            ? sourceNode.position.y + sourceHeight / 2 - newNodeHeight / 2
-            : START_NODE_Y
+        const position = sourceNode
+            ? positionAfter(sourceNode, nodeType, data)
+            : { x: 460, y: 0 }
 
         mutateState((prevNodes, prevEdges) => ({
             nodes: [...prevNodes, {
                 id: newNodeId,
                 type: nodeType,
-                position: { x: newX, y: newY },
+                position,
                 data: { ...data, width: data.width || 200, height: data.height || 120 },
             }],
-            edges: [...prevEdges, {
-                id: `edge-${sourceNodeId}-${newNodeId}`,
-                source: sourceNodeId,
-                target: newNodeId,
-                animated: true,
-                style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
-            }],
+            edges: [...prevEdges, makeEdge(sourceNodeId, newNodeId)],
         }))
     }, [mutateState])
 
@@ -321,8 +288,6 @@ function BuilderSimpleInner() {
     const handleAddBefore = useCallback((targetNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
-        const newNodeWidth = (data.width || 200)
-        const gap = GRID_CELL * 5 // 5 grid units = 100px
 
         mutateState((prevNodes, prevEdges) => {
             const targetNode = prevNodes.find(n => n.id === targetNodeId)
@@ -330,26 +295,14 @@ function BuilderSimpleInner() {
             const sourceId = incomingEdge?.source || null
             const sourceNode = sourceId ? prevNodes.find(n => n.id === sourceId) : null
 
-            const newX = sourceNode && targetNode
-                ? (sourceNode.position.x + targetNode.position.x) / 2
-                : targetNode
-                    ? targetNode.position.x - newNodeWidth - gap
-                    : 0
-            // Center-align Y with target node for straight horizontal edge
-            const targetHeight: number = targetNode
-                ? (targetNode.data?.height as number)
-                ?? widgetRegistry.get(targetNode.type || '')?.defaultHeight
-                ?? 120
-                : 120
-            const newNodeHeight = data.height || 120
-            const newY = targetNode
-                ? targetNode.position.y + targetHeight / 2 - newNodeHeight / 2
-                : START_NODE_Y
+            const position = targetNode
+                ? positionBefore(targetNode, sourceNode ?? null, nodeType, data)
+                : { x: 0, y: 0 }
 
             const newNodes = [...prevNodes, {
                 id: newNodeId,
                 type: nodeType,
-                position: { x: newX, y: newY },
+                position,
                 data: { ...data, width: data.width || 200, height: data.height || 120 },
             }]
 
@@ -361,13 +314,7 @@ function BuilderSimpleInner() {
                         : e
                 )
             }
-            newEdges = [...newEdges, {
-                id: `edge-${newNodeId}-${targetNodeId}`,
-                source: newNodeId,
-                target: targetNodeId,
-                animated: true,
-                style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
-            }]
+            newEdges = [...newEdges, makeEdge(newNodeId, targetNodeId)]
 
             return { nodes: newNodes, edges: newEdges }
         })
@@ -376,33 +323,9 @@ function BuilderSimpleInner() {
     // ── Configure handler ──
     const handleConfigure = useCallback((nodeId: string, action: string) => {
         if (action === 'delete') {
-            mutateState((prevNodes, prevEdges) => {
-                // Bridge reconnection: find incoming and outgoing edges
-                const incomingEdges = prevEdges.filter(e => e.target === nodeId)
-                const outgoingEdges = prevEdges.filter(e => e.source === nodeId)
-
-                // Create bridge edges: connect each source to each target
-                const bridgeEdges: Edge[] = []
-                for (const inc of incomingEdges) {
-                    for (const out of outgoingEdges) {
-                        bridgeEdges.push({
-                            id: `edge-${inc.source}-${out.target}`,
-                            source: inc.source,
-                            target: out.target,
-                            animated: true,
-                            style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
-                        })
-                    }
-                }
-
-                return {
-                    nodes: prevNodes.filter(n => n.id !== nodeId),
-                    edges: [
-                        ...prevEdges.filter(e => e.source !== nodeId && e.target !== nodeId),
-                        ...bridgeEdges,
-                    ],
-                }
-            })
+            mutateState((prevNodes, prevEdges) =>
+                deleteNodeWithReconnect(nodeId, prevNodes, prevEdges)
+            )
         } else if (action === 'settings') {
             setSettingsNodeId(nodeId)
         }
