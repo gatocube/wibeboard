@@ -403,16 +403,19 @@ function AIScriptInner() {
             }
         }
 
-        // Apply position changes to scenario nodes via position overrides
+        // Only commit position overrides for scenario nodes when drag ENDS.
+        // During drag, React Flow manages positions internally — writing back
+        // on every frame causes a re-render loop that makes the screen blink.
         if (scenarioChanges.length > 0) {
             const posChanges = scenarioChanges.filter(
-                (c): c is NodeChange & { type: 'position'; id: string; position?: { x: number; y: number } } =>
+                (c): c is NodeChange & { type: 'position'; id: string; position?: { x: number; y: number }; dragging?: boolean } =>
                     c.type === 'position'
             )
-            if (posChanges.length > 0) {
+            const finalPositions = posChanges.filter(c => c.position && !c.dragging)
+            if (finalPositions.length > 0) {
                 setPositionOverrides(prev => {
                     const next = { ...prev }
-                    for (const c of posChanges) {
+                    for (const c of finalPositions) {
                         if (c.position) next[c.id] = c.position
                     }
                     return next
