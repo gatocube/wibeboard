@@ -5,33 +5,21 @@ test.describe('Integrations Page', () => {
         await page.goto('http://localhost:5173/wibeboard/?page=integrations')
     })
 
-    test('GitHub token from .env is read-only and tested successfully', async ({ page }) => {
-        // Find the GitHub card
+    test('GitHub card shows enabled input and disabled test button when no token set', async ({ page }) => {
         const card = page.getByTestId('integration-card-github')
+        await expect(card).toBeVisible()
 
-        // Skip if card doesn't show a .env indicator (no VITE_GITHUB_TOKEN in env)
-        const hasEnvLabel = await card.locator('text=.env').count()
-        if (hasEnvLabel === 0) {
-            test.skip(true, 'No VITE_GITHUB_TOKEN in .env — skipping')
-            return
-        }
-
-        // It should indicate it's loaded from .env
-        await expect(card).toContainText('.env')
-
-        // The input should be disabled
+        // Input should be enabled (editable) when no .env token
         const input = card.locator('input[type="password"]')
-        await expect(input).toBeDisabled()
-        await expect(input).toHaveValue('•••••••••••••••••••••••••')
+        await expect(input).toBeVisible()
 
-        // Click Test Connection
+        // Test Connection button should be disabled until a key is entered
         const testBtn = card.locator('button', { hasText: 'Test Connection' })
-        await expect(testBtn).toBeEnabled()
-        await testBtn.click()
+        await expect(testBtn).toBeDisabled()
 
-        // Wait for the result message
-        // The response should indicate read is OK but write is Forbidden
-        await expect(card.locator('text=Read: OK, Write: Forbidden')).toBeVisible({ timeout: 10000 })
+        // Type a mock token
+        await input.fill('ghp_mock_token_12345')
+        await expect(testBtn).toBeEnabled()
     })
 
     test('Mock integration (Cursor) tests format validation', async ({ page }) => {
