@@ -34,8 +34,9 @@ const nodeTypes = {
 }
 
 // ── iPad-friendly constants ──
-const START_NODE_X = 80
-const START_NODE_Y = 300
+// Start node center is at (0, 0) — position is top-left corner = (-width/2, -height/2)
+const START_NODE_X = -30  // -60/2 = center at x=0
+const START_NODE_Y = -30  // -60/2 = center at y=0
 const DEFAULT_ZOOM = 0.85
 const FIT_VIEW_PADDING = 0.3
 
@@ -288,7 +289,16 @@ function BuilderSimpleInner() {
             : 200
         const gap = GRID_CELL * 5 // 5 grid units = 100px
         const newX = sourceNode ? sourceNode.position.x + sourceWidth + gap : 460
-        const newY = sourceNode ? sourceNode.position.y : START_NODE_Y
+        // Center-align Y so handles connect with a straight horizontal edge
+        const sourceHeight: number = sourceNode
+            ? (sourceNode.data?.height as number)
+            ?? widgetRegistry.get(sourceNode.type || '')?.defaultHeight
+            ?? 120
+            : 120
+        const newNodeHeight = data.height || 120
+        const newY = sourceNode
+            ? sourceNode.position.y + sourceHeight / 2 - newNodeHeight / 2
+            : START_NODE_Y
 
         mutateState((prevNodes, prevEdges) => ({
             nodes: [...prevNodes, {
@@ -325,7 +335,16 @@ function BuilderSimpleInner() {
                 : targetNode
                     ? targetNode.position.x - newNodeWidth - gap
                     : 0
-            const newY = targetNode ? targetNode.position.y : START_NODE_Y
+            // Center-align Y with target node for straight horizontal edge
+            const targetHeight: number = targetNode
+                ? (targetNode.data?.height as number)
+                ?? widgetRegistry.get(targetNode.type || '')?.defaultHeight
+                ?? 120
+                : 120
+            const newNodeHeight = data.height || 120
+            const newY = targetNode
+                ? targetNode.position.y + targetHeight / 2 - newNodeHeight / 2
+                : START_NODE_Y
 
             const newNodes = [...prevNodes, {
                 id: newNodeId,

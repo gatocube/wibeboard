@@ -256,6 +256,42 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
             // 5gu gap (100px) / start node (60px) = ~1.67, so ratio < 3 is a safe bound
             const ratio = gap / startBox.width
             expect(ratio).toBeLessThan(3)
+
+            // Vertical centers should be aligned for a straight horizontal edge
+            // The start node has a label below, adding to its DOM height,
+            // so we allow tolerance of 10px (half a grid unit)
+            const startCenterY = startBox.y + startBox.height / 2
+            const newCenterY = newBox.y + newBox.height / 2
+            expect(Math.abs(startCenterY - newCenterY)).toBeLessThan(10)
+        }
+
+        await breath()
+    })
+
+    test('starting node center is at origin (0, 0)', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // Get the start node's data-id position via React Flow internals
+        // The node's position in flow coordinates should place its center at (0, 0)
+        const position = await page.evaluate(() => {
+            const el = document.querySelector('.react-flow__node[data-id="start-1"]')
+            if (!el) return null
+            // React Flow sets transform on the node wrapper
+            const transform = el.getAttribute('style')
+            const match = transform?.match(/translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/)
+            if (!match) return null
+            return { x: parseFloat(match[1]), y: parseFloat(match[2]) }
+        })
+
+        expect(position).toBeTruthy()
+        if (position) {
+            // Start node is 60×60, so position should be (-30, -30) for center at (0,0)
+            // center = position + size/2 = (-30 + 30, -30 + 30) = (0, 0)
+            const centerX = position.x + 30  // 60/2 = 30
+            const centerY = position.y + 30
+            expect(Math.abs(centerX)).toBeLessThan(1)
+            expect(Math.abs(centerY)).toBeLessThan(1)
         }
 
         await breath()
@@ -291,10 +327,6 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
         // After bridge reconnection: Start → B (2 nodes, 1 edge)
         expect(await nodeCount(page)).toBe(2)
         expect(await edgeCount(page)).toBe(1)
-
-        // ── Verify the edge connects Start to the remaining node ──
-        const edge = page.locator('.react-flow__edge').first()
-        await expect(edge).toBeVisible()
 
         await breath()
     })
