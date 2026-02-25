@@ -31,7 +31,7 @@ interface IconItem {
 const UI_ICONS: IconItem[] = [
     // Navigation
     { name: 'Home', component: Home, color: '#94a3b8', usage: 'Sidebar: Home page' },
-    { name: 'Layout', component: Layout, color: '#94a3b8', usage: 'Sidebar: Builder Demo' },
+    { name: 'Layout', component: Layout, color: '#94a3b8', usage: 'Sidebar: Builder Demo Complex' },
     { name: 'GitBranch', component: GitBranch, color: '#94a3b8', usage: 'Sidebar: Two-Node Scenario' },
     { name: 'Network', component: Network, color: '#94a3b8', usage: 'Sidebar: Four-Node Concurrent' },
     { name: 'Layers', component: Layers, color: '#94a3b8', usage: 'Sidebar: Widget Gallery' },

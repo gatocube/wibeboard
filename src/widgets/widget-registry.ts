@@ -239,6 +239,25 @@ const WIDGETS: WidgetDefinition[] = [
             },
         ],
     },
+    // ── Starting Node ──
+    {
+        type: 'starting',
+        label: 'Starting Node',
+        icon: 'play',
+        category: 'Job',
+        tags: ['start', 'entry', 'begin', 'trigger', 'flow', 'origin'],
+        description: 'Entry point of a workflow — the first node in a flow',
+        color: '#22c55e',
+        minWidth: 48, minHeight: 48,
+        defaultWidth: 48, defaultHeight: 48,
+        templates: [
+            {
+                name: 'Start',
+                description: 'Default starting point',
+                defaultData: { label: 'Start', color: '#22c55e' },
+            },
+        ],
+    },
 ]
 
 // ── Registry API ────────────────────────────────────────────────────────────────

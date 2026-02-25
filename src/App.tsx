@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TestBuilderPage } from '@/pages/test-builder'
+import BuilderSimplePage from '@/pages/builder-simple'
 import { TestWidgetsPage } from '@/pages/test-widgets'
 import { TwoNodeScenarioPage } from '@/pages/two-node-scenario'
 import { FourNodeConcurrentPage } from '@/pages/four-node-concurrent'
@@ -11,7 +12,7 @@ import { ButtonsMenuPage } from '@/pages/buttons-menu'
 import { FpsMeter } from '@/components/FpsMeter'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu'
+type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu'
 
 interface NavItem {
     id: Page
@@ -22,7 +23,8 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: <Home size={14} />, description: 'Overview' },
-    { id: 'builder', label: 'Builder Demo', icon: <Layout size={14} />, description: 'Flow builder with Agent, Script & Group nodes' },
+    { id: 'builder', label: 'Builder Demo Complex', icon: <Layout size={14} />, description: 'Flow builder with Agent, Script & Group nodes' },
+    { id: 'builder-simple', label: 'Builder Demo Simple', icon: <Layout size={14} />, description: 'Minimal flow starting from a single node' },
     { id: 'two-node', label: 'Two-Node Scenario', icon: <GitBranch size={14} />, description: 'Tool calling + artifact publishing' },
     { id: 'four-node', label: 'Four-Node Concurrent', icon: <Network size={14} />, description: 'Parallel workers with aggregation' },
     { id: 'ai-script', label: 'AI + Script', icon: <Workflow size={14} />, description: 'Agent → Tests → Review → Deploy' },
@@ -238,6 +240,7 @@ export function App() {
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                     {page === 'home' && <HomePage onNavigate={navigate} />}
                     {page === 'builder' && <TestBuilderPage />}
+                    {page === 'builder-simple' && <BuilderSimplePage />}
                     {page === 'two-node' && <TwoNodeScenarioPage />}
                     {page === 'four-node' && <FourNodeConcurrentPage />}
                     {page === 'ai-script' && <AIScriptScenarioPage />}
