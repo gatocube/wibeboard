@@ -184,10 +184,10 @@ function BuilderSimpleInner() {
         }
     }, [nodes.length, fitView])
 
-    // ── Persist workflows to localStorage ──
-    useEffect(() => {
-        saveWorkflows(workflows, activeId)
-    }, [workflows, activeId])
+    // ── Persist workflows to localStorage (disabled for now) ──
+    // useEffect(() => {
+    //     saveWorkflows(workflows, activeId)
+    // }, [workflows, activeId])
 
     // ── Reset history when switching workflows ──
     const prevActiveIdRef = useRef(activeId)
