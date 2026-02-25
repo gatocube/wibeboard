@@ -130,32 +130,35 @@ test.describe('SwipeButtons activation modes', () => {
 
     // ── 3. Swipe mode ────────────────────────────────────────────────────
 
-    test('swipe mode: sub-menu expands on hover', async ({ page }) => {
+    test('swipe mode: hovering node shows radial menu', async ({ page }) => {
         await selectMode(page, 'Swipe')
 
-        // Click node to show radial buttons (click still shows the top-level menu)
-        await clickCenterNode(page)
+        // Just hover the node — menu should appear without clicking
+        const node = page.getByTestId('mock-node-center-node')
+        await node.hover()
+
+        // Radial buttons should appear on hover
         await expectMenuVisible(page)
 
-        // Hover the After button — in swipe mode this should expand sub-menu
+        // Hover the After button — sub-menu should expand on hover too
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.hover()
 
-        // Sub-buttons should appear on hover
+        // Sub-buttons should appear
         await expect(page.getByTestId('ext-after-script')).toBeVisible({ timeout: 2_000 })
         await expect(page.getByTestId('ext-after-ai')).toBeVisible()
         await expect(page.getByTestId('ext-after-user')).toBeVisible()
     })
 
-    test('swipe mode: config sub-menu expands on hover', async ({ page }) => {
+    test('swipe mode: hovering node then config expands config sub-menu', async ({ page }) => {
         await selectMode(page, 'Swipe')
 
-        await clickCenterNode(page)
+        // Hover node to open menu
+        await page.getByTestId('mock-node-center-node').hover()
         await expectMenuVisible(page)
 
-        // Hover the Config button
-        const configBtn = page.getByTestId('swipe-btn-configure')
-        await configBtn.hover()
+        // Hover config button  
+        await page.getByTestId('swipe-btn-configure').hover()
 
         // Config sub-buttons should appear
         await expect(page.getByTestId('ext-cfg-rename')).toBeVisible({ timeout: 2_000 })

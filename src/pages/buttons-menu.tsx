@@ -92,13 +92,14 @@ function EventLog({ log, placeholder }: { log: string[]; placeholder: string }) 
 
 // ── Mock node ───────────────────────────────────────────────────────────────────
 
-function MockNode({ id, label, color, icon, selected, onClick, style }: {
+function MockNode({ id, label, color, icon, selected, onClick, onMouseEnter, style }: {
     id: string
     label: string
     color: string
     icon: string
     selected: boolean
     onClick: () => void
+    onMouseEnter?: () => void
     style?: React.CSSProperties
 }) {
     return (
@@ -106,6 +107,7 @@ function MockNode({ id, label, color, icon, selected, onClick, style }: {
             data-id={id}
             data-testid={`mock-node-${id}`}
             onClick={(e) => { e.stopPropagation(); onClick() }}
+            onMouseEnter={onMouseEnter}
             style={{
                 width: 120, height: 60,
                 borderRadius: 10,
@@ -203,6 +205,7 @@ function CenterPreview({ mode }: { mode: SwipeButtonsActivation }) {
                         icon="🤖"
                         selected={selectedId === 'center-node'}
                         onClick={() => setSelectedId(prev => prev === 'center-node' ? null : 'center-node')}
+                        onMouseEnter={mode === 'swipe' ? () => setSelectedId('center-node') : undefined}
                     />
                 </div>
 
@@ -268,6 +271,7 @@ function LeftCornerPreview({ mode }: { mode: SwipeButtonsActivation }) {
                         icon="▶"
                         selected={selectedId === 'left-node'}
                         onClick={() => setSelectedId(prev => prev === 'left-node' ? null : 'left-node')}
+                        onMouseEnter={mode === 'swipe' ? () => setSelectedId('left-node') : undefined}
                         style={{ position: 'absolute', top: 24, left: 24 }}
                     />
                 </div>
@@ -331,6 +335,7 @@ function RightEdgePreview({ mode }: { mode: SwipeButtonsActivation }) {
                         icon="🚀"
                         selected={selectedId === 'right-node'}
                         onClick={() => setSelectedId(prev => prev === 'right-node' ? null : 'right-node')}
+                        onMouseEnter={mode === 'swipe' ? () => setSelectedId('right-node') : undefined}
                         style={{ position: 'absolute', top: '50%', right: 24, transform: 'translateY(-50%)' }}
                     />
                 </div>
