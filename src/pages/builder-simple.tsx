@@ -76,12 +76,28 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
         const tpl = def?.templates[0]
-        return { nodeType: 'user', data: { ...tpl?.defaultData, label: tpl?.defaultData.label || 'User' } }
+        return {
+            nodeType: 'user',
+            data: {
+                ...tpl?.defaultData,
+                label: tpl?.defaultData.label || 'User',
+                width: def?.defaultWidth || 160,
+                height: def?.defaultHeight || 100,
+            },
+        }
     }
     if (widgetType === 'subflow') {
         const def = widgetRegistry.get('subflow')
         const tpl = def?.templates[0]
-        return { nodeType: 'subflow', data: { ...tpl?.defaultData, label: tpl?.defaultData.label || 'SubFlow' } }
+        return {
+            nodeType: 'subflow',
+            data: {
+                ...tpl?.defaultData,
+                label: tpl?.defaultData.label || 'SubFlow',
+                width: def?.defaultWidth || 200,
+                height: def?.defaultHeight || 120,
+            },
+        }
     }
     if (widgetType.startsWith('script:') || widgetType.startsWith('ai:')) {
         const [prefix, variant] = widgetType.split(':')
@@ -150,15 +166,13 @@ function BuilderSimpleInner() {
         setCanRedo(historyIndexRef.current < historyRef.current.length - 1)
     }, [])
 
-    // ── Auto-fit when node count changes (skip for single-node initial state) ──
+    // ── Auto-fit when node count changes or workflow switches ──
     const prevCountRef = useRef(nodes.length)
     useEffect(() => {
         if (nodes.length !== prevCountRef.current) {
             prevCountRef.current = nodes.length
-            if (nodes.length > 1) {
-                const t = setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 100)
-                return () => clearTimeout(t)
-            }
+            const t = setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 100)
+            return () => clearTimeout(t)
         }
     }, [nodes.length, fitView])
 
@@ -177,9 +191,11 @@ function BuilderSimpleInner() {
                 historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
                 historyIndexRef.current = 0
                 updateUndoRedoState()
+                // Center viewport on the new workflow's nodes
+                setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 100)
             }
         }
-    }, [activeId, workflows, updateUndoRedoState])
+    }, [activeId, workflows, updateUndoRedoState, fitView])
 
     const updateWorkflow = useCallback((updatedNodes: Node[], updatedEdges: Edge[]) => {
         setWorkflows(prev => prev.map(w =>
@@ -271,7 +287,7 @@ function BuilderSimpleInner() {
                 id: newNodeId,
                 type: nodeType,
                 position,
-                data: { ...data, width: data.width || 200, height: data.height || 120 },
+                data,
             }],
             edges: [...prevEdges, api.makeEdge(sourceNodeId, newNodeId)],
         }))
@@ -296,7 +312,7 @@ function BuilderSimpleInner() {
                 id: newNodeId,
                 type: nodeType,
                 position,
-                data: { ...data, width: data.width || 200, height: data.height || 120 },
+                data,
             }]
 
             let newEdges = prevEdges

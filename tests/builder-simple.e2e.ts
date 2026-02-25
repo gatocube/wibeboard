@@ -330,4 +330,36 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
 
         await breath()
     })
+
+    test('new workflow shows start node visible in viewport', async ({ page }) => {
+        await openPage(page)
+
+        // Click + New to create a second workflow
+        await page.click('[data-testid="workflow-new-btn"]')
+        await page.waitForTimeout(500)
+
+        // New workflow should have exactly 1 node (start node)
+        expect(await nodeCount(page)).toBe(1)
+
+        // The start node must be visible in the viewport (not off-screen)
+        const startNode = page.locator('.react-flow__node').first()
+        await expect(startNode).toBeVisible({ timeout: 3_000 })
+
+        // Verify the node has a real bounding box (not zero-area or off-screen)
+        const nodeBBox = await startNode.boundingBox()
+        expect(nodeBBox).not.toBeNull()
+        expect(nodeBBox!.width).toBeGreaterThan(0)
+        expect(nodeBBox!.height).toBeGreaterThan(0)
+
+        // Node center should be within the page viewport
+        const viewportSize = page.viewportSize()!
+        const nodeCenterX = nodeBBox!.x + nodeBBox!.width / 2
+        const nodeCenterY = nodeBBox!.y + nodeBBox!.height / 2
+        expect(nodeCenterX).toBeGreaterThanOrEqual(0)
+        expect(nodeCenterX).toBeLessThanOrEqual(viewportSize.width)
+        expect(nodeCenterY).toBeGreaterThanOrEqual(0)
+        expect(nodeCenterY).toBeLessThanOrEqual(viewportSize.height)
+
+        await breath()
+    })
 })
