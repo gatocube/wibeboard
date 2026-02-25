@@ -26,7 +26,7 @@ import { FlowBuilderSettings } from './FlowBuilderSettings'
 import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { ConnectorOverlay } from './ConnectorOverlay'
 import { WidgetPicker } from './WidgetPicker'
-import { NodeButtonsMenu } from './NodeButtonsMenu'
+import { ExtendedNodeButtonsMenu } from '@/kit/ExtendedNodeButtonsMenu'
 
 // ── Ghost node/edge IDs ─────────────────────────────────────────────────────────
 const GHOST_NODE_ID = '__connector-ghost__'
@@ -606,18 +606,16 @@ export function FlowBuilder({
 
             {/* Node buttons menu — fixed position overlay */}
             {editMode && selectedNode && (
-                <NodeButtonsMenu
+                <ExtendedNodeButtonsMenu
                     nodeId={selectedNode.id}
-                    nodeWidth={Number(selectedNode.data?.width) || Number(selectedNode.style?.width) || 160}
-                    nodeHeight={Number(selectedNode.data?.height) || Number(selectedNode.style?.height) || 100}
                     currentLabel={String(selectedNode.data?.label || selectedNode.id)}
-                    onAddBefore={(id) => {
-                        onAddBefore?.(id)
+                    onAddBefore={(id, widgetType) => {
+                        onAddBefore?.(id, widgetType)
                         setSelectedNodeId(null)
                     }}
-                    onAddAfter={(id) => {
+                    onAddAfter={(id, widgetType) => {
                         if (onAddAfter) {
-                            onAddAfter(id)
+                            onAddAfter(id, widgetType)
                         } else {
                             // Default: start connector from the node
                             const nodeEl = document.querySelector(`[data-id="${id}"]`)
@@ -629,7 +627,7 @@ export function FlowBuilder({
                         }
                         setSelectedNodeId(null)
                     }}
-                    onConfigure={(id) => onConfigure?.(id)}
+                    onConfigure={(id, action) => onConfigure?.(id, action)}
                     onRename={(id, newName) => onRename?.(id, newName)}
                     onDismiss={() => setSelectedNodeId(null)}
                 />

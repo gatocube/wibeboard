@@ -158,6 +158,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     color="#06b6d4"
                     delay={0}
                     active={expanded === 'config'}
+                    dimmed={expanded !== null && expanded !== 'config'}
                     onClick={() => setExpanded(prev => prev === 'config' ? null : 'config')}
                     onHover={() => setExpanded('config')}
                 />
@@ -194,6 +195,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     color="#22c55e"
                     delay={0.04}
                     active={expanded === 'after'}
+                    dimmed={expanded !== null && expanded !== 'after'}
                     onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
                     onHover={() => setExpanded('after')}
                 />
@@ -237,6 +239,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     label="Name"
                     color="#f59e0b"
                     delay={0.08}
+                    dimmed={expanded !== null}
                     onClick={() => { setRenaming(true); setExpanded(null) }}
                 />
 
@@ -250,6 +253,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     color="#8b5cf6"
                     delay={0.12}
                     active={expanded === 'before'}
+                    dimmed={expanded !== null && expanded !== 'before'}
                     onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
                     onHover={() => setExpanded('before')}
                 />
@@ -337,7 +341,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
 
 // ── MotionButton ────────────────────────────────────────────────────────────────
 
-function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, onClick, onHover }: {
+function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size = 48, active, dimmed, onClick, onHover }: {
     testId: string
     pos: { x: number; y: number }
     icon: typeof Plus
@@ -346,6 +350,7 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
     delay?: number
     size?: number
     active?: boolean
+    dimmed?: boolean
     onClick: () => void
     onHover?: () => void
 }) {
@@ -354,7 +359,7 @@ function MotionButton({ testId, pos, icon: Icon, label, color, delay = 0, size =
         <motion.button
             data-testid={testId}
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: dimmed ? 0.35 : 1, scale: dimmed ? 0.85 : 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ delay, duration: 0.15, ease: 'easeOut' }}
             onClick={(e) => { e.stopPropagation(); onClick() }}

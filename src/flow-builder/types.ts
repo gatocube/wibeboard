@@ -67,18 +67,17 @@ export interface FlowBuilderProps {
      */
     onNodeCancelled?: (placeholderId: string) => void
     /**
-     * Called when "Add Before" is clicked on a node's action menu.
-     * Inserts a new node between the clicked node and its predecessor.
+     * Called when "Add Before" is clicked — widgetType is 'ai', 'script', or 'user'.
      */
-    onAddBefore?: (nodeId: string) => void
+    onAddBefore?: (nodeId: string, widgetType: string) => void
     /**
-     * Called when "Add After" is clicked — appends a connected node.
+     * Called when "Add After" is clicked — widgetType is 'ai', 'script', or 'user'.
      */
-    onAddAfter?: (nodeId: string) => void
+    onAddAfter?: (nodeId: string, widgetType: string) => void
     /**
-     * Called when "Configure" is clicked — opens configuration for the node.
+     * Called when a configure action is selected — action is 'rename', 'delete', or 'duplicate'.
      */
-    onConfigure?: (nodeId: string) => void
+    onConfigure?: (nodeId: string, action: string) => void
     /**
      * Called when "Rename" is confirmed with a new name.
      */
