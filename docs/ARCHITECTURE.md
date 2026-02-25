@@ -33,7 +33,7 @@ wibeboard/
 │   │
 │   ├── engine/
 │   │   ├── widget-registry.ts     # Widget definitions (GRID_CELL, MIN_GRID, sizes)
-│   │   ├── node-factory.ts        # Node creation API (positioning, spacing, delete)
+│   │   ├── FlowStudioApi.ts       # High-level API (state + store + node CRUD)
 │   │   ├── NodeContext.ts         # NodeContext type + React context
 │   │   ├── AgentMessenger.ts      # Contact management + messaging for agents
 │   │   ├── ConnectorFlow.tsx      # Click-based connection drawing
@@ -149,13 +149,16 @@ Self-contained ReactFlow wrapper providing:
 
 See [docs/flow-studio.md](flow-studio.md) for full component documentation.
 
-### Node Factory (`engine/node-factory.ts`)
-Centralized API for node creation with correct positioning:
-- `createStartNode()` — center at (0, 0)
-- `positionAfter(source)` — 5 grid units right, Y center-aligned
-- `positionBefore(target)` — left of target, Y center-aligned
-- `deleteNodeWithReconnect()` — bridge-reconnection (A→B→C → A→C)
-- `makeEdge()` — styled edge factory
+### FlowStudioApi (`engine/FlowStudioApi.ts`)
+High-level API that owns:
+- `state` — FlowStudioStore (MobX) for UI state
+- `store` — StepStore (Automerge) for persistent step execution (optional)
+- Node CRUD with correct positioning:
+  - `createStartNode()` — center at (0, 0)
+  - `positionAfter(source)` — 5 grid units right, Y center-aligned
+  - `positionBefore(target)` — left of target, Y center-aligned
+  - `deleteWithReconnect()` — bridge-reconnection (A→B→C → A→C)
+  - `makeEdge()` — styled edge factory
 
 See [docs/grid-sizing.md](grid-sizing.md) for grid sizing guidelines.
 

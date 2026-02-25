@@ -7,28 +7,58 @@
  *  - `store`  — StepStore (Automerge) for persistent step execution
  *                (step state, undo/redo, play/pause — optional)
  *
- * Exposes node CRUD methods with correct positioning:
- *  - `createStartNode()`   — centered at (0, 0)
- *  - `positionAfter()`     — 5gu right, Y center-aligned
- *  - `positionBefore()`    — left of target, Y center-aligned
- *  - `deleteWithReconnect()` — bridge-reconnection
- *  - `makeEdge()`          — styled edge factory
+ * Provides node CRUD with correct positioning:
+ *  - `createStartNode()`      — centered at (0, 0)
+ *  - `positionAfter()`        — 5gu right, Y center-aligned
+ *  - `positionBefore()`       — left of target, Y center-aligned
+ *  - `deleteWithReconnect()`  — bridge-reconnection
+ *  - `makeEdge()`             — styled edge factory
  *
- * Consumer pages create an instance and use it for all flow operations.
+ * All positions follow the grid-sizing guidelines:
+ *  - Starting node center is at (0, 0)
+ *  - New nodes are placed 5 grid units (100px) from the source/target node
+ *  - Nodes are center-aligned on the Y axis for straight horizontal edges
+ *  - Sizes come from the widget registry
  */
 
 import type { Node, Edge } from '@xyflow/react'
 import { FlowStudioStore } from '../flow-studio/FlowStudioStore'
 import type { StepStore } from './automerge-store'
 import type { ThemeKey, NodeSize } from '../flow-studio/types'
-import {
-    createStartNode,
-    positionAfter,
-    positionBefore,
-    deleteNodeWithReconnect,
-    makeEdge,
-    NODE_SPACING,
-} from './node-factory'
+import { GRID_CELL, widgetRegistry } from './widget-registry'
+
+// ── Constants ────────────────────────────────────────────────────────────────
+
+/** Standard node spacing: 5 grid units */
+const SPACING = GRID_CELL * 5  // 100px
+
+// ── Internal helpers ─────────────────────────────────────────────────────────
+
+/** Get a node's width from its data, style, or registry defaults */
+function getNodeWidth(node: Node): number {
+    return (typeof (node.style as any)?.width === 'number' ? (node.style as any).width : null)
+        ?? (node.data?.width as number)
+        ?? widgetRegistry.get(node.type || '')?.defaultWidth
+        ?? 200
+}
+
+/** Get a node's height from its data, style, or registry defaults */
+function getNodeHeight(node: Node): number {
+    return (typeof (node.style as any)?.height === 'number' ? (node.style as any).height : null)
+        ?? (node.data?.height as number)
+        ?? widgetRegistry.get(node.type || '')?.defaultHeight
+        ?? 120
+}
+
+/** Get default width for a widget type from the registry */
+function getDefaultWidth(widgetType: string): number {
+    return widgetRegistry.get(widgetType)?.defaultWidth ?? 200
+}
+
+/** Get default height for a widget type from the registry */
+function getDefaultHeight(widgetType: string): number {
+    return widgetRegistry.get(widgetType)?.defaultHeight ?? 120
+}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,17 +85,29 @@ export class FlowStudioApi {
         this.store = options.stepStore ?? null
     }
 
-    // ── Node factory methods ─────────────────────────────────────────────
+    // ── Node creation ────────────────────────────────────────────────────
 
     /**
      * Create a starting node centered at origin (0, 0).
+     *
+     * The node's top-left position is offset so that its center sits exactly
+     * at the coordinate origin, per grid-sizing guidelines.
      */
     createStartNode(
         id: string = 'start-1',
         data: Record<string, any> = { label: 'Start', color: '#22c55e' },
     ): Node {
-        return createStartNode(id, data)
+        const w = getDefaultWidth('starting')
+        const h = getDefaultHeight('starting')
+        return {
+            id,
+            type: 'starting',
+            position: { x: -w / 2, y: -h / 2 },
+            data,
+        }
     }
+
+    // ── Positioning ──────────────────────────────────────────────────────
 
     /**
      * Calculate position for a new node placed AFTER a source node.
@@ -76,7 +118,14 @@ export class FlowStudioApi {
         newWidgetType: string,
         newData?: Record<string, any>,
     ): { x: number; y: number } {
-        return positionAfter(sourceNode, newWidgetType, newData)
+        const sourceW = getNodeWidth(sourceNode)
+        const sourceH = getNodeHeight(sourceNode)
+        const newH = newData?.height ?? getDefaultHeight(newWidgetType)
+
+        return {
+            x: sourceNode.position.x + sourceW + SPACING,
+            y: sourceNode.position.y + sourceH / 2 - newH / 2,
+        }
     }
 
     /**
@@ -89,8 +138,20 @@ export class FlowStudioApi {
         newWidgetType: string,
         newData?: Record<string, any>,
     ): { x: number; y: number } {
-        return positionBefore(targetNode, sourceNode, newWidgetType, newData)
+        const newW = newData?.width ?? getDefaultWidth(newWidgetType)
+        const targetH = getNodeHeight(targetNode)
+        const newH = newData?.height ?? getDefaultHeight(newWidgetType)
+
+        const x = sourceNode
+            ? (sourceNode.position.x + targetNode.position.x) / 2
+            : targetNode.position.x - newW - SPACING
+
+        const y = targetNode.position.y + targetH / 2 - newH / 2
+
+        return { x, y }
     }
+
+    // ── Deletion ─────────────────────────────────────────────────────────
 
     /**
      * Delete a node and bridge-reconnect its neighbors.
@@ -101,16 +162,41 @@ export class FlowStudioApi {
         nodes: Node[],
         edges: Edge[],
     ): { nodes: Node[]; edges: Edge[] } {
-        return deleteNodeWithReconnect(nodeId, nodes, edges)
+        const incomingEdges = edges.filter(e => e.target === nodeId)
+        const outgoingEdges = edges.filter(e => e.source === nodeId)
+
+        // Create bridge edges: each source → each target
+        const bridgeEdges: Edge[] = []
+        for (const inc of incomingEdges) {
+            for (const out of outgoingEdges) {
+                bridgeEdges.push(this.makeEdge(inc.source, out.target))
+            }
+        }
+
+        return {
+            nodes: nodes.filter(n => n.id !== nodeId),
+            edges: [
+                ...edges.filter(e => e.source !== nodeId && e.target !== nodeId),
+                ...bridgeEdges,
+            ],
+        }
     }
+
+    // ── Edge factory ─────────────────────────────────────────────────────
 
     /**
      * Create a styled edge between two nodes.
      */
     makeEdge(sourceId: string, targetId: string): Edge {
-        return makeEdge(sourceId, targetId)
+        return {
+            id: `edge-${sourceId}-${targetId}`,
+            source: sourceId,
+            target: targetId,
+            animated: true,
+            style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+        }
     }
 
     /** Standard node spacing (5 grid units = 100px) */
-    static readonly SPACING = NODE_SPACING
+    static readonly SPACING = SPACING
 }
