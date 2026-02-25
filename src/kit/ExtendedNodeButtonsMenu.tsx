@@ -240,14 +240,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* After → Script sub-types: grid around the Script button */}
+                {/* After → Script sub-types: column to the right of Script button */}
                 {expanded === 'after' && scriptExpanded === 'after' && (() => {
                     const scriptBtnX = positions.right.x + TILE
                     const scriptBtnY = positions.right.y - TILE
                     const subPositions = [
-                        { x: scriptBtnX, y: scriptBtnY - TILE },       // above
-                        { x: scriptBtnX + TILE, y: scriptBtnY },       // right
-                        { x: scriptBtnX, y: scriptBtnY + TILE },       // below (same row as AI)
+                        { x: scriptBtnX + TILE, y: scriptBtnY - TILE },  // top
+                        { x: scriptBtnX + TILE, y: scriptBtnY },          // center
+                        { x: scriptBtnX + TILE, y: scriptBtnY + TILE },  // bottom
                     ]
                     return SCRIPT_TYPES.map((st, i) => (
                         <MotionButton
@@ -343,14 +343,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* Before → Script sub-types: grid around the Script button */}
+                {/* Before → Script sub-types: column to the left of Script button */}
                 {expanded === 'before' && scriptExpanded === 'before' && (() => {
                     const scriptBtnX = positions.left.x - TILE
                     const scriptBtnY = positions.left.y - TILE
                     const subPositions = [
-                        { x: scriptBtnX, y: scriptBtnY - TILE },       // above
-                        { x: scriptBtnX - TILE, y: scriptBtnY },       // left
-                        { x: scriptBtnX, y: scriptBtnY + TILE },       // below (same row as AI)
+                        { x: scriptBtnX - TILE, y: scriptBtnY - TILE },  // top
+                        { x: scriptBtnX - TILE, y: scriptBtnY },          // center
+                        { x: scriptBtnX - TILE, y: scriptBtnY + TILE },  // bottom
                     ]
                     return SCRIPT_TYPES.map((st, i) => (
                         <MotionButton
