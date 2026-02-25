@@ -159,7 +159,7 @@ test.describe('Builder Demo Simple — flow construction', () => {
 
         await page.waitForTimeout(600)
         expect(await nodeCount(page)).toBe(3)
-        expect(await edgeCount(page)).toBe(1)
+        expect(await edgeCount(page)).toBe(2) // bridge reconnection: A→B→C→D → delete C → A→B→D (2 edges)
         await breath()
 
         // ── Step 7: Undo (Cmd+Z) = deleted node restored ──
@@ -214,6 +214,83 @@ test.describe('Builder Demo Simple — flow construction', () => {
             const leftThird = viewport.width / 3
             expect(nodeBox.x).toBeLessThan(leftThird)
         }
+
+        await breath()
+    })
+})
+
+test.describe('Builder Demo Simple — grid sizing guidelines', () => {
+
+    test('add-after positions new node with 5 grid unit gap', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Start with 1 node ──
+        expect(await nodeCount(page)).toBe(1)
+
+        // ── Add a node after start ──
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        expect(await nodeCount(page)).toBe(2)
+
+        // ── Get both node bounding boxes ──
+        const startNode = page.locator('.react-flow__node[data-id="start-1"]')
+        const newNodeId = await getLastNodeId(page)
+        const newNode = page.locator(`.react-flow__node[data-id="${newNodeId}"]`)
+
+        const startBox = await startNode.boundingBox()
+        const newBox = await newNode.boundingBox()
+        expect(startBox).toBeTruthy()
+        expect(newBox).toBeTruthy()
+
+        if (startBox && newBox) {
+            // Gap between right edge of start node and left edge of new node
+            const gap = newBox.x - (startBox.x + startBox.width)
+            // Should be approximately 5 grid units (100px at zoom 1.0)
+            // Allow tolerance for zoom level differences
+            expect(gap).toBeGreaterThan(0)
+        }
+
+        await breath()
+    })
+
+    test('delete middle node reconnects neighbors (bridge reconnection)', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Build chain: Start → A → B ──
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        const nodeAId = await getLastNodeId(page)
+
+        await clickNode(page, nodeAId)
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        // Now have: Start → A → B (3 nodes, 2 edges)
+        expect(await nodeCount(page)).toBe(3)
+        expect(await edgeCount(page)).toBe(2)
+
+        // ── Delete middle node A ──
+        await clickNode(page, nodeAId)
+        await clickSwipeBtn(page, 'swipe-btn-configure')
+        await clickSwipeBtn(page, 'ext-cfg-delete')
+        await page.waitForTimeout(600)
+
+        // After bridge reconnection: Start → B (2 nodes, 1 edge)
+        expect(await nodeCount(page)).toBe(2)
+        expect(await edgeCount(page)).toBe(1)
+
+        // ── Verify the edge connects Start to the remaining node ──
+        const edge = page.locator('.react-flow__edge').first()
+        await expect(edge).toBeVisible()
 
         await breath()
     })

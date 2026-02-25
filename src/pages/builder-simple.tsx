@@ -21,7 +21,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
-import { widgetRegistry } from '@/engine/widget-registry'
+import { widgetRegistry, GRID_CELL } from '@/engine/widget-registry'
 import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
@@ -279,7 +279,9 @@ function BuilderSimpleInner() {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
-        const newX = sourceNode ? sourceNode.position.x + 260 : 460
+        const nodeWidth = (data.width || 200)
+        const gap = GRID_CELL * 5 // 5 grid units
+        const newX = sourceNode ? sourceNode.position.x + nodeWidth + gap : 460
         const newY = sourceNode ? sourceNode.position.y : START_NODE_Y
 
         mutateState((prevNodes, prevEdges) => ({
@@ -303,6 +305,8 @@ function BuilderSimpleInner() {
     const handleAddBefore = useCallback((targetNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
         const newNodeId = `node-${Date.now()}`
+        const nodeWidth = (data.width || 200)
+        const gap = GRID_CELL * 5 // 5 grid units
 
         mutateState((prevNodes, prevEdges) => {
             const targetNode = prevNodes.find(n => n.id === targetNodeId)
@@ -313,7 +317,7 @@ function BuilderSimpleInner() {
             const newX = sourceNode && targetNode
                 ? (sourceNode.position.x + targetNode.position.x) / 2
                 : targetNode
-                    ? targetNode.position.x - 260
+                    ? targetNode.position.x - nodeWidth - gap
                     : 0
             const newY = targetNode ? targetNode.position.y : START_NODE_Y
 
@@ -347,10 +351,33 @@ function BuilderSimpleInner() {
     // ── Configure handler ──
     const handleConfigure = useCallback((nodeId: string, action: string) => {
         if (action === 'delete') {
-            mutateState((prevNodes, prevEdges) => ({
-                nodes: prevNodes.filter(n => n.id !== nodeId),
-                edges: prevEdges.filter(e => e.source !== nodeId && e.target !== nodeId),
-            }))
+            mutateState((prevNodes, prevEdges) => {
+                // Bridge reconnection: find incoming and outgoing edges
+                const incomingEdges = prevEdges.filter(e => e.target === nodeId)
+                const outgoingEdges = prevEdges.filter(e => e.source === nodeId)
+
+                // Create bridge edges: connect each source to each target
+                const bridgeEdges: Edge[] = []
+                for (const inc of incomingEdges) {
+                    for (const out of outgoingEdges) {
+                        bridgeEdges.push({
+                            id: `edge-${inc.source}-${out.target}`,
+                            source: inc.source,
+                            target: out.target,
+                            animated: true,
+                            style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+                        })
+                    }
+                }
+
+                return {
+                    nodes: prevNodes.filter(n => n.id !== nodeId),
+                    edges: [
+                        ...prevEdges.filter(e => e.source !== nodeId && e.target !== nodeId),
+                        ...bridgeEdges,
+                    ],
+                }
+            })
         } else if (action === 'settings') {
             setSettingsNodeId(nodeId)
         }
