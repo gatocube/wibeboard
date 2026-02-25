@@ -6,8 +6,9 @@
  *  2. Hold mode — menu opens after long-press (~500 ms)
  *  3. Swipe mode — sub-menus expand on hover
  *
- * Each test verifies that the radial menu appears and interaction buttons
- * become visible, confirming the activation mode works end-to-end.
+ * Button hierarchy (per docs/swipe-buttons-menu.md):
+ *  Add (Before/After) → User | Job (→ Script/AI) | Recent
+ *  Config → Attach (→ Expectation/Note) | Settings | Delete
  */
 
 import { test, expect, type Page } from '@playwright/test'
@@ -18,7 +19,6 @@ test.setTimeout(60_000)
 
 async function openButtonsMenuPage(page: Page) {
     await page.goto('?page=buttons-menu')
-    // Wait for the SwipeButtons page to render
     await expect(page.locator('text=SwipeButtons')).toBeVisible({ timeout: 10_000 })
 }
 
@@ -33,12 +33,10 @@ async function selectMode(page: Page, mode: 'Click' | 'Hold' | 'Swipe') {
     await page.locator(`button:has-text("${mode}")`).first().click()
 }
 
-/** Assert the four main radial buttons are visible */
+/** Assert the 3 main radial buttons are visible (Config, After, Before) */
 async function expectMenuVisible(page: Page) {
-    // The wrapper div is 0×0 (position: fixed overlay), so check individual buttons
     await expect(page.getByTestId('swipe-btn-configure')).toBeVisible({ timeout: 3_000 })
     await expect(page.getByTestId('swipe-btn-add-after')).toBeVisible()
-    await expect(page.getByTestId('swipe-btn-rename')).toBeVisible()
     await expect(page.getByTestId('swipe-btn-add-before')).toBeVisible()
 }
 
@@ -59,22 +57,20 @@ test.describe('SwipeButtons activation modes', () => {
 
     test('click mode: menu opens on node click, buttons visible', async ({ page }) => {
         await selectMode(page, 'Click')
-
-        // Click the center node
         await clickCenterNode(page)
 
-        // Radial menu should appear with 4 main buttons
+        // Radial menu should appear with 3 main buttons
         await expectMenuVisible(page)
 
-        // Hover the "After" button — in click mode, hover expands sub-menu for drill-down
+        // Hover the "After" button — sub-menu expands (User, Job, Recent)
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.hover()
         await page.waitForTimeout(200)
 
-        // Sub-buttons (Script, AI, User) should appear
-        await expect(page.getByTestId('ext-after-script')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-after-ai')).toBeVisible()
-        await expect(page.getByTestId('ext-after-user')).toBeVisible()
+        // Sub-buttons should appear
+        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
 
     test('click mode: dismiss menu by clicking node again', async ({ page }) => {
@@ -82,9 +78,7 @@ test.describe('SwipeButtons activation modes', () => {
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // Click the node again to toggle the menu off
         await clickCenterNode(page)
-
         await expectMenuHidden(page)
     })
 
@@ -93,39 +87,36 @@ test.describe('SwipeButtons activation modes', () => {
     test('hold mode: menu does NOT open on quick click', async ({ page }) => {
         await selectMode(page, 'Hold')
 
-        // Click the node to show the radial menu
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // In hold mode, quick-clicking a main button should NOT expand sub-menu
+        // Quick-clicking After should NOT expand sub-menu in hold mode
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.click()
 
-        // Sub-buttons should NOT appear (hold requires long-press)
-        await expect(page.getByTestId('ext-after-script')).not.toBeVisible({ timeout: 1_000 })
+        await expect(page.getByTestId('ext-after-user')).not.toBeVisible({ timeout: 1_000 })
     })
 
     test('hold mode: menu expands on long-press', async ({ page }) => {
         await selectMode(page, 'Hold')
 
-        // Click center node to show radial buttons
         await clickCenterNode(page)
         await expectMenuVisible(page)
 
-        // Long-press the After button (hold ~600ms > 500ms threshold)
+        // Long-press the After button
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         const afterBox = await afterBtn.boundingBox()
         expect(afterBox).toBeTruthy()
 
         await page.mouse.move(afterBox!.x + afterBox!.width / 2, afterBox!.y + afterBox!.height / 2)
         await page.mouse.down()
-        await page.waitForTimeout(600) // wait > 500ms hold threshold
+        await page.waitForTimeout(600)
         await page.mouse.up()
 
         // Sub-buttons should now be visible
-        await expect(page.getByTestId('ext-after-script')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-after-ai')).toBeVisible()
-        await expect(page.getByTestId('ext-after-user')).toBeVisible()
+        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
 
     // ── 3. Swipe mode ────────────────────────────────────────────────────
@@ -133,36 +124,31 @@ test.describe('SwipeButtons activation modes', () => {
     test('swipe mode: hovering node shows radial menu', async ({ page }) => {
         await selectMode(page, 'Swipe')
 
-        // Just hover the node — menu should appear without clicking
         const node = page.getByTestId('mock-node-center-node')
         await node.hover()
 
-        // Radial buttons should appear on hover
         await expectMenuVisible(page)
 
-        // Hover the After button — sub-menu should expand on hover too
+        // Hover After — sub-menu should expand
         const afterBtn = page.getByTestId('swipe-btn-add-after')
         await afterBtn.hover()
 
-        // Sub-buttons should appear
-        await expect(page.getByTestId('ext-after-script')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-after-ai')).toBeVisible()
-        await expect(page.getByTestId('ext-after-user')).toBeVisible()
+        await expect(page.getByTestId('ext-after-user')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
     })
 
-    test('swipe mode: hovering node then config expands config sub-menu', async ({ page }) => {
+    test('swipe mode: hovering config expands config sub-menu', async ({ page }) => {
         await selectMode(page, 'Swipe')
 
-        // Hover node to open menu
         await page.getByTestId('mock-node-center-node').hover()
         await expectMenuVisible(page)
 
-        // Hover config button  
         await page.getByTestId('swipe-btn-configure').hover()
 
-        // Config sub-buttons should appear
-        await expect(page.getByTestId('ext-cfg-rename')).toBeVisible({ timeout: 2_000 })
-        await expect(page.getByTestId('ext-cfg-duplicate')).toBeVisible()
+        // Config sub-buttons: Attach, Settings, Delete
+        await expect(page.getByTestId('ext-cfg-attach')).toBeVisible({ timeout: 2_000 })
+        await expect(page.getByTestId('ext-cfg-settings')).toBeVisible()
         await expect(page.getByTestId('ext-cfg-delete')).toBeVisible()
     })
 
@@ -176,13 +162,11 @@ test.describe('SwipeButtons activation modes', () => {
         for (const testId of [
             'swipe-btn-configure',
             'swipe-btn-add-after',
-            'swipe-btn-rename',
             'swipe-btn-add-before',
         ]) {
             const btn = page.getByTestId(testId)
             const box = await btn.boundingBox()
             expect(box, `${testId} should have a bounding box`).toBeTruthy()
-            // Buttons should be at least 20px — actual size depends on viewport scaling
             expect(box!.width, `${testId} width > 0`).toBeGreaterThan(20)
             expect(box!.height, `${testId} height > 0`).toBeGreaterThan(20)
         }
@@ -191,13 +175,8 @@ test.describe('SwipeButtons activation modes', () => {
     // ── Multi-section layout ─────────────────────────────────────────────
 
     test('all 3 preview sections render with nodes', async ({ page }) => {
-        // Center node
         await expect(page.getByTestId('mock-node-center-node')).toBeVisible({ timeout: 3_000 })
-
-        // Left corner node  
         await expect(page.getByTestId('mock-node-left-node')).toBeVisible({ timeout: 3_000 })
-
-        // Right edge node
         await expect(page.getByTestId('mock-node-right-node')).toBeVisible({ timeout: 3_000 })
     })
 })

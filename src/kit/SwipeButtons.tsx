@@ -22,7 +22,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Pencil, Cpu, Code, UserCircle, Trash2, Copy, FileCode, Terminal, FileType, Brain, Wrench, Search } from 'lucide-react'
+import { Plus, Settings, Cpu, Code, UserCircle, Trash2, FileCode, Terminal, FileType, Brain, Wrench, Search, Paperclip, Clock, StickyNote, Briefcase, ClipboardCheck } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -33,11 +33,17 @@ interface SubButton {
     color: string
 }
 
-// Widget types — AI is in the center (index 1) so it fans out at y=0
-const WIDGET_TYPES: SubButton[] = [
+// Top-level sub-buttons for Add (Before / After)
+const ADD_NODE_TYPES: SubButton[] = [
+    { key: 'user', label: 'User', icon: UserCircle, color: '#22c55e' },
+    { key: 'job', label: 'Job', icon: Briefcase, color: '#8b5cf6' },
+    { key: 'recent', label: 'Recent', icon: Clock, color: '#64748b' },
+]
+
+// Job sub-types (children of Job)
+const JOB_TYPES: SubButton[] = [
     { key: 'script', label: 'Script', icon: Code, color: '#f7df1e' },
     { key: 'ai', label: 'AI', icon: Cpu, color: '#8b5cf6' },
-    { key: 'user', label: 'User', icon: UserCircle, color: '#22c55e' },
 ]
 
 const AI_ROLES: SubButton[] = [
@@ -47,9 +53,14 @@ const AI_ROLES: SubButton[] = [
 ]
 
 const CONFIG_ACTIONS: SubButton[] = [
-    { key: 'rename', label: 'Rename', icon: Pencil, color: '#f59e0b' },
-    { key: 'duplicate', label: 'Duplicate', icon: Copy, color: '#06b6d4' },
+    { key: 'attach', label: 'Attach', icon: Paperclip, color: '#06b6d4' },
+    { key: 'settings', label: 'Settings', icon: Settings, color: '#f59e0b' },
     { key: 'delete', label: 'Delete', icon: Trash2, color: '#ef4444' },
+]
+
+const ATTACH_TYPES: SubButton[] = [
+    { key: 'expectation', label: 'Expect', icon: ClipboardCheck, color: '#22d3ee' },
+    { key: 'note', label: 'Note', icon: StickyNote, color: '#fbbf24' },
 ]
 
 const SCRIPT_TYPES: SubButton[] = [
@@ -126,12 +137,18 @@ export function SwipeButtons(props: SwipeButtonsProps) {
     } = props
     const dirs = directions ?? ['top', 'right', 'bottom', 'left']
     const [expanded, setExpanded] = useState<null | 'before' | 'after' | 'config'>(null)
+    const [jobExpanded, setJobExpanded] = useState<null | 'after' | 'before'>(null)
     const [scriptExpanded, setScriptExpanded] = useState<null | 'after' | 'before'>(null)
     const [aiExpanded, setAiExpanded] = useState<null | 'after' | 'before'>(null)
+    const [attachExpanded, setAttachExpanded] = useState(false)
     const [renaming, setRenaming] = useState(false)
     const [renameValue, setRenameValue] = useState(currentLabel)
     const inputRef = useRef<HTMLInputElement>(null)
     const [nodeRect, setNodeRect] = useState<DOMRect | null>(null)
+
+    const resetSubs = useCallback(() => {
+        setJobExpanded(null); setScriptExpanded(null); setAiExpanded(null); setAttachExpanded(false)
+    }, [])
 
     // Track node screen position
     useEffect(() => {
@@ -227,17 +244,39 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
+                        active={sub.key === 'attach' && attachExpanded}
                         onClick={() => {
-                            if (sub.key === 'rename') {
-                                setRenaming(true)
-                                setExpanded(null)
+                            if (sub.key === 'attach') {
+                                setAttachExpanded(prev => !prev)
                             } else {
                                 onConfigure(nodeId, sub.key)
-                                setExpanded(null)
+                                setExpanded(null); resetSubs()
                             }
                         }}
+                        onHover={
+                            sub.key === 'attach' ? () => setAttachExpanded(true)
+                                : () => setAttachExpanded(false)
+                        }
                     />
                 ))}
+
+                {/* Config → Attach sub-types: fan above the Attach button */}
+                {show('top') && expanded === 'config' && attachExpanded && (() => {
+                    const attachBtnX = positions.top.x + (0 - 1) * TILE  // Attach is at index 0
+                    const attachBtnY = positions.top.y - TILE
+                    return ATTACH_TYPES.map((at, i) => (
+                        <MotionButton
+                            key={`cfg-attach-${at.key}`}
+                            testId={`ext-cfg-attach-${at.key}`}
+                            pos={{ x: attachBtnX + (i === 0 ? -TILE : TILE), y: attachBtnY - TILE }}
+                            icon={at.icon}
+                            label={at.label}
+                            color={at.color}
+                            delay={i * 0.03}
+                            onClick={() => { onConfigure(nodeId, `attach:${at.key}`); setExpanded(null); resetSubs() }}
+                        />
+                    ))
+                })()}
 
                 {/* ── After (right) — purple ── */}
                 {show('right') && <MotionButton
@@ -251,12 +290,12 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     active={expanded === 'after'}
                     dimmed={expanded !== null && expanded !== 'after'}
                     activationMode={activationMode}
-                    onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
-                    onHover={() => { setExpanded('after'); setAiExpanded(null) }}
+                    onClick={() => { setExpanded(prev => prev === 'after' ? null : 'after'); resetSubs() }}
+                    onHover={() => { setExpanded('after'); resetSubs() }}
                 />}
 
-                {/* After sub-buttons: fan right — Script (top), AI (center), User (bottom) */}
-                {show('right') && expanded === 'after' && WIDGET_TYPES.map((sub, i) => (
+                {/* After sub-buttons: fan right — User (top), Job (center), Recent (bottom) */}
+                {show('right') && expanded === 'after' && ADD_NODE_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`after-${sub.key}`}
                         testId={`ext-after-${sub.key}`}
@@ -265,84 +304,91 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        active={(sub.key === 'script' && scriptExpanded === 'after') || (sub.key === 'ai' && aiExpanded === 'after')}
+                        active={sub.key === 'job' && jobExpanded === 'after'}
                         onClick={() => {
-                            if (sub.key === 'ai') {
-                                // Direct click on AI → create Worker
-                                onAddAfter(nodeId, 'ai:worker')
-                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            if (sub.key === 'job') {
+                                setJobExpanded(prev => prev === 'after' ? null : 'after')
+                                setScriptExpanded(null); setAiExpanded(null)
                             } else {
                                 onAddAfter(nodeId, sub.key)
-                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                                setExpanded(null); resetSubs()
                             }
                         }}
                         onHover={
-                            sub.key === 'script' ? () => { setScriptExpanded('after'); setAiExpanded(null) }
-                                : sub.key === 'ai' ? () => { setAiExpanded('after'); setScriptExpanded(null) }
-                                    : () => { setScriptExpanded(null); setAiExpanded(null) }
+                            sub.key === 'job' ? () => { setJobExpanded('after'); setScriptExpanded(null); setAiExpanded(null) }
+                                : () => { setJobExpanded(null); setScriptExpanded(null); setAiExpanded(null) }
                         }
                     />
                 ))}
 
-                {/* After → Script sub-types: column to the right of Script button */}
-                {show('right') && expanded === 'after' && scriptExpanded === 'after' && (() => {
-                    const scriptBtnX = positions.right.x + TILE
+                {/* After → Job sub-types: Script & AI */}
+                {show('right') && expanded === 'after' && jobExpanded === 'after' && (() => {
+                    const jobBtnX = positions.right.x + TILE
+                    const jobBtnY = positions.right.y  // Job is at center (index 1)
+                    return JOB_TYPES.map((jt, i) => (
+                        <MotionButton
+                            key={`after-job-${jt.key}`}
+                            testId={`ext-after-job-${jt.key}`}
+                            pos={{ x: jobBtnX + TILE, y: jobBtnY + (i === 0 ? -TILE : TILE) }}
+                            icon={jt.icon}
+                            label={jt.label}
+                            color={jt.color}
+                            delay={i * 0.03}
+                            active={(jt.key === 'script' && scriptExpanded === 'after') || (jt.key === 'ai' && aiExpanded === 'after')}
+                            onClick={() => {
+                                if (jt.key === 'script') {
+                                    // Direct click on Script → create JS (default)
+                                    onAddAfter(nodeId, 'script:js')
+                                    setExpanded(null); resetSubs()
+                                } else {
+                                    // Direct click on AI → create Worker (default)
+                                    onAddAfter(nodeId, 'ai:worker')
+                                    setExpanded(null); resetSubs()
+                                }
+                            }}
+                            onHover={
+                                jt.key === 'script' ? () => { setScriptExpanded('after'); setAiExpanded(null) }
+                                    : () => { setAiExpanded('after'); setScriptExpanded(null) }
+                            }
+                        />
+                    ))
+                })()}
+
+                {/* After → Job → Script sub-types */}
+                {show('right') && expanded === 'after' && jobExpanded === 'after' && scriptExpanded === 'after' && (() => {
+                    const scriptBtnX = positions.right.x + TILE * 2
                     const scriptBtnY = positions.right.y - TILE
-                    const subPositions = [
-                        { x: scriptBtnX + TILE, y: scriptBtnY - TILE },  // top
-                        { x: scriptBtnX + TILE, y: scriptBtnY },          // center
-                        { x: scriptBtnX + TILE, y: scriptBtnY + TILE },  // bottom
-                    ]
                     return SCRIPT_TYPES.map((st, i) => (
                         <MotionButton
                             key={`after-script-${st.key}`}
                             testId={`ext-after-script-${st.key}`}
-                            pos={subPositions[i]}
+                            pos={{ x: scriptBtnX + TILE, y: scriptBtnY + (i - 1) * TILE }}
                             icon={st.icon}
                             label={st.label}
                             color={st.color}
                             delay={i * 0.03}
-                            onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                            onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); resetSubs() }}
                         />
                     ))
                 })()}
 
-                {/* After → AI roles: grid around the AI button */}
-                {show('right') && expanded === 'after' && aiExpanded === 'after' && (() => {
-                    const aiBtnX = positions.right.x + TILE
-                    const aiBtnY = positions.right.y
-                    const subPositions = [
-                        { x: aiBtnX + TILE, y: aiBtnY - TILE },  // top-right
-                        { x: aiBtnX + TILE, y: aiBtnY },          // right
-                        { x: aiBtnX + TILE, y: aiBtnY + TILE },  // bottom-right
-                    ]
+                {/* After → Job → AI roles */}
+                {show('right') && expanded === 'after' && jobExpanded === 'after' && aiExpanded === 'after' && (() => {
+                    const aiBtnX = positions.right.x + TILE * 2
+                    const aiBtnY = positions.right.y + TILE
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
                             key={`after-ai-${role.key}`}
                             testId={`ext-after-ai-${role.key}`}
-                            pos={subPositions[i]}
+                            pos={{ x: aiBtnX + TILE, y: aiBtnY + (i - 1) * TILE }}
                             icon={role.icon}
                             label={role.label}
                             color={role.color}
                             delay={i * 0.03}
-                            onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                            onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); resetSubs() }}
                         />
                     ))
                 })()}
-
-                {/* ── Rename (bottom) ── */}
-                {show('bottom') && <MotionButton
-                    key="rename"
-                    testId="swipe-btn-rename"
-                    pos={positions.bottom}
-                    icon={Pencil}
-                    label="Name"
-                    color="#f59e0b"
-                    delay={0.08}
-                    dimmed={expanded !== null}
-                    activationMode={activationMode}
-                    onClick={() => { setRenaming(true); setExpanded(null) }}
-                />}
 
                 {/* ── Before (left) — purple ── */}
                 {show('left') && <MotionButton
@@ -356,12 +402,12 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                     active={expanded === 'before'}
                     dimmed={expanded !== null && expanded !== 'before'}
                     activationMode={activationMode}
-                    onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
-                    onHover={() => { setExpanded('before'); setAiExpanded(null) }}
+                    onClick={() => { setExpanded(prev => prev === 'before' ? null : 'before'); resetSubs() }}
+                    onHover={() => { setExpanded('before'); resetSubs() }}
                 />}
 
-                {/* Before sub-buttons: fan left — Script (top), AI (center), User (bottom) */}
-                {show('left') && expanded === 'before' && WIDGET_TYPES.map((sub, i) => (
+                {/* Before sub-buttons: fan left — User (top), Job (center), Recent (bottom) */}
+                {show('left') && expanded === 'before' && ADD_NODE_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`before-${sub.key}`}
                         testId={`ext-before-${sub.key}`}
@@ -370,67 +416,86 @@ export function SwipeButtons(props: SwipeButtonsProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        active={(sub.key === 'script' && scriptExpanded === 'before') || (sub.key === 'ai' && aiExpanded === 'before')}
+                        active={sub.key === 'job' && jobExpanded === 'before'}
                         onClick={() => {
-                            if (sub.key === 'ai') {
-                                // Direct click on AI → create Worker
-                                onAddBefore(nodeId, 'ai:worker')
-                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            if (sub.key === 'job') {
+                                setJobExpanded(prev => prev === 'before' ? null : 'before')
+                                setScriptExpanded(null); setAiExpanded(null)
                             } else {
                                 onAddBefore(nodeId, sub.key)
-                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                                setExpanded(null); resetSubs()
                             }
                         }}
                         onHover={
-                            sub.key === 'script' ? () => { setScriptExpanded('before'); setAiExpanded(null) }
-                                : sub.key === 'ai' ? () => { setAiExpanded('before'); setScriptExpanded(null) }
-                                    : () => { setScriptExpanded(null); setAiExpanded(null) }
+                            sub.key === 'job' ? () => { setJobExpanded('before'); setScriptExpanded(null); setAiExpanded(null) }
+                                : () => { setJobExpanded(null); setScriptExpanded(null); setAiExpanded(null) }
                         }
                     />
                 ))}
 
-                {/* Before → Script sub-types: column to the left of Script button */}
-                {show('left') && expanded === 'before' && scriptExpanded === 'before' && (() => {
-                    const scriptBtnX = positions.left.x - TILE
-                    const scriptBtnY = positions.left.y - TILE
-                    const subPositions = [
-                        { x: scriptBtnX - TILE, y: scriptBtnY - TILE },  // top
-                        { x: scriptBtnX - TILE, y: scriptBtnY },          // center
-                        { x: scriptBtnX - TILE, y: scriptBtnY + TILE },  // bottom
-                    ]
-                    return SCRIPT_TYPES.map((st, i) => (
+                {/* Before → Job sub-types: Script & AI */}
+                {show('left') && expanded === 'before' && jobExpanded === 'before' && (() => {
+                    const jobBtnX = positions.left.x - TILE
+                    const jobBtnY = positions.left.y
+                    return JOB_TYPES.map((jt, i) => (
                         <MotionButton
-                            key={`before-script-${st.key}`}
-                            testId={`ext-before-script-${st.key}`}
-                            pos={subPositions[i]}
-                            icon={st.icon}
-                            label={st.label}
-                            color={st.color}
+                            key={`before-job-${jt.key}`}
+                            testId={`ext-before-job-${jt.key}`}
+                            pos={{ x: jobBtnX - TILE, y: jobBtnY + (i === 0 ? -TILE : TILE) }}
+                            icon={jt.icon}
+                            label={jt.label}
+                            color={jt.color}
                             delay={i * 0.03}
-                            onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                            active={(jt.key === 'script' && scriptExpanded === 'before') || (jt.key === 'ai' && aiExpanded === 'before')}
+                            onClick={() => {
+                                if (jt.key === 'script') {
+                                    onAddBefore(nodeId, 'script:js')
+                                    setExpanded(null); resetSubs()
+                                } else {
+                                    onAddBefore(nodeId, 'ai:worker')
+                                    setExpanded(null); resetSubs()
+                                }
+                            }}
+                            onHover={
+                                jt.key === 'script' ? () => { setScriptExpanded('before'); setAiExpanded(null) }
+                                    : () => { setAiExpanded('before'); setScriptExpanded(null) }
+                            }
                         />
                     ))
                 })()}
 
-                {/* Before → AI roles: grid around the AI button */}
-                {show('left') && expanded === 'before' && aiExpanded === 'before' && (() => {
-                    const aiBtnX = positions.left.x - TILE
-                    const aiBtnY = positions.left.y
-                    const subPositions = [
-                        { x: aiBtnX - TILE, y: aiBtnY - TILE },  // top-left
-                        { x: aiBtnX - TILE, y: aiBtnY },          // left
-                        { x: aiBtnX - TILE, y: aiBtnY + TILE },  // bottom-left
-                    ]
+                {/* Before → Job → Script sub-types */}
+                {show('left') && expanded === 'before' && jobExpanded === 'before' && scriptExpanded === 'before' && (() => {
+                    const scriptBtnX = positions.left.x - TILE * 2
+                    const scriptBtnY = positions.left.y - TILE
+                    return SCRIPT_TYPES.map((st, i) => (
+                        <MotionButton
+                            key={`before-script-${st.key}`}
+                            testId={`ext-before-script-${st.key}`}
+                            pos={{ x: scriptBtnX - TILE, y: scriptBtnY + (i - 1) * TILE }}
+                            icon={st.icon}
+                            label={st.label}
+                            color={st.color}
+                            delay={i * 0.03}
+                            onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); resetSubs() }}
+                        />
+                    ))
+                })()}
+
+                {/* Before → Job → AI roles */}
+                {show('left') && expanded === 'before' && jobExpanded === 'before' && aiExpanded === 'before' && (() => {
+                    const aiBtnX = positions.left.x - TILE * 2
+                    const aiBtnY = positions.left.y + TILE
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
                             key={`before-ai-${role.key}`}
                             testId={`ext-before-ai-${role.key}`}
-                            pos={subPositions[i]}
+                            pos={{ x: aiBtnX - TILE, y: aiBtnY + (i - 1) * TILE }}
                             icon={role.icon}
                             label={role.label}
                             color={role.color}
                             delay={i * 0.03}
-                            onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                            onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); resetSubs() }}
                         />
                     ))
                 })()}
