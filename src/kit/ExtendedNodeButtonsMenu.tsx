@@ -265,13 +265,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
 
                 {/* After → AI roles: orbit around the AI button */}
                 {expanded === 'after' && aiExpanded === 'after' && (() => {
-                    // AI button is at index 1 in WIDGET_TYPES → y offset = 0
+                    // AI button is at index 1 (center) → y offset = 0
                     const aiBtnX = positions.right.x + 58
                     const aiBtnY = positions.right.y
+                    // Place sub-types diagonally to avoid overlapping Script (above) and User (below)
                     const subPositions = [
-                        { x: aiBtnX, y: aiBtnY - 50 },
-                        { x: aiBtnX + 50, y: aiBtnY },
-                        { x: aiBtnX, y: aiBtnY + 50 },
+                        { x: aiBtnX + 44, y: aiBtnY - 44 },   // top-right
+                        { x: aiBtnX + 58, y: aiBtnY },         // right
+                        { x: aiBtnX + 44, y: aiBtnY + 44 },   // bottom-right
                     ]
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
@@ -373,10 +374,11 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                 {expanded === 'before' && aiExpanded === 'before' && (() => {
                     const aiBtnX = positions.left.x - 58
                     const aiBtnY = positions.left.y
+                    // Place sub-types diagonally to avoid overlapping Script (above) and User (below)
                     const subPositions = [
-                        { x: aiBtnX, y: aiBtnY - 50 },
-                        { x: aiBtnX - 50, y: aiBtnY },
-                        { x: aiBtnX, y: aiBtnY + 50 },
+                        { x: aiBtnX - 44, y: aiBtnY - 44 },   // top-left
+                        { x: aiBtnX - 58, y: aiBtnY },         // left
+                        { x: aiBtnX - 44, y: aiBtnY + 44 },   // bottom-left
                     ]
                     return AI_ROLES.map((role, i) => (
                         <MotionButton
