@@ -14,12 +14,16 @@ import { motion } from 'framer-motion'
 export type PreviewContentType = 'terminal'
 
 export interface PreviewCanvasProps {
-    /** Content type — determines rendering style */
-    type: PreviewContentType
+    /** Content type — determines rendering style (default: 'terminal') */
+    type?: PreviewContentType
     /** Log lines for terminal type */
     lines?: string[]
     /** Max visible lines (default: 5) */
     maxLines?: number
+    /** Width in px (optional) */
+    width?: number
+    /** Height in px (optional) */
+    height?: number
 }
 
 /** Color a log line based on its prefix */
@@ -34,7 +38,7 @@ function lineColor(line: string): string {
     return '#64748b'                                 // default — slate
 }
 
-export function PreviewCanvas({ type, lines = [], maxLines = 5 }: PreviewCanvasProps) {
+export function PreviewCanvas({ type = 'terminal', lines = [], maxLines = 5 }: PreviewCanvasProps) {
     if (type !== 'terminal') return null
 
     const visibleLines = lines.slice(-maxLines)

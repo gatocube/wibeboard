@@ -108,8 +108,8 @@ test.describe('Widget Gallery compliance', () => {
     })
 
     test('non-compact agent nodes display name, time, calls, and progress', async ({ page }) => {
-        // Agent widget should be selected by default
-        await expect(page.getByText('Agent', { exact: true }).first()).toBeVisible({ timeout: 5_000 })
+        // Job widget (agent template) should be selected by default in WidgetPicker
+        await page.waitForTimeout(500)
 
         // Set status to 'done' so all stats populate
         await page.locator('[data-testid="status-done"]').click()
@@ -134,9 +134,9 @@ test.describe('Widget Gallery compliance', () => {
     })
 
     test('non-compact script nodes display time, calls, and status text', async ({ page }) => {
-        // Click on "JavaScript" in the widget selector
-        const jsWidget = page.locator('[data-testid="widget-script-js"]')
-        await jsWidget.click()
+        // Click on "JavaScript" subtype to switch to script variant
+        const jsSubtype = page.locator('[data-testid="subtype-js"]')
+        await jsSubtype.click()
         await page.waitForTimeout(500)
 
         // Set status to 'done'

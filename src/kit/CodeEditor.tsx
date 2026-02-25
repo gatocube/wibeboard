@@ -199,7 +199,7 @@ export function CodeEditor({
             style={{
                 borderRadius: 8,
                 border: '1px solid rgba(255,255,255,0.1)',
-                overflow: 'hidden',
+                overflow: 'auto',
                 minHeight,
                 maxHeight,
                 ...style,
