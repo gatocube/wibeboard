@@ -2,19 +2,19 @@
  * ExtendedNodeButtonsMenu — enhanced version with sub-menus.
  *
  * When the user hovers Before/After, a fan of widget-type buttons
- * appears on the corresponding side: AI, Script, User.
+ * appears on the corresponding side: Script | AI → (Planner, Worker, Reviewer) | User.
  * When Configure is hovered, sub-options fan out above: Rename, Delete, Duplicate.
  *
  * Layout:
- *   Top:    Configure → fan: Rename | Delete | Duplicate
- *   Right:  After (+) → fan: AI | Script → (js, sh, py) | User
+ *   Top:    Configure (orange) → fan: Rename | Delete | Duplicate
+ *   Right:  After (+) purple → fan: Script | AI → roles | User
  *   Bottom: Rename
- *   Left:   Before (+) → fan: AI | Script → (js, sh, py) | User
+ *   Left:   Before (+) purple → fan: Script | AI → roles | User
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Pencil, Cpu, Code, UserCircle, Trash2, Copy, FileCode, Terminal, FileType } from 'lucide-react'
+import { Plus, Settings, Pencil, Cpu, Code, UserCircle, Trash2, Copy, FileCode, Terminal, FileType, Brain, Wrench, Search } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -25,10 +25,17 @@ interface SubButton {
     color: string
 }
 
+// Widget types — AI is in the center (index 1) so it fans out at y=0
 const WIDGET_TYPES: SubButton[] = [
-    { key: 'ai', label: 'AI', icon: Cpu, color: '#8b5cf6' },
     { key: 'script', label: 'Script', icon: Code, color: '#f7df1e' },
+    { key: 'ai', label: 'AI', icon: Cpu, color: '#8b5cf6' },
     { key: 'user', label: 'User', icon: UserCircle, color: '#22c55e' },
+]
+
+const AI_ROLES: SubButton[] = [
+    { key: 'planner', label: 'Planner', icon: Brain, color: '#a78bfa' },
+    { key: 'worker', label: 'Worker', icon: Wrench, color: '#8b5cf6' },
+    { key: 'reviewer', label: 'Reviewer', icon: Search, color: '#c084fc' },
 ]
 
 const CONFIG_ACTIONS: SubButton[] = [
@@ -85,6 +92,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
     const { nodeId, currentLabel, onAddBefore, onAddAfter, onConfigure, onRename } = props
     const [expanded, setExpanded] = useState<null | 'before' | 'after' | 'config'>(null)
     const [scriptExpanded, setScriptExpanded] = useState<null | 'after' | 'before'>(null)
+    const [aiExpanded, setAiExpanded] = useState<null | 'after' | 'before'>(null)
     const [renaming, setRenaming] = useState(false)
     const [renameValue, setRenameValue] = useState(currentLabel)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -148,14 +156,14 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
             style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, zIndex: 1000, pointerEvents: 'none' }}>
 
             <AnimatePresence>
-                {/* ── Config (top) ── */}
+                {/* ── Config (top) — orange ── */}
                 <MotionButton
                     key="config"
                     testId="ext-btn-configure"
                     pos={positions.top}
                     icon={Settings}
                     label="Config"
-                    color="#06b6d4"
+                    color="#f59e0b"
                     delay={0}
                     active={expanded === 'config'}
                     dimmed={expanded !== null && expanded !== 'config'}
@@ -185,22 +193,22 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* ── After (right) ── */}
+                {/* ── After (right) — purple ── */}
                 <MotionButton
                     key="after"
                     testId="ext-btn-add-after"
                     pos={positions.right}
                     icon={Plus}
                     label="After"
-                    color="#22c55e"
+                    color="#8b5cf6"
                     delay={0.04}
                     active={expanded === 'after'}
                     dimmed={expanded !== null && expanded !== 'after'}
                     onClick={() => setExpanded(prev => prev === 'after' ? null : 'after')}
-                    onHover={() => setExpanded('after')}
+                    onHover={() => { setExpanded('after'); setAiExpanded(null) }}
                 />
 
-                {/* After sub-buttons: fan right */}
+                {/* After sub-buttons: fan right — Script (top), AI (center), User (bottom) */}
                 {expanded === 'after' && WIDGET_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`after-${sub.key}`}
@@ -210,9 +218,22 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        active={sub.key === 'script' && scriptExpanded === 'after'}
-                        onClick={() => { onAddAfter(nodeId, sub.key); setExpanded(null); setScriptExpanded(null) }}
-                        onHover={sub.key === 'script' ? () => setScriptExpanded('after') : () => setScriptExpanded(null)}
+                        active={(sub.key === 'script' && scriptExpanded === 'after') || (sub.key === 'ai' && aiExpanded === 'after')}
+                        onClick={() => {
+                            if (sub.key === 'ai') {
+                                // Direct click on AI → create Worker
+                                onAddAfter(nodeId, 'ai:worker')
+                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            } else {
+                                onAddAfter(nodeId, sub.key)
+                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            }
+                        }}
+                        onHover={
+                            sub.key === 'script' ? () => { setScriptExpanded('after'); setAiExpanded(null) }
+                                : sub.key === 'ai' ? () => { setAiExpanded('after'); setScriptExpanded(null) }
+                                    : () => { setScriptExpanded(null); setAiExpanded(null) }
+                        }
                     />
                 ))}
 
@@ -226,7 +247,21 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={st.label}
                         color={st.color}
                         delay={i * 0.03}
-                        onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null) }}
+                        onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                    />
+                ))}
+
+                {/* After → AI roles: fan further right */}
+                {expanded === 'after' && aiExpanded === 'after' && AI_ROLES.map((role, i) => (
+                    <MotionButton
+                        key={`after-ai-${role.key}`}
+                        testId={`ext-after-ai-${role.key}`}
+                        pos={{ x: positions.right.x + 58 + 58, y: positions.right.y + (i - 1) * 56 }}
+                        icon={role.icon}
+                        label={role.label}
+                        color={role.color}
+                        delay={i * 0.03}
+                        onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                     />
                 ))}
 
@@ -243,7 +278,7 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     onClick={() => { setRenaming(true); setExpanded(null) }}
                 />
 
-                {/* ── Before (left) ── */}
+                {/* ── Before (left) — purple ── */}
                 <MotionButton
                     key="before"
                     testId="ext-btn-add-before"
@@ -255,10 +290,10 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     active={expanded === 'before'}
                     dimmed={expanded !== null && expanded !== 'before'}
                     onClick={() => setExpanded(prev => prev === 'before' ? null : 'before')}
-                    onHover={() => setExpanded('before')}
+                    onHover={() => { setExpanded('before'); setAiExpanded(null) }}
                 />
 
-                {/* Before sub-buttons: fan left */}
+                {/* Before sub-buttons: fan left — Script (top), AI (center), User (bottom) */}
                 {expanded === 'before' && WIDGET_TYPES.map((sub, i) => (
                     <MotionButton
                         key={`before-${sub.key}`}
@@ -268,9 +303,22 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={sub.label}
                         color={sub.color}
                         delay={i * 0.03}
-                        active={sub.key === 'script' && scriptExpanded === 'before'}
-                        onClick={() => { onAddBefore(nodeId, sub.key); setExpanded(null); setScriptExpanded(null) }}
-                        onHover={sub.key === 'script' ? () => setScriptExpanded('before') : () => setScriptExpanded(null)}
+                        active={(sub.key === 'script' && scriptExpanded === 'before') || (sub.key === 'ai' && aiExpanded === 'before')}
+                        onClick={() => {
+                            if (sub.key === 'ai') {
+                                // Direct click on AI → create Worker
+                                onAddBefore(nodeId, 'ai:worker')
+                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            } else {
+                                onAddBefore(nodeId, sub.key)
+                                setExpanded(null); setScriptExpanded(null); setAiExpanded(null)
+                            }
+                        }}
+                        onHover={
+                            sub.key === 'script' ? () => { setScriptExpanded('before'); setAiExpanded(null) }
+                                : sub.key === 'ai' ? () => { setAiExpanded('before'); setScriptExpanded(null) }
+                                    : () => { setScriptExpanded(null); setAiExpanded(null) }
+                        }
                     />
                 ))}
 
@@ -284,7 +332,21 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                         label={st.label}
                         color={st.color}
                         delay={i * 0.03}
-                        onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null) }}
+                        onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                    />
+                ))}
+
+                {/* Before → AI roles: fan further left */}
+                {expanded === 'before' && aiExpanded === 'before' && AI_ROLES.map((role, i) => (
+                    <MotionButton
+                        key={`before-ai-${role.key}`}
+                        testId={`ext-before-ai-${role.key}`}
+                        pos={{ x: positions.left.x - 58 - 58, y: positions.left.y + (i - 1) * 56 }}
+                        icon={role.icon}
+                        label={role.label}
+                        color={role.color}
+                        delay={i * 0.03}
+                        onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
                     />
                 ))}
             </AnimatePresence>
