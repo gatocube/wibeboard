@@ -20,9 +20,8 @@ import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
-import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import { widgetRegistry } from '@/engine/widget-registry'
-import { createStartNode, positionAfter, positionBefore, deleteNodeWithReconnect, makeEdge } from '@/engine/node-factory'
+import { FlowStudioApi } from '@/engine/FlowStudioApi'
 import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
@@ -50,7 +49,7 @@ function createWorkflow(name: string): Workflow {
     return {
         id: `wf-${Date.now()}`,
         name,
-        nodes: [createStartNode()],
+        nodes: [api.createStartNode()],
         edges: [],
     }
 }
@@ -76,7 +75,7 @@ function saveWorkflows(workflows: Workflow[], activeId: string) {
     } catch (e) { /* ignore */ }
 }
 
-const studioStore = new FlowStudioStore()
+const api = new FlowStudioApi()
 
 // ── Resolve widgetType string to { type, data } ──
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
@@ -126,7 +125,7 @@ interface HistoryEntry { nodes: Node[]; edges: Edge[] }
 // ── Page wrapper (provides context) ──
 export default function BuilderSimplePage() {
     return (
-        <FlowStudioStoreProvider store={studioStore}>
+        <FlowStudioStoreProvider store={api.state}>
             <ReactFlowProvider>
                 <BuilderSimpleInner />
             </ReactFlowProvider>
@@ -270,7 +269,7 @@ function BuilderSimpleInner() {
         const newNodeId = `node-${Date.now()}`
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
         const position = sourceNode
-            ? positionAfter(sourceNode, nodeType, data)
+            ? api.positionAfter(sourceNode, nodeType, data)
             : { x: 460, y: 0 }
 
         mutateState((prevNodes, prevEdges) => ({
@@ -280,7 +279,7 @@ function BuilderSimpleInner() {
                 position,
                 data: { ...data, width: data.width || 200, height: data.height || 120 },
             }],
-            edges: [...prevEdges, makeEdge(sourceNodeId, newNodeId)],
+            edges: [...prevEdges, api.makeEdge(sourceNodeId, newNodeId)],
         }))
     }, [mutateState])
 
@@ -296,7 +295,7 @@ function BuilderSimpleInner() {
             const sourceNode = sourceId ? prevNodes.find(n => n.id === sourceId) : null
 
             const position = targetNode
-                ? positionBefore(targetNode, sourceNode ?? null, nodeType, data)
+                ? api.positionBefore(targetNode, sourceNode ?? null, nodeType, data)
                 : { x: 0, y: 0 }
 
             const newNodes = [...prevNodes, {
@@ -314,7 +313,7 @@ function BuilderSimpleInner() {
                         : e
                 )
             }
-            newEdges = [...newEdges, makeEdge(newNodeId, targetNodeId)]
+            newEdges = [...newEdges, api.makeEdge(newNodeId, targetNodeId)]
 
             return { nodes: newNodes, edges: newEdges }
         })
@@ -324,7 +323,7 @@ function BuilderSimpleInner() {
     const handleConfigure = useCallback((nodeId: string, action: string) => {
         if (action === 'delete') {
             mutateState((prevNodes, prevEdges) =>
-                deleteNodeWithReconnect(nodeId, prevNodes, prevEdges)
+                api.deleteWithReconnect(nodeId, prevNodes, prevEdges)
             )
         } else if (action === 'settings') {
             setSettingsNodeId(nodeId)
