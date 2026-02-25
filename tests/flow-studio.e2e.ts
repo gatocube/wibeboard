@@ -114,3 +114,90 @@ test.describe('FlowStudio — node creation', () => {
         await expect(page.locator('text=6 lines')).toBeVisible({ timeout: 2_000 })
     })
 })
+
+// ── NodeButtonsMenu (merged from node-buttons-menu.e2e.ts) ───────────────
+
+test.describe('NodeButtonsMenu', () => {
+
+    // NodeButtonsMenu component exists but is NOT rendered in FlowStudio or test-builder.
+    // These tests will pass once the component is wired up.
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(true, 'NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered')
+
+    test.beforeEach(async ({ page }) => {
+        await openBuilder(page)
+        // Enable edit mode
+        const btn = page.getByTestId('edit-mode-toggle').first()
+        const text = await btn.textContent()
+        if (text?.includes('View')) await btn.click()
+        await expect(btn).toContainText('Edit')
+    })
+
+    test('shows 4 action buttons when node is clicked in edit mode', async ({ page }) => {
+        await page.locator('.react-flow__node').first().click()
+        const menu = page.getByTestId('node-buttons-menu')
+        await expect(menu).toBeVisible({ timeout: 3_000 })
+        await expect(page.getByTestId('node-btn-add-before')).toBeVisible()
+        await expect(page.getByTestId('node-btn-add-after')).toBeVisible()
+        await expect(page.getByTestId('node-btn-rename')).toBeVisible()
+        await expect(page.getByTestId('node-btn-configure')).toBeVisible()
+    })
+
+    test('does not show menu when edit mode is off', async ({ page }) => {
+        // Disable edit mode
+        const btn = page.getByTestId('edit-mode-toggle').first()
+        const text = await btn.textContent()
+        if (text?.includes('Edit')) await btn.click()
+        await expect(btn).toContainText('View')
+
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).not.toBeVisible({ timeout: 1_000 })
+    })
+
+    test('dismisses menu when clicking on empty canvas', async ({ page }) => {
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).toBeVisible({ timeout: 3_000 })
+        await page.locator('.react-flow__pane').click({ position: { x: 50, y: 50 } })
+        await expect(page.getByTestId('node-buttons-menu')).not.toBeVisible({ timeout: 2_000 })
+    })
+
+    test('rename: shows input, accepts new name on Enter', async ({ page }) => {
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).toBeVisible({ timeout: 3_000 })
+        await page.getByTestId('node-btn-rename').click()
+        const input = page.getByTestId('node-rename-field')
+        await expect(input).toBeVisible({ timeout: 2_000 })
+        await input.fill('My Renamed Node')
+        await input.press('Enter')
+        await expect(page.getByTestId('node-rename-input')).not.toBeVisible({ timeout: 2_000 })
+    })
+
+    test('add before: inserts a new placeholder node', async ({ page }) => {
+        const initialCount = await page.locator('.react-flow__node').count()
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).toBeVisible({ timeout: 3_000 })
+        await page.getByTestId('node-btn-add-before').click()
+        await expect(page.locator('.react-flow__node')).toHaveCount(initialCount + 1, { timeout: 3_000 })
+    })
+
+    test('add after: starts connector from the node', async ({ page }) => {
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).toBeVisible({ timeout: 3_000 })
+        await page.getByTestId('node-btn-add-after').click()
+        await expect(page.getByTestId('node-buttons-menu')).not.toBeVisible({ timeout: 2_000 })
+        await expect(page.locator('.react-flow__node').last()).toBeVisible({ timeout: 3_000 })
+    })
+
+    test('buttons have minimum 48px touch targets', async ({ page }) => {
+        await page.locator('.react-flow__node').first().click()
+        await expect(page.getByTestId('node-buttons-menu')).toBeVisible({ timeout: 3_000 })
+        for (const testId of ['node-btn-add-before', 'node-btn-add-after', 'node-btn-rename', 'node-btn-configure']) {
+            const btn = page.getByTestId(testId)
+            const box = await btn.boundingBox()
+            expect(box).toBeTruthy()
+            expect(box!.width).toBeGreaterThanOrEqual(48)
+            expect(box!.height).toBeGreaterThanOrEqual(48)
+        }
+    })
+})
+

@@ -362,4 +362,31 @@ test.describe('Builder Demo Simple — grid sizing guidelines', () => {
 
         await breath()
     })
+
+    // ── Minimap toggle (merged from verify-minimap.e2e.ts) ──────────────
+
+    test('minimap toggle and controls', async ({ page }) => {
+        await openPage(page)
+
+        // Ensure Controls are visible
+        await expect(page.locator('.react-flow__controls')).toBeVisible()
+
+        // The minimap shouldn't be visible by default
+        await expect(page.locator('.react-flow__minimap')).toBeHidden()
+
+        // Click the settings button in the top right panel
+        await page.getByTestId('settings-btn').click()
+
+        // Check the "Show Minimap" label which triggers the toggle
+        const minimapLabel = page.locator('label:has-text("Show Minimap")')
+        await minimapLabel.click()
+
+        // Wait a brief moment for the animation/render
+        await page.waitForTimeout(500)
+
+        // Ensure Minimap is now visible
+        await expect(page.locator('.react-flow__minimap')).toBeVisible()
+
+        await breath()
+    })
 })

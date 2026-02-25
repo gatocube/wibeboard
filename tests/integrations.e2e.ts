@@ -63,4 +63,32 @@ test.describe('Integrations Page', () => {
         await expect(inputReloaded).toHaveValue('mock-cursor-key-123')
         await expect(cardReloaded).toContainText('Storage')
     })
+
+    // ── Custom integrations (merged from verify-integrations.e2e.ts) ────
+
+    test('custom integrations JSON editor saves and shows Ollama card', async ({ page }) => {
+        // Navigate to integrations page via nav
+        await page.goto('http://localhost:5173/wibeboard/?page=integrations')
+
+        // Find the custom integrations JSON editor
+        const textarea = page.locator('textarea')
+        await expect(textarea).toBeVisible()
+
+        // Apply the default JSON
+        await page.getByText('Apply Changes').click()
+        await expect(page.getByText('Saved')).toBeVisible()
+
+        // Wait for the custom integration card to appear
+        const ollamaCard = page.getByTestId('integration-card-ollama')
+        await expect(ollamaCard).toBeVisible()
+
+        // Fill the URL
+        await ollamaCard.locator('input[type="text"]').fill('http://localhost:11434')
+
+        // Test connection
+        await ollamaCard.locator('button:has-text("Test Connection")').click()
+
+        // Wait for success message
+        await expect(ollamaCard.getByText(/Success: Host is reachable|Failed:/)).toBeVisible({ timeout: 10000 })
+    })
 })
