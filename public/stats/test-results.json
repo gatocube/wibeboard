@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-02-25T22:52:47.277Z",
-  "commit": "6a74cd8",
+  "timestamp": "2026-02-25T22:58:01.884Z",
+  "commit": "c29ae4e",
   "smoke": {
     "suites": [
       {
@@ -32,7 +32,7 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2454,
+                        "duration": 2083,
                         "errors": [],
                         "stdout": [
                           {
@@ -56,7 +56,7 @@
                         ],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:45.722Z",
+                        "startTime": "2026-02-25T22:55:53.019Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -75,8 +75,8 @@
       }
     ],
     "stats": {
-      "startTime": "2026-02-25T22:50:43.293Z",
-      "duration": 5318.6990000000005,
+      "startTime": "2026-02-25T22:55:50.561Z",
+      "duration": 5638.048000000001,
       "expected": 1,
       "skipped": 0,
       "unexpected": 0,
@@ -113,18 +113,109 @@
                       {
                         "workerIndex": 0,
                         "parallelIndex": 0,
-                        "status": "passed",
-                        "duration": 11196,
-                        "errors": [],
+                        "status": "failed",
+                        "duration": 2766,
+                        "error": {
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:121:39",
+                          "location": {
+                            "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                            "column": 39,
+                            "line": 121
+                          },
+                          "snippet": "\u001b[0m \u001b[90m 119 |\u001b[39m\n \u001b[90m 120 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m600\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 121 |\u001b[39m         expect(\u001b[36mawait\u001b[39m nodeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m2\u001b[39m)\n \u001b[90m     |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 122 |\u001b[39m         expect(\u001b[36mawait\u001b[39m edgeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m1\u001b[39m)\n \u001b[90m 123 |\u001b[39m\n \u001b[90m 124 |\u001b[39m         \u001b[36mconst\u001b[39m firstNewNodeId \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m getLastNodeId(page)\u001b[0m"
+                        },
+                        "errors": [
+                          {
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                              "column": 39,
+                              "line": 121
+                            },
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  119 |\n  120 |         await page.waitForTimeout(600)\n> 121 |         expect(await nodeCount(page)).toBe(2)\n      |                                       ^\n  122 |         expect(await edgeCount(page)).toBe(1)\n  123 |\n  124 |         const firstNewNodeId = await getLastNodeId(page)\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:121:39"
+                          }
+                        ],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:39.445Z",
+                        "startTime": "2026-02-25T22:55:51.419Z",
+                        "annotations": [],
+                        "attachments": [
+                          {
+                            "name": "error-context",
+                            "contentType": "text/markdown",
+                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-58eed-w-add-nodes-delete-and-undo-chromium/error-context.md"
+                          }
+                        ],
+                        "errorLocation": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                          "column": 39,
+                          "line": 121
+                        }
+                      },
+                      {
+                        "workerIndex": 1,
+                        "parallelIndex": 0,
+                        "status": "failed",
+                        "duration": 3184,
+                        "error": {
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:121:39",
+                          "location": {
+                            "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                            "column": 39,
+                            "line": 121
+                          },
+                          "snippet": "\u001b[0m \u001b[90m 119 |\u001b[39m\n \u001b[90m 120 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m600\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 121 |\u001b[39m         expect(\u001b[36mawait\u001b[39m nodeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m2\u001b[39m)\n \u001b[90m     |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 122 |\u001b[39m         expect(\u001b[36mawait\u001b[39m edgeCount(page))\u001b[33m.\u001b[39mtoBe(\u001b[35m1\u001b[39m)\n \u001b[90m 123 |\u001b[39m\n \u001b[90m 124 |\u001b[39m         \u001b[36mconst\u001b[39m firstNewNodeId \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m getLastNodeId(page)\u001b[0m"
+                        },
+                        "errors": [
+                          {
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                              "column": 39,
+                              "line": 121
+                            },
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  119 |\n  120 |         await page.waitForTimeout(600)\n> 121 |         expect(await nodeCount(page)).toBe(2)\n      |                                       ^\n  122 |         expect(await edgeCount(page)).toBe(1)\n  123 |\n  124 |         const firstNewNodeId = await getLastNodeId(page)\n    at /home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts:121:39"
+                          }
+                        ],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 1,
+                        "startTime": "2026-02-25T22:55:55.611Z",
+                        "annotations": [],
+                        "attachments": [
+                          {
+                            "name": "error-context",
+                            "contentType": "text/markdown",
+                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-58eed-w-add-nodes-delete-and-undo-chromium-retry1/error-context.md"
+                          },
+                          {
+                            "name": "trace",
+                            "contentType": "application/zip",
+                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/builder-simple.e2e.ts-Buil-58eed-w-add-nodes-delete-and-undo-chromium-retry1/trace.zip"
+                          }
+                        ],
+                        "errorLocation": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/builder-simple.e2e.ts",
+                          "column": 39,
+                          "line": 121
+                        }
+                      },
+                      {
+                        "workerIndex": 2,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 10875,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 2,
+                        "startTime": "2026-02-25T22:56:00.053Z",
                         "annotations": [],
                         "attachments": []
                       }
                     ],
-                    "status": "expected"
+                    "status": "flaky"
                   }
                 ],
                 "id": "16470303892dd33bf49c-ac08bc06a135496b2fc9",
@@ -145,15 +236,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1369,
+                        "duration": 1400,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:51.721Z",
+                        "startTime": "2026-02-25T22:56:11.026Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -187,15 +278,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2586,
+                        "duration": 2567,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:53.105Z",
+                        "startTime": "2026-02-25T22:56:12.440Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -221,15 +312,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 677,
+                        "duration": 727,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:55.708Z",
+                        "startTime": "2026-02-25T22:56:15.023Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -255,15 +346,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 6322,
+                        "duration": 6361,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:50:56.409Z",
+                        "startTime": "2026-02-25T22:56:15.766Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -289,15 +380,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1280,
+                        "duration": 1225,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:02.743Z",
+                        "startTime": "2026-02-25T22:56:22.141Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -308,6 +399,40 @@
                 "id": "16470303892dd33bf49c-c4652278d2d6dfd0e0d0",
                 "file": "builder-simple.e2e.ts",
                 "line": 334,
+                "column": 5
+              },
+              {
+                "title": "minimap toggle and controls",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 90000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 2,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1239,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:23.377Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "16470303892dd33bf49c-fe3125940f231c8ac48d",
+                "file": "builder-simple.e2e.ts",
+                "line": 368,
                 "column": 5
               }
             ]
@@ -340,15 +465,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 812,
+                        "duration": 767,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:04.047Z",
+                        "startTime": "2026-02-25T22:56:24.641Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -374,15 +499,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1538,
+                        "duration": 1440,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:04.878Z",
+                        "startTime": "2026-02-25T22:56:25.424Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -408,15 +533,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1477,
+                        "duration": 1484,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:06.434Z",
+                        "startTime": "2026-02-25T22:56:26.881Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -442,15 +567,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1248,
+                        "duration": 1257,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:07.929Z",
+                        "startTime": "2026-02-25T22:56:28.381Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -461,6 +586,392 @@
                 "id": "6414dd0c3faa895c0e1b-76656b4ef2d9353d8c95",
                 "file": "flow-studio.e2e.ts",
                 "line": 110,
+                "column": 5
+              }
+            ]
+          },
+          {
+            "title": "NodeButtonsMenu",
+            "file": "flow-studio.e2e.ts",
+            "line": 120,
+            "column": 6,
+            "specs": [
+              {
+                "title": "shows 4 action buttons when node is clicked in edit mode",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.655Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-5a90159b3f20f96546a5",
+                "file": "flow-studio.e2e.ts",
+                "line": 136,
+                "column": 5
+              },
+              {
+                "title": "does not show menu when edit mode is off",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.655Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-fb312718eeb27a22dd01",
+                "file": "flow-studio.e2e.ts",
+                "line": 146,
+                "column": 5
+              },
+              {
+                "title": "dismisses menu when clicking on empty canvas",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.655Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-68a4fba8f1b5f3928ee0",
+                "file": "flow-studio.e2e.ts",
+                "line": 157,
+                "column": 5
+              },
+              {
+                "title": "rename: shows input, accepts new name on Enter",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.655Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-aeea37795f20b81c2d0f",
+                "file": "flow-studio.e2e.ts",
+                "line": 164,
+                "column": 5
+              },
+              {
+                "title": "add before: inserts a new placeholder node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.655Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-2f7f47f8f3909a41c290",
+                "file": "flow-studio.e2e.ts",
+                "line": 175,
+                "column": 5
+              },
+              {
+                "title": "add after: starts connector from the node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.656Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-1413a7bbbacbe013f59c",
+                "file": "flow-studio.e2e.ts",
+                "line": 183,
+                "column": 5
+              },
+              {
+                "title": "buttons have minimum 48px touch targets",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 60000,
+                    "annotations": [
+                      {
+                        "type": "skip",
+                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                        "location": {
+                          "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                          "line": 125,
+                          "column": 10
+                        }
+                      }
+                    ],
+                    "expectedStatus": "skipped",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": -1,
+                        "parallelIndex": -1,
+                        "status": "skipped",
+                        "duration": 0,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-25T22:56:29.656Z",
+                        "annotations": [
+                          {
+                            "type": "skip",
+                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
+                            "location": {
+                              "file": "/home/runner/work/wibeboard/wibeboard/tests/flow-studio.e2e.ts",
+                              "line": 125,
+                              "column": 10
+                            }
+                          }
+                        ],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "skipped"
+                  }
+                ],
+                "id": "6414dd0c3faa895c0e1b-6c7ae1fc68ad0683ec8c",
+                "file": "flow-studio.e2e.ts",
+                "line": 191,
                 "column": 5
               }
             ]
@@ -493,15 +1004,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10564,
+                        "duration": 10539,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:09.200Z",
+                        "startTime": "2026-02-25T22:56:29.670Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -544,15 +1055,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4520,
+                        "duration": 4383,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:19.796Z",
+                        "startTime": "2026-02-25T22:56:40.230Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -578,7 +1089,7 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
                         "duration": 3290,
@@ -586,7 +1097,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:24.333Z",
+                        "startTime": "2026-02-25T22:56:44.626Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -612,15 +1123,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3271,
+                        "duration": 3291,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:27.637Z",
+                        "startTime": "2026-02-25T22:56:47.932Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -646,15 +1157,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1731,
+                        "duration": 1735,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:30.919Z",
+                        "startTime": "2026-02-25T22:56:51.240Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -680,15 +1191,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2950,
+                        "duration": 2918,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:32.663Z",
+                        "startTime": "2026-02-25T22:56:52.992Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -714,15 +1225,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3646,
+                        "duration": 2947,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:35.629Z",
+                        "startTime": "2026-02-25T22:56:55.924Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -748,15 +1259,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3066,
+                        "duration": 3093,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:39.289Z",
+                        "startTime": "2026-02-25T22:56:58.885Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -809,15 +1320,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "skipped",
-                        "duration": 489,
+                        "duration": 498,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:42.374Z",
+                        "startTime": "2026-02-25T22:57:02.008Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -853,15 +1364,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1638,
+                        "duration": 1661,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:42.876Z",
+                        "startTime": "2026-02-25T22:57:02.525Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -873,400 +1384,39 @@
                 "file": "integrations.e2e.ts",
                 "line": 37,
                 "column": 5
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "title": "node-buttons-menu.e2e.ts",
-        "file": "node-buttons-menu.e2e.ts",
-        "column": 0,
-        "line": 0,
-        "specs": [],
-        "suites": [
-          {
-            "title": "NodeButtonsMenu",
-            "file": "node-buttons-menu.e2e.ts",
-            "line": 55,
-            "column": 6,
-            "specs": [
+              },
               {
-                "title": "shows 4 action buttons when node is clicked in edit mode",
+                "title": "custom integrations JSON editor saves and shows Ollama card",
                 "ok": true,
                 "tags": [],
                 "tests": [
                   {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
+                    "timeout": 30000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
                     "projectId": "chromium",
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
+                        "workerIndex": 2,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 851,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
+                        "startTime": "2026-02-25T22:57:04.202Z",
+                        "annotations": [],
                         "attachments": []
                       }
                     ],
-                    "status": "skipped"
+                    "status": "expected"
                   }
                 ],
-                "id": "8ddaf3c84982edb6f57d-a55919ecae05d6c50c58",
-                "file": "node-buttons-menu.e2e.ts",
+                "id": "398a8be455863c2b5776-3c92b42d8aa7f6d1788d",
+                "file": "integrations.e2e.ts",
                 "line": 69,
-                "column": 5
-              },
-              {
-                "title": "does not show menu when edit mode is off",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-0d47c2311747884c796e",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 84,
-                "column": 5
-              },
-              {
-                "title": "dismisses menu when clicking on empty canvas",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-294ebf99b78ba74573a0",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 95,
-                "column": 5
-              },
-              {
-                "title": "rename: shows input, accepts new name on Enter",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-ba664b6d72463e01d1e5",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 108,
-                "column": 5
-              },
-              {
-                "title": "add before: inserts a new placeholder node",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-ad62e64a8979ed7e4eb9",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 129,
-                "column": 5
-              },
-              {
-                "title": "add after: starts connector from the node",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.528Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-f40dbe49b04d12108b17",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 144,
-                "column": 5
-              },
-              {
-                "title": "buttons have minimum 48px touch targets",
-                "ok": true,
-                "tags": [],
-                "tests": [
-                  {
-                    "timeout": 60000,
-                    "annotations": [
-                      {
-                        "type": "skip",
-                        "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                        "location": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                          "line": 60,
-                          "column": 10
-                        }
-                      }
-                    ],
-                    "expectedStatus": "skipped",
-                    "projectId": "chromium",
-                    "projectName": "chromium",
-                    "results": [
-                      {
-                        "workerIndex": -1,
-                        "parallelIndex": -1,
-                        "status": "skipped",
-                        "duration": 0,
-                        "errors": [],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.529Z",
-                        "annotations": [
-                          {
-                            "type": "skip",
-                            "description": "NodeButtonsMenu is not yet integrated into FlowStudio — component exists but is not rendered",
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-buttons-menu.e2e.ts",
-                              "line": 60,
-                              "column": 10
-                            }
-                          }
-                        ],
-                        "attachments": []
-                      }
-                    ],
-                    "status": "skipped"
-                  }
-                ],
-                "id": "8ddaf3c84982edb6f57d-0e1ddcaf432d2edd838e",
-                "file": "node-buttons-menu.e2e.ts",
-                "line": 161,
                 "column": 5
               }
             ]
@@ -1299,10 +1449,10 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1854,
+                        "duration": 1846,
                         "errors": [],
                         "stdout": [
                           {
@@ -1326,7 +1476,7 @@
                         ],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:44.536Z",
+                        "startTime": "2026-02-25T22:57:05.095Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1369,15 +1519,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1155,
+                        "duration": 1140,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:46.417Z",
+                        "startTime": "2026-02-25T22:57:06.967Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1403,15 +1553,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 694,
+                        "duration": 712,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:47.587Z",
+                        "startTime": "2026-02-25T22:57:08.122Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1437,15 +1587,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 918,
+                        "duration": 916,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:48.295Z",
+                        "startTime": "2026-02-25T22:57:08.849Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1471,15 +1621,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1330,
+                        "duration": 1311,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:49.229Z",
+                        "startTime": "2026-02-25T22:57:09.779Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1505,15 +1655,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1176,
+                        "duration": 637,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:50.574Z",
+                        "startTime": "2026-02-25T22:57:11.103Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1539,15 +1689,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 955,
+                        "duration": 852,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:51.766Z",
+                        "startTime": "2026-02-25T22:57:11.754Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1573,15 +1723,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 830,
+                        "duration": 689,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:52.734Z",
+                        "startTime": "2026-02-25T22:57:12.619Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1607,15 +1757,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1979,
+                        "duration": 500,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:53.579Z",
+                        "startTime": "2026-02-25T22:57:13.323Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1641,15 +1791,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 921,
+                        "duration": 673,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:55.572Z",
+                        "startTime": "2026-02-25T22:57:13.848Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1675,15 +1825,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 703,
+                        "duration": 677,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:56.508Z",
+                        "startTime": "2026-02-25T22:57:14.536Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1709,15 +1859,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 645,
+                        "duration": 611,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:57.225Z",
+                        "startTime": "2026-02-25T22:57:15.225Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1743,15 +1893,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 985,
+                        "duration": 973,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:57.885Z",
+                        "startTime": "2026-02-25T22:57:15.851Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1794,15 +1944,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10351,
+                        "duration": 10292,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:51:58.896Z",
+                        "startTime": "2026-02-25T22:57:16.852Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1828,15 +1978,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4890,
+                        "duration": 4822,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:09.256Z",
+                        "startTime": "2026-02-25T22:57:27.155Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1862,15 +2012,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2674,
+                        "duration": 2655,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:14.156Z",
+                        "startTime": "2026-02-25T22:57:31.989Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1896,15 +2046,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2866,
+                        "duration": 2799,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:16.839Z",
+                        "startTime": "2026-02-25T22:57:34.653Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1930,15 +2080,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2835,
+                        "duration": 2766,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:19.715Z",
+                        "startTime": "2026-02-25T22:57:37.464Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1964,15 +2114,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2863,
+                        "duration": 2821,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:22.563Z",
+                        "startTime": "2026-02-25T22:57:40.240Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1998,15 +2148,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 0,
+                        "workerIndex": 2,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 6015,
+                        "duration": 5909,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-25T22:52:25.438Z",
+                        "startTime": "2026-02-25T22:57:43.074Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2022,99 +2172,15 @@
             ]
           }
         ]
-      },
-      {
-        "title": "verify-integrations.e2e.ts",
-        "file": "verify-integrations.e2e.ts",
-        "column": 0,
-        "line": 0,
-        "specs": [
-          {
-            "title": "custom integrations",
-            "ok": true,
-            "tags": [],
-            "tests": [
-              {
-                "timeout": 30000,
-                "annotations": [],
-                "expectedStatus": "passed",
-                "projectId": "chromium",
-                "projectName": "chromium",
-                "results": [
-                  {
-                    "workerIndex": 0,
-                    "parallelIndex": 0,
-                    "status": "passed",
-                    "duration": 1376,
-                    "errors": [],
-                    "stdout": [],
-                    "stderr": [],
-                    "retry": 0,
-                    "startTime": "2026-02-25T22:52:31.470Z",
-                    "annotations": [],
-                    "attachments": []
-                  }
-                ],
-                "status": "expected"
-              }
-            ],
-            "id": "3a12bfb241b5a3d53627-926f726cf2898d3c2e59",
-            "file": "verify-integrations.e2e.ts",
-            "line": 3,
-            "column": 1
-          }
-        ]
-      },
-      {
-        "title": "verify-minimap.e2e.ts",
-        "file": "verify-minimap.e2e.ts",
-        "column": 0,
-        "line": 0,
-        "specs": [
-          {
-            "title": "minimap toggle and controls",
-            "ok": true,
-            "tags": [],
-            "tests": [
-              {
-                "timeout": 30000,
-                "annotations": [],
-                "expectedStatus": "passed",
-                "projectId": "chromium",
-                "projectName": "chromium",
-                "results": [
-                  {
-                    "workerIndex": 0,
-                    "parallelIndex": 0,
-                    "status": "passed",
-                    "duration": 1753,
-                    "errors": [],
-                    "stdout": [],
-                    "stderr": [],
-                    "retry": 0,
-                    "startTime": "2026-02-25T22:52:32.865Z",
-                    "annotations": [],
-                    "attachments": []
-                  }
-                ],
-                "status": "expected"
-              }
-            ],
-            "id": "e05a0fdb8661b3b78bad-555b82c7b0a2167708a6",
-            "file": "verify-minimap.e2e.ts",
-            "line": 3,
-            "column": 1
-          }
-        ]
       }
     ],
     "stats": {
-      "startTime": "2026-02-25T22:50:36.451Z",
-      "duration": 118274.241,
-      "expected": 41,
+      "startTime": "2026-02-25T22:55:48.495Z",
+      "duration": 120566.04699999999,
+      "expected": 40,
       "skipped": 8,
       "unexpected": 0,
-      "flaky": 0
+      "flaky": 1
     }
   }
 }
