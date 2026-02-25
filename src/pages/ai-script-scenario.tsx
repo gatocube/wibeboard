@@ -10,7 +10,7 @@
  * Supports drag-and-drop widget creation from the sidebar WidgetPicker.
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { ReactFlowProvider, Panel, type Node, type Edge, type NodeTypes, type NodeChange, applyNodeChanges } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
@@ -513,6 +513,169 @@ function AIScriptInner() {
         }
     }, [updateExtraNodeData, handleRunScript])
 
+    // ── Add After: insert node between source and its downstream neighbor ────
+
+    const nextInsertId = useRef(1)
+
+    const handleAddAfter = useCallback((sourceId: string, widgetType: string) => {
+        // Resolve widget type → node type and default data
+        let nodeType = 'script-js'
+        let nodeLabel = 'script.js'
+        let nodeLanguage = 'js'
+        if (widgetType.startsWith('script:')) {
+            const lang = widgetType.split(':')[1] || 'js'
+            nodeType = `script-${lang}`
+            nodeLanguage = lang
+            nodeLabel = `script.${lang}`
+        } else if (widgetType === 'script') {
+            nodeType = 'script-js'
+        } else if (widgetType.startsWith('ai:') || widgetType === 'ai') {
+            nodeType = 'agent'
+            nodeLabel = 'AI Agent'
+        } else if (widgetType === 'user') {
+            nodeType = 'user'
+            nodeLabel = 'User Task'
+        }
+
+        // Find all current nodes with their effective positions
+        const allNodes = [...scenarioNodesWithPositions, ...extraNodes]
+        const allEdges = [...scenarioEdges, ...extraEdges]
+
+        const sourceNode = allNodes.find(n => n.id === sourceId)
+        if (!sourceNode) return
+
+        // Find the node after sourceId via edges
+        const outEdge = allEdges.find(e => e.source === sourceId)
+        const nextNodeId = outEdge?.target || null
+
+        // Compute insertion position: right edge of source + gap
+        const sourceX = sourceNode.position.x
+        const newX = sourceX + sz.w + sz.gap
+        const newY = sourceNode.position.y
+
+        // Shift all nodes to the right of the insertion point
+        const shiftAmount = sz.w + sz.gap
+        const shiftThreshold = newX - 10 // anything at or past newX needs shifting
+
+        // Shift scenario nodes via position overrides
+        setPositionOverrides(prev => {
+            const next = { ...prev }
+            for (const sn of scenarioNodesWithPositions) {
+                if (sn.id === sourceId) continue
+                const curX = sn.position.x
+                if (curX >= shiftThreshold) {
+                    next[sn.id] = { x: curX + shiftAmount, y: sn.position.y }
+                }
+            }
+            return next
+        })
+
+        // Shift extra (user-added) nodes
+        setExtraNodes(nds => nds.map(n => {
+            if (n.position.x >= shiftThreshold) {
+                return { ...n, position: { x: n.position.x + shiftAmount, y: n.position.y } }
+            }
+            return n
+        }))
+
+        // Create the new node
+        const newId = `inserted-${nextInsertId.current++}`
+        const newNodeData: Record<string, any> = {
+            label: nodeLabel,
+            width: sz.w, height: sz.h,
+            connectedHandles: ['in', 'out'],
+        }
+
+        if (nodeType.startsWith('script-')) {
+            newNodeData.language = nodeLanguage
+            newNodeData.configured = false
+            newNodeData.code = ''
+            newNodeData.logs = []
+            newNodeData.status = 'idle'
+            newNodeData.onSaveScript = (code: string) => {
+                updateExtraNodeData(newId, { code, configured: true })
+            }
+            newNodeData.onRunScript = () => handleRunScript(newId)
+        } else if (nodeType === 'agent') {
+            newNodeData.agent = 'Claude 3.5'
+            newNodeData.color = '#8b5cf6'
+            newNodeData.status = 'idle'
+            newNodeData.task = ''
+            newNodeData.logs = []
+        } else if (nodeType === 'user') {
+            newNodeData.color = '#f59e0b'
+            newNodeData.status = 'idle'
+            newNodeData.reviewTitle = ''
+            newNodeData.reviewBody = ''
+        }
+
+        setExtraNodes(nds => [...nds, {
+            id: newId,
+            type: nodeType,
+            position: { x: newX, y: newY },
+            draggable: true,
+            data: newNodeData,
+            style: { width: sz.w, height: sz.h },
+        }])
+
+        // Re-wire edges: remove old source→next if it's an extra edge
+        // Add source→new and new→next
+        setExtraEdges(eds => {
+            const newEdges = eds.filter(e => !(e.source === sourceId && e.target === nextNodeId))
+            newEdges.push({
+                id: `edge-${sourceId}-${newId}`,
+                source: sourceId,
+                target: newId,
+                sourceHandle: 'out',
+                targetHandle: 'in',
+                animated: false,
+                style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+            })
+            if (nextNodeId) {
+                newEdges.push({
+                    id: `edge-${newId}-${nextNodeId}`,
+                    source: newId,
+                    target: nextNodeId,
+                    sourceHandle: 'out',
+                    targetHandle: 'in',
+                    animated: false,
+                    style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+                })
+            }
+            return newEdges
+        })
+    }, [scenarioNodesWithPositions, extraNodes, scenarioEdges, extraEdges, sz, updateExtraNodeData, handleRunScript])
+
+    // ── Add Before: insert node before a target ──────────────────────────────
+
+    const handleAddBefore = useCallback((targetId: string, widgetType: string) => {
+        // For now, delegate to handleAddAfter on the predecessor
+        const allEdges = [...scenarioEdges, ...extraEdges]
+        const inEdge = allEdges.find(e => e.target === targetId)
+        if (inEdge) {
+            handleAddAfter(inEdge.source, widgetType)
+        }
+    }, [scenarioEdges, extraEdges, handleAddAfter])
+
+    // ── Configure / Rename (stubs — can be extended later) ───────────────────
+
+    const handleConfigure = useCallback((nodeId: string, action: string) => {
+        if (action === 'delete') {
+            setExtraNodes(nds => nds.filter(n => n.id !== nodeId))
+            setExtraEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId))
+        }
+        // duplicate, rename handled separately
+    }, [])
+
+    const handleRename = useCallback((nodeId: string, newName: string) => {
+        // Update scenario node labels via override (or extra node data)
+        if (SCENARIO_NODE_IDS.includes(nodeId as any)) {
+            // Scenario nodes use data from buildScenarioNodes — can't easily rename here
+            return
+        }
+        updateExtraNodeData(nodeId, { label: newName })
+    }, [updateExtraNodeData])
+
     // ── Combine scenario + extra nodes/edges ─────────────────────────────────
 
     const combinedNodes = useMemo(
@@ -538,6 +701,10 @@ function AIScriptInner() {
             gridGap={GRID_SIZE}
             editMode
             onNodeCreated={handleNodeCreated}
+            onAddAfter={handleAddAfter}
+            onAddBefore={handleAddBefore}
+            onConfigure={handleConfigure}
+            onRename={handleRename}
         >
             <StepPlayer store={store} />
 
