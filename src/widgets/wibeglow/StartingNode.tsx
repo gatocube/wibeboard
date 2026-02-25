@@ -4,18 +4,18 @@ import { Play } from 'lucide-react'
 /**
  * StartingNode (wibeglow) — entry point of a flow.
  *
- * A small 48×48 play-button node with a single output handle.
+ * A 60×60 play-button node (3×3 grid) with a single output handle.
  * Designed as the starting point for workflows.
  *
  * data.label  — node label (default: "Start")
  * data.color  — accent color (default: green #22c55e)
- * data.width  — width (default: 48)
- * data.height — height (default: 48)
+ * data.width  — width (default: 60)
+ * data.height — height (default: 60)
  */
 export function StartingNode({ data }: { data: any }) {
     const color = data.color || '#22c55e'
-    const w = data.width || 48
-    const h = data.height || 48
+    const w = data.width || 60
+    const h = data.height || 60
     const label = data.label || 'Start'
 
     return (

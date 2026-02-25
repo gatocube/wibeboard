@@ -188,7 +188,7 @@ const WIDGETS: WidgetDefinition[] = [
         tags: ['note', 'sticker', 'annotation', 'comment', 'post-it', 'label', 'group', 'section'],
         description: 'Annotation notes, stickers, and labels',
         color: '#fbbf24',
-        minWidth: 60, minHeight: 40,
+        minWidth: 60, minHeight: 60,
         defaultWidth: 160, defaultHeight: 120,
         subTypes: [
             { value: 'sticker', label: 'Sticker', color: '#fbbf24' },
@@ -233,8 +233,8 @@ const WIDGETS: WidgetDefinition[] = [
         tags: ['expectation', 'assert', 'verify', 'check', 'artifact', 'tool', 'test'],
         description: 'Asserts that an agent produces an artifact or calls a tool',
         color: '#10b981',
-        minWidth: 60, minHeight: 40,
-        defaultWidth: 160, defaultHeight: 60,
+        minWidth: 60, minHeight: 60,
+        defaultWidth: 160, defaultHeight: 80,
         subTypes: [
             { value: 'artifact', label: 'Artifact', color: '#10b981' },
             { value: 'tool-call', label: 'Tool Call', color: '#06b6d4' },
@@ -266,8 +266,8 @@ const WIDGETS: WidgetDefinition[] = [
         tags: ['start', 'begin', 'entry', 'trigger', 'play'],
         description: 'Entry point of the flow — a play-button node',
         color: '#22c55e',
-        minWidth: 48, minHeight: 48,
-        defaultWidth: 48, defaultHeight: 48,
+        minWidth: 60, minHeight: 60,
+        defaultWidth: 60, defaultHeight: 60,
         templates: [
             {
                 name: 'Start',
