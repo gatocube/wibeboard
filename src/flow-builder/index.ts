@@ -8,6 +8,7 @@ export { WidgetConfigurator } from './WidgetConfigurator'
 export { FlowBuilderSettings } from './FlowBuilderSettings'
 export { ConnectorOverlay } from './ConnectorOverlay'
 export { NodeButtonsMenu } from './NodeButtonsMenu'
+export { NodeConfigPanel } from './NodeConfigPanel'
 
 export type {
     FlowBuilderProps,

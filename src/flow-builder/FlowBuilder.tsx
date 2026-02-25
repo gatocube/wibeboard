@@ -90,6 +90,7 @@ export function FlowBuilder({
     onAddAfter,
     onConfigure,
     onRename,
+    sidebarContent,
 }: FlowBuilderProps) {
     const { screenToFlowPosition } = useReactFlow()
 
@@ -649,7 +650,7 @@ export function FlowBuilder({
                     </ReactFlow>
                 </div>
 
-                {/* Widget picker — right side */}
+                {/* Sidebar — right side */}
                 {editMode && (
                     <div style={{
                         width: 260, flexShrink: 0,
@@ -657,14 +658,16 @@ export function FlowBuilder({
                         display: 'flex', flexDirection: 'column',
                         overflow: 'hidden',
                     }}>
-                        <WidgetPicker
-                            rectSize={{ width: 200, height: 120 }}
-                            onSelect={() => {
-                                startSizingAt({ x: 200, y: 200 })
-                            }}
-                            onCancel={() => { }}
-                            embedded
-                        />
+                        {sidebarContent || (
+                            <WidgetPicker
+                                rectSize={{ width: 200, height: 120 }}
+                                onSelect={() => {
+                                    startSizingAt({ x: 200, y: 200 })
+                                }}
+                                onCancel={() => { }}
+                                embedded
+                            />
+                        )}
                     </div>
                 )}
             </div>

@@ -14,7 +14,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { ReactFlowProvider, Panel, type Node, type Edge, type NodeTypes, type NodeChange, applyNodeChanges } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
-import { FlowBuilder, type NodeSize } from '@/flow-builder'
+import { FlowBuilder, NodeConfigPanel, type NodeSize } from '@/flow-builder'
 import { AgentNode } from '@/widgets/wibeglow/AgentNode'
 import { ScriptNode } from '@/widgets/wibeglow/ScriptNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
@@ -366,6 +366,9 @@ function AIScriptInner() {
     const [extraNodes, setExtraNodes] = useState<Node[]>([])
     const [extraEdges, setExtraEdges] = useState<Edge[]>([])
 
+    // Track which node is being configured in the sidebar
+    const [configuringNodeId, setConfiguringNodeId] = useState<string | null>(null)
+
     // Build scenario nodes each render (data driven by StepStore)
     const scenarioNodes = useMemo(
         () => buildScenarioNodes(state, sz, commentCount, handleComment, handleApprove),
@@ -624,6 +627,9 @@ function AIScriptInner() {
             style: { width: sz.w, height: sz.h },
         }])
 
+        // Open the configuration panel for the new node
+        setConfiguringNodeId(newId)
+
         // Re-wire edges: remove old source→next if it's an extra edge
         // Add source→new and new→next
         setExtraEdges(eds => {
@@ -711,6 +717,23 @@ function AIScriptInner() {
             onAddBefore={handleAddBefore}
             onConfigure={handleConfigure}
             onRename={handleRename}
+            sidebarContent={configuringNodeId ? (() => {
+                const node = [...scenarioNodesWithPositions, ...extraNodes].find(n => n.id === configuringNodeId)
+                if (!node) return undefined
+                return (
+                    <NodeConfigPanel
+                        nodeId={configuringNodeId}
+                        nodeType={String(node.type || 'script-js')}
+                        nodeLabel={String(node.data?.label || node.id)}
+                        nodeData={node.data as Record<string, any>}
+                        onUpdateData={(id, data) => {
+                            updateExtraNodeData(id, data)
+                            setConfiguringNodeId(null)
+                        }}
+                        onClose={() => setConfiguringNodeId(null)}
+                    />
+                )
+            })() : undefined}
         >
             <StepPlayer store={store} />
 

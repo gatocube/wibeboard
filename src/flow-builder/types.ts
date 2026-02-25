@@ -82,4 +82,9 @@ export interface FlowBuilderProps {
      * Called when "Rename" is confirmed with a new name.
      */
     onRename?: (nodeId: string, newName: string) => void
+    /**
+     * When provided, replaces the default WidgetPicker in the right sidebar.
+     * Useful for showing a node configuration panel after creation.
+     */
+    sidebarContent?: React.ReactNode
 }
