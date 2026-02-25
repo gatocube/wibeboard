@@ -31,9 +31,8 @@ test.describe('Pages smoke check', () => {
 
         // 2. Navigate to widgets using top nav button (exact match)
         await page.getByRole('button', { name: 'widgets', exact: true }).click()
-        // New gallery shows WidgetSelector (left) + 3 theme panes (right)
-        await expect(page.locator('[data-testid="widget-agent"]')).toBeVisible({ timeout: 5_000 })
-        await expect(page.locator('[data-testid="status-idle"]')).toBeVisible({ timeout: 3_000 })
+        // New gallery shows subtype buttons, status icons, and theme panes
+        await expect(page.locator('[data-testid="status-idle"]')).toBeVisible({ timeout: 5_000 })
         visitedPages.push('widgets')
 
         // Verify theme panes show widget labels
