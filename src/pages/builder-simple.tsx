@@ -70,15 +70,10 @@ const STORAGE_KEY = 'flowstudio_workflows'
 const ACTIVE_KEY = 'flowstudio_active_workflow'
 
 function loadWorkflows(): { workflows: Workflow[]; activeId: string } {
+    // Persistence disabled — clear any stale data and start fresh
     try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-            const workflows = JSON.parse(raw) as Workflow[]
-            if (workflows.length > 0) {
-                const activeId = localStorage.getItem(ACTIVE_KEY) || workflows[0].id
-                return { workflows, activeId }
-            }
-        }
+        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(ACTIVE_KEY)
     } catch (e) { /* ignore */ }
     const wf = createWorkflow('Workflow 1')
     return { workflows: [wf], activeId: wf.id }
