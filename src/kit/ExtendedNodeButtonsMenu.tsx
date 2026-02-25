@@ -237,33 +237,56 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* After → Script sub-types: fan further right */}
-                {expanded === 'after' && scriptExpanded === 'after' && SCRIPT_TYPES.map((st, i) => (
-                    <MotionButton
-                        key={`after-script-${st.key}`}
-                        testId={`ext-after-script-${st.key}`}
-                        pos={{ x: positions.right.x + 58 + 58, y: positions.right.y + (i - 1) * 56 }}
-                        icon={st.icon}
-                        label={st.label}
-                        color={st.color}
-                        delay={i * 0.03}
-                        onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
-                    />
-                ))}
+                {/* After → Script sub-types: orbit around the Script button */}
+                {expanded === 'after' && scriptExpanded === 'after' && (() => {
+                    // Script button is at index 0 in WIDGET_TYPES → y offset = (0-1)*56 = -56
+                    const scriptBtnX = positions.right.x + 58
+                    const scriptBtnY = positions.right.y + (0 - 1) * 56
+                    // Place sub-types: above, right, below the Script button
+                    const subPositions = [
+                        { x: scriptBtnX, y: scriptBtnY - 50 },        // above
+                        { x: scriptBtnX + 50, y: scriptBtnY },        // right
+                        { x: scriptBtnX, y: scriptBtnY + 50 },        // below
+                    ]
+                    return SCRIPT_TYPES.map((st, i) => (
+                        <MotionButton
+                            key={`after-script-${st.key}`}
+                            testId={`ext-after-script-${st.key}`}
+                            pos={subPositions[i]}
+                            icon={st.icon}
+                            label={st.label}
+                            color={st.color}
+                            size={38}
+                            delay={i * 0.03}
+                            onClick={() => { onAddAfter(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                        />
+                    ))
+                })()}
 
-                {/* After → AI roles: fan further right */}
-                {expanded === 'after' && aiExpanded === 'after' && AI_ROLES.map((role, i) => (
-                    <MotionButton
-                        key={`after-ai-${role.key}`}
-                        testId={`ext-after-ai-${role.key}`}
-                        pos={{ x: positions.right.x + 58 + 58, y: positions.right.y + (i - 1) * 56 }}
-                        icon={role.icon}
-                        label={role.label}
-                        color={role.color}
-                        delay={i * 0.03}
-                        onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
-                    />
-                ))}
+                {/* After → AI roles: orbit around the AI button */}
+                {expanded === 'after' && aiExpanded === 'after' && (() => {
+                    // AI button is at index 1 in WIDGET_TYPES → y offset = 0
+                    const aiBtnX = positions.right.x + 58
+                    const aiBtnY = positions.right.y
+                    const subPositions = [
+                        { x: aiBtnX, y: aiBtnY - 50 },
+                        { x: aiBtnX + 50, y: aiBtnY },
+                        { x: aiBtnX, y: aiBtnY + 50 },
+                    ]
+                    return AI_ROLES.map((role, i) => (
+                        <MotionButton
+                            key={`after-ai-${role.key}`}
+                            testId={`ext-after-ai-${role.key}`}
+                            pos={subPositions[i]}
+                            icon={role.icon}
+                            label={role.label}
+                            color={role.color}
+                            size={38}
+                            delay={i * 0.03}
+                            onClick={() => { onAddAfter(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                        />
+                    ))
+                })()}
 
                 {/* ── Rename (bottom) ── */}
                 <MotionButton
@@ -322,33 +345,53 @@ export function ExtendedNodeButtonsMenu(props: ExtendedNodeButtonsMenuProps) {
                     />
                 ))}
 
-                {/* Before → Script sub-types: fan further left */}
-                {expanded === 'before' && scriptExpanded === 'before' && SCRIPT_TYPES.map((st, i) => (
-                    <MotionButton
-                        key={`before-script-${st.key}`}
-                        testId={`ext-before-script-${st.key}`}
-                        pos={{ x: positions.left.x - 58 - 58, y: positions.left.y + (i - 1) * 56 }}
-                        icon={st.icon}
-                        label={st.label}
-                        color={st.color}
-                        delay={i * 0.03}
-                        onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
-                    />
-                ))}
+                {/* Before → Script sub-types: orbit around the Script button */}
+                {expanded === 'before' && scriptExpanded === 'before' && (() => {
+                    const scriptBtnX = positions.left.x - 58
+                    const scriptBtnY = positions.left.y + (0 - 1) * 56
+                    const subPositions = [
+                        { x: scriptBtnX, y: scriptBtnY - 50 },
+                        { x: scriptBtnX - 50, y: scriptBtnY },
+                        { x: scriptBtnX, y: scriptBtnY + 50 },
+                    ]
+                    return SCRIPT_TYPES.map((st, i) => (
+                        <MotionButton
+                            key={`before-script-${st.key}`}
+                            testId={`ext-before-script-${st.key}`}
+                            pos={subPositions[i]}
+                            icon={st.icon}
+                            label={st.label}
+                            color={st.color}
+                            size={38}
+                            delay={i * 0.03}
+                            onClick={() => { onAddBefore(nodeId, `script:${st.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                        />
+                    ))
+                })()}
 
-                {/* Before → AI roles: fan further left */}
-                {expanded === 'before' && aiExpanded === 'before' && AI_ROLES.map((role, i) => (
-                    <MotionButton
-                        key={`before-ai-${role.key}`}
-                        testId={`ext-before-ai-${role.key}`}
-                        pos={{ x: positions.left.x - 58 - 58, y: positions.left.y + (i - 1) * 56 }}
-                        icon={role.icon}
-                        label={role.label}
-                        color={role.color}
-                        delay={i * 0.03}
-                        onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
-                    />
-                ))}
+                {/* Before → AI roles: orbit around the AI button */}
+                {expanded === 'before' && aiExpanded === 'before' && (() => {
+                    const aiBtnX = positions.left.x - 58
+                    const aiBtnY = positions.left.y
+                    const subPositions = [
+                        { x: aiBtnX, y: aiBtnY - 50 },
+                        { x: aiBtnX - 50, y: aiBtnY },
+                        { x: aiBtnX, y: aiBtnY + 50 },
+                    ]
+                    return AI_ROLES.map((role, i) => (
+                        <MotionButton
+                            key={`before-ai-${role.key}`}
+                            testId={`ext-before-ai-${role.key}`}
+                            pos={subPositions[i]}
+                            icon={role.icon}
+                            label={role.label}
+                            color={role.color}
+                            size={38}
+                            delay={i * 0.03}
+                            onClick={() => { onAddBefore(nodeId, `ai:${role.key}`); setExpanded(null); setScriptExpanded(null); setAiExpanded(null) }}
+                        />
+                    ))
+                })()}
             </AnimatePresence>
 
             {/* Rename inline input */}
