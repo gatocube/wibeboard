@@ -23,10 +23,13 @@ import type { WidgetTemplate } from '@/engine/widget-registry'
 
 // ── Node types ───────────────────────────────────────────────────────────────
 
+const GRID_SIZE = 20
+const NODE_GAP = GRID_SIZE * 6       // 6 grid units between nodes
+
 const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
-    S: { w: 50, h: 50, gap: 100 },
-    M: { w: 160, h: 100, gap: 200 },
-    L: { w: 300, h: 200, gap: 360 },
+    S: { w: 50, h: 50, gap: NODE_GAP },
+    M: { w: 160, h: 100, gap: NODE_GAP },
+    L: { w: 300, h: 200, gap: NODE_GAP },
 }
 
 const NODE_TYPES: NodeTypes = {
@@ -39,7 +42,7 @@ const NODE_TYPES: NodeTypes = {
     placeholder: PlaceholderNode,
 }
 
-const GRID_SIZE = 20
+
 
 // ── IDs of scenario (step-driven) nodes ──────────────────────────────────────
 
