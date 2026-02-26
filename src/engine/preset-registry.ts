@@ -62,7 +62,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-script', widgetType: 'job', subType: 'js',
         label: 'Script', description: 'Generic script preset',
         tags: ['script', 'javascript', 'js', 'code'],
-        ui: { icons: { default: 'file-code', working: 'loader-2' } },
+        ui: { icons: { default: 'terminal', working: 'loader-2' } },
         defaultData: {
             label: 'Script', subType: 'js', language: 'js',
             code: `export function activate(ctx) {\n   console.log('Hello from script');\n}`,
@@ -72,7 +72,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-js', widgetType: 'job', subType: 'js',
         label: 'JS', description: 'JavaScript with activate() entry',
         tags: ['script', 'javascript', 'js', 'code'],
-        ui: { icons: { default: 'file-code', working: 'loader-2' } },
+        ui: { icons: { default: 'script-js', working: 'loader-2' } },
         defaultData: {
             label: 'script.js', subType: 'js', language: 'js',
             code: `export function activate(ctx) {\n   console.log('Hello from js');\n}`,
@@ -82,7 +82,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-ts', widgetType: 'job', subType: 'ts',
         label: 'TS Script', description: 'TypeScript with type-safe activate()',
         tags: ['script', 'typescript', 'ts', 'code'],
-        ui: { icons: { default: 'file-code', working: 'loader-2' } },
+        ui: { icons: { default: 'script-ts', working: 'loader-2' } },
         defaultData: {
             label: 'script.ts', subType: 'ts', language: 'ts',
             code: `export function activate(ctx: Context) {\n   console.log('Hello from', ctx.node.name);\n}`,
@@ -92,7 +92,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-sh', widgetType: 'job', subType: 'sh',
         label: 'Shell Script', description: 'Shell script for system commands',
         tags: ['script', 'shell', 'bash', 'sh'],
-        ui: { icons: { default: 'terminal', working: 'loader-2' } },
+        ui: { icons: { default: 'script-sh', working: 'loader-2' } },
         defaultData: {
             label: 'script.sh', subType: 'sh', language: 'sh',
             code: `#!/bin/bash\necho "Hello from $NODE_NAME"`,
@@ -102,7 +102,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-py', widgetType: 'job', subType: 'py',
         label: 'Python Script', description: 'Python for data processing and ML',
         tags: ['script', 'python', 'py', 'ml'],
-        ui: { icons: { default: 'file-type', working: 'loader-2' } },
+        ui: { icons: { default: 'script-py', working: 'loader-2' } },
         defaultData: {
             label: 'script.py', subType: 'py', language: 'py',
             code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
