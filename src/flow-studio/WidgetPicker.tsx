@@ -350,6 +350,9 @@ export function WidgetPicker({
                                         ? widget.label
                                         : tmpl.label
                                     const truncLabel = label.length > 7 ? label.slice(0, 7) : label
+                                    const presetIcon = tmpl.ui?.icons?.default || widget.ui.icons.default
+                                    const hasBorderColors = tmpl.ui?.borderColors && tmpl.ui.borderColors.length > 1
+                                    const tileColor = tmpl.ui?.color || widget.ui.color
                                     return (
                                         <div
                                             key={`${widget.type}-${i}`}
@@ -367,8 +370,11 @@ export function WidgetPicker({
                                             onMouseLeave={() => onHoverWidget?.(null)}
                                             style={{
                                                 width: 48, height: 48, borderRadius: 8,
-                                                background: `${widget.ui.color}15`,
-                                                border: `1px solid ${widget.ui.color}33`,
+                                                background: hasBorderColors
+                                                    ? `conic-gradient(${tmpl.ui!.borderColors!.join(', ')})`
+                                                    : `${tileColor}15`,
+                                                border: hasBorderColors ? 'none' : `1px solid ${tileColor}33`,
+                                                padding: hasBorderColors ? 2 : 0,
                                                 display: 'flex', flexDirection: 'column',
                                                 alignItems: 'center', justifyContent: 'center',
                                                 cursor: 'pointer',
@@ -376,20 +382,40 @@ export function WidgetPicker({
                                                 gap: 2,
                                             }}
                                             onMouseOver={e => {
-                                                (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}25`
-                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}55`
-                                                    ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
+                                                if (!hasBorderColors) {
+                                                    (e.currentTarget as HTMLElement).style.background = `${tileColor}25`
+                                                        ; (e.currentTarget as HTMLElement).style.borderColor = `${tileColor}55`
+                                                }
+                                                ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
                                             }}
                                             onMouseOut={e => {
-                                                (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}15`
-                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}33`
-                                                    ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                                                if (!hasBorderColors) {
+                                                    (e.currentTarget as HTMLElement).style.background = `${tileColor}15`
+                                                        ; (e.currentTarget as HTMLElement).style.borderColor = `${tileColor}33`
+                                                }
+                                                ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                             }}
                                         >
-                                            <WidgetIcon type={(tmpl.ui?.icons?.default || widget.ui.icons.default)} size={16} color={widget.ui.color} />
-                                            <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
-                                                {truncLabel}
-                                            </span>
+                                            {hasBorderColors ? (
+                                                <div style={{
+                                                    width: '100%', height: '100%', borderRadius: 6,
+                                                    background: '#0a0a14',
+                                                    display: 'flex', flexDirection: 'column',
+                                                    alignItems: 'center', justifyContent: 'center', gap: 2,
+                                                }}>
+                                                    <WidgetIcon type={presetIcon} size={16} />
+                                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
+                                                        {truncLabel}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <WidgetIcon type={presetIcon} size={16} />
+                                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
+                                                        {truncLabel}
+                                                    </span>
+                                                </>
+                                            )}
                                         </div>
                                     )
                                 })
