@@ -277,7 +277,7 @@ function buildPreviewData(
 export function NodeConfiguratorPage() {
     const allWidgets = useMemo(() => widgetRegistry.getAll(), [])
     const [selectedType, setSelectedType] = useState(allWidgets[0]?.type || 'job')
-    const [templateIdx, setTemplateIdx] = useState(0)
+
     const [mode, setMode] = useState<Mode>('visual')
     const [rawJson, setRawJson] = useState('')
     const [parseError, setParseError] = useState<string | null>(null)
@@ -288,7 +288,7 @@ export function NodeConfiguratorPage() {
         [allWidgets, selectedType],
     )
 
-    const template = presetRegistry.getByWidget(widgetDef.type)[templateIdx] || presetRegistry.getByWidget(widgetDef.type)[0]
+    const template = presetRegistry.getByWidget(widgetDef.type)[0]
 
     // Re-init nodeData when widget/template changes
     useMemo(() => {
@@ -301,21 +301,15 @@ export function NodeConfiguratorPage() {
 
     const handleTypeChange = useCallback((type: string) => {
         setSelectedType(type)
-        setTemplateIdx(0)
         setMode('visual')
         setParseError(null)
     }, [])
 
-    const handleTemplateChange = useCallback((idx: number) => {
-        setTemplateIdx(idx)
-        setParseError(null)
-    }, [])
+
 
     // Widget picker selection → auto-populate everything
     const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: PresetDefinition) => {
         setSelectedType(widget.type)
-        const idx = presetRegistry.getByWidget(widget.type).indexOf(tmpl)
-        setTemplateIdx(idx >= 0 ? idx : 0)
         setNodeData({ ...tmpl.defaultData })
         setMode('visual')
         setParseError(null)
@@ -477,63 +471,6 @@ export function NodeConfiguratorPage() {
                             </select>
                         </div>
 
-                        {/* Template selector */}
-                        {presetRegistry.getByWidget(widgetDef.type).length > 1 && (
-                            <div>
-                                <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Template</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {presetRegistry.getByWidget(widgetDef.type).map((tpl, i) => {
-                                        const presetIcon = tpl.ui?.icons?.default || widgetDef.ui.icons.default
-                                        const hasBorderColors = tpl.ui?.borderColors && tpl.ui.borderColors.length > 1
-                                        const gradientBorder = hasBorderColors
-                                            ? (() => {
-                                                const c = tpl.ui!.borderColors!
-                                                const stops = c.map((col, idx) => `${col}88 ${Math.round((idx / (c.length - 1)) * 100)}%`)
-                                                return `linear-gradient(135deg, ${stops.join(', ')})`
-                                            })()
-                                            : undefined
-                                        return (
-                                            <button
-                                                key={i}
-                                                data-testid={`template-${i}`}
-                                                onClick={() => handleTemplateChange(i)}
-                                                style={{
-                                                    display: 'flex', alignItems: 'center', gap: 10,
-                                                    padding: hasBorderColors ? '1px' : '8px 12px',
-                                                    borderRadius: 8, border: 'none',
-                                                    background: hasBorderColors
-                                                        ? gradientBorder
-                                                        : i === templateIdx
-                                                            ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.02)',
-                                                    cursor: 'pointer', textAlign: 'left',
-                                                    fontFamily: 'Inter, sans-serif',
-                                                }}
-                                            >
-                                                <div style={hasBorderColors ? {
-                                                    display: 'flex', alignItems: 'center', gap: 10,
-                                                    padding: '6px 10px', borderRadius: 6, width: '100%',
-                                                    background: i === templateIdx
-                                                        ? 'rgba(139,92,246,0.15)' : '#0a0a14',
-                                                } : undefined}>
-                                                    <WidgetIcon type={presetIcon} size={14} />
-                                                    <div>
-                                                        <div style={{
-                                                            fontSize: 11, fontWeight: 600,
-                                                            color: i === templateIdx ? '#c084fc' : '#e2e8f0',
-                                                        }}>
-                                                            {tpl.label}
-                                                        </div>
-                                                        <div style={{ fontSize: 9, color: '#64748b' }}>
-                                                            {tpl.description}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        )
-                                    })}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
 
