@@ -57,8 +57,8 @@ test.describe('Node Configurator', () => {
     test('clicking widget in WidgetPicker auto-populates config', async ({ page }) => {
         await goto(page)
 
-        // Click on "Note" widget in the compact picker sidebar
-        const noteWidget = page.locator('[data-testid="widget-note"]')
+        // Click on first Note template tile in the compact picker sidebar
+        const noteWidget = page.locator('[data-testid="widget-note-0"]')
         await expect(noteWidget).toBeVisible({ timeout: 5_000 })
         await noteWidget.click()
 

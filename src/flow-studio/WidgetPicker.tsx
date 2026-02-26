@@ -341,50 +341,58 @@ export function WidgetPicker({
                     )}
 
                     {compact ? (
-                        /* ── Compact tile grid ── */
+                        /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
-                            {filtered.map(widget => (
-                                <div
-                                    key={widget.type}
-                                    data-testid={`widget-${widget.type}`}
-                                    title={`${widget.label} — ${widget.description}`}
-                                    draggable
-                                    onDragStart={e => {
-                                        e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                            type: widget.type, template: widget.templates[0],
-                                        }))
-                                        e.dataTransfer.effectAllowed = 'move'
-                                    }}
-                                    onClick={() => handleWidgetClick(widget)}
-                                    onMouseEnter={() => onHoverWidget?.(widget)}
-                                    onMouseLeave={() => onHoverWidget?.(null)}
-                                    style={{
-                                        width: 48, height: 48, borderRadius: 8,
-                                        background: `${widget.color}15`,
-                                        border: `1px solid ${widget.color}33`,
-                                        display: 'flex', flexDirection: 'column',
-                                        alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.15s',
-                                        gap: 2,
-                                    }}
-                                    onMouseOver={e => {
-                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}25`
-                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}55`
-                                            ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
-                                    }}
-                                    onMouseOut={e => {
-                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}15`
-                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}33`
-                                            ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
-                                    }}
-                                >
-                                    <WidgetIcon type={widget.type} size={16} />
-                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
-                                        {widget.label.length > 6 ? widget.label.slice(0, 6) : widget.label}
-                                    </span>
-                                </div>
-                            ))}
+                            {filtered.flatMap(widget =>
+                                widget.templates.map((tmpl, i) => {
+                                    const label = widget.templates.length === 1
+                                        ? widget.label
+                                        : tmpl.name
+                                    const truncLabel = label.length > 7 ? label.slice(0, 7) : label
+                                    return (
+                                        <div
+                                            key={`${widget.type}-${i}`}
+                                            data-testid={`widget-${widget.type}${widget.templates.length > 1 ? `-${i}` : ''}`}
+                                            title={`${widget.label}${widget.templates.length > 1 ? ` — ${tmpl.name}` : ''}: ${tmpl.description}`}
+                                            draggable
+                                            onDragStart={e => {
+                                                e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
+                                                    type: widget.type, template: tmpl,
+                                                }))
+                                                e.dataTransfer.effectAllowed = 'move'
+                                            }}
+                                            onClick={() => handleSelect(widget, tmpl)}
+                                            onMouseEnter={() => onHoverWidget?.(widget)}
+                                            onMouseLeave={() => onHoverWidget?.(null)}
+                                            style={{
+                                                width: 48, height: 48, borderRadius: 8,
+                                                background: `${widget.color}15`,
+                                                border: `1px solid ${widget.color}33`,
+                                                display: 'flex', flexDirection: 'column',
+                                                alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.15s',
+                                                gap: 2,
+                                            }}
+                                            onMouseOver={e => {
+                                                (e.currentTarget as HTMLElement).style.background = `${widget.color}25`
+                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}55`
+                                                    ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
+                                            }}
+                                            onMouseOut={e => {
+                                                (e.currentTarget as HTMLElement).style.background = `${widget.color}15`
+                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}33`
+                                                    ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                                            }}
+                                        >
+                                            <WidgetIcon type={widget.type} size={16} />
+                                            <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
+                                                {truncLabel}
+                                            </span>
+                                        </div>
+                                    )
+                                })
+                            )}
                             {filtered.length === 0 && (
                                 <div style={{ padding: '12px 0', fontSize: 9, color: '#475569', width: '100%', textAlign: 'center' }}>
                                     {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
