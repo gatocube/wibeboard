@@ -12,6 +12,7 @@ import { IconButton, ICON_BUTTON_COLORS, IconSelector, type IconButtonColor, typ
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { Plus, Settings, Pencil, ArrowRight, Code, Cpu, Zap, Star, Heart, Globe, Shield, UserCircle, Construction } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ReactFlowProvider } from '@xyflow/react'
 import { ExpectationNode } from '@/widgets/wibeglow/ExpectationNode'
 
 // ── Icon list for demo ──────────────────────────────────────────────────────────
@@ -791,113 +792,115 @@ function ExpectationNodeSection() {
     }, [])
 
     return (
-        <section>
-            <h2 style={{
-                fontSize: 13, fontWeight: 700, color: '#e2e8f0',
-                marginBottom: 16,
-                display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-                <span style={{
-                    width: 20, height: 20, borderRadius: 5,
-                    background: 'rgba(236,72,153,0.15)',
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10,
-                }}>✅</span>
-                ExpectationNode States
-            </h2>
+        <ReactFlowProvider>
+            <section>
+                <h2 style={{
+                    fontSize: 13, fontWeight: 700, color: '#e2e8f0',
+                    marginBottom: 16,
+                    display: 'flex', alignItems: 'center', gap: 8,
+                }}>
+                    <span style={{
+                        width: 20, height: 20, borderRadius: 5,
+                        background: 'rgba(236,72,153,0.15)',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10,
+                    }}>✅</span>
+                    ExpectationNode States
+                </h2>
 
-            <p style={{ fontSize: 10, color: '#64748b', marginBottom: 16 }}>
-                Assertion nodes track whether an agent produces the expected output.
-                States: <strong style={{ color: '#94a3b8' }}>Idle</strong> →
-                <strong style={{ color: '#94a3b8' }}> Working</strong> →
-                <strong style={{ color: '#10b981' }}> Pass</strong> / <strong style={{ color: '#ef4444' }}>Fail</strong>
-            </p>
+                <p style={{ fontSize: 10, color: '#64748b', marginBottom: 16 }}>
+                    Assertion nodes track whether an agent produces the expected output.
+                    States: <strong style={{ color: '#94a3b8' }}>Idle</strong> →
+                    <strong style={{ color: '#94a3b8' }}> Working</strong> →
+                    <strong style={{ color: '#10b981' }}> Pass</strong> / <strong style={{ color: '#ef4444' }}>Fail</strong>
+                </p>
 
-            {/* States × Variants grid */}
-            {EXPECTATION_VARIANTS.map(v => (
-                <div key={v.variant} style={{ marginBottom: 20 }}>
+                {/* States × Variants grid */}
+                {EXPECTATION_VARIANTS.map(v => (
+                    <div key={v.variant} style={{ marginBottom: 20 }}>
+                        <div style={{
+                            fontSize: 9, fontWeight: 700, color: v.color,
+                            textTransform: 'uppercase', letterSpacing: 0.5,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            marginBottom: 8,
+                        }}>
+                            {v.label} ({v.color})
+                        </div>
+                        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                            {EXPECTATION_STATES.map(s => (
+                                <div key={s.status} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                                    <div style={{
+                                        fontSize: 8, fontWeight: 700, color: '#64748b',
+                                        textTransform: 'uppercase', letterSpacing: 0.5,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                    }}>{s.label}</div>
+                                    <ExpectationNode data={{
+                                        label: v.label, variant: v.variant, status: s.status,
+                                        target: v.target, color: v.color,
+                                        width: 160, height: 60,
+                                    }} />
+                                    <div style={{ fontSize: 7, color: '#475569', textAlign: 'center', maxWidth: 160 }}>
+                                        {s.desc}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
+                {/* Progress animation demo */}
+                <div style={{ marginTop: 16 }}>
                     <div style={{
-                        fontSize: 9, fontWeight: 700, color: v.color,
+                        fontSize: 9, fontWeight: 700, color: '#64748b',
                         textTransform: 'uppercase', letterSpacing: 0.5,
                         fontFamily: "'JetBrains Mono', monospace",
                         marginBottom: 8,
                     }}>
-                        {v.label} ({v.color})
+                        Progress Border Animation ({progress}%)
                     </div>
-                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                        {EXPECTATION_STATES.map(s => (
-                            <div key={s.status} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                                <div style={{
-                                    fontSize: 8, fontWeight: 700, color: '#64748b',
-                                    textTransform: 'uppercase', letterSpacing: 0.5,
-                                    fontFamily: "'JetBrains Mono', monospace",
-                                }}>{s.label}</div>
+                    <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+                        {EXPECTATION_VARIANTS.map(v => (
+                            <div key={v.variant} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                                 <ExpectationNode data={{
-                                    label: v.label, variant: v.variant, status: s.status,
-                                    target: v.target, color: v.color,
-                                    width: 160, height: 60,
+                                    label: `${v.label} (${progress}%)`,
+                                    variant: v.variant,
+                                    status: 'working',
+                                    progress,
+                                    target: v.target,
+                                    color: v.color,
+                                    width: 180, height: 70,
                                 }} />
-                                <div style={{ fontSize: 7, color: '#475569', textAlign: 'center', maxWidth: 160 }}>
-                                    {s.desc}
+                                <div style={{ fontSize: 7, color: v.color, fontFamily: "'JetBrains Mono', monospace" }}>
+                                    {v.variant}
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-            ))}
 
-            {/* Progress animation demo */}
-            <div style={{ marginTop: 16 }}>
-                <div style={{
-                    fontSize: 9, fontWeight: 700, color: '#64748b',
-                    textTransform: 'uppercase', letterSpacing: 0.5,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    marginBottom: 8,
-                }}>
-                    Progress Border Animation ({progress}%)
+                {/* Compact sizes */}
+                <div style={{ marginTop: 16 }}>
+                    <div style={{
+                        fontSize: 9, fontWeight: 700, color: '#64748b',
+                        textTransform: 'uppercase', letterSpacing: 0.5,
+                        fontFamily: "'JetBrains Mono', monospace",
+                        marginBottom: 8,
+                    }}>
+                        Compact (S size)
+                    </div>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                        {EXPECTATION_VARIANTS.map(v => (
+                            EXPECTATION_STATES.map(s => (
+                                <ExpectationNode key={`${v.variant}-${s.status}`} data={{
+                                    label: v.label, variant: v.variant, status: s.status,
+                                    color: v.color, width: 60, height: 50,
+                                }} />
+                            ))
+                        ))}
+                    </div>
                 </div>
-                <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-                    {EXPECTATION_VARIANTS.map(v => (
-                        <div key={v.variant} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                            <ExpectationNode data={{
-                                label: `${v.label} (${progress}%)`,
-                                variant: v.variant,
-                                status: 'working',
-                                progress,
-                                target: v.target,
-                                color: v.color,
-                                width: 180, height: 70,
-                            }} />
-                            <div style={{ fontSize: 7, color: v.color, fontFamily: "'JetBrains Mono', monospace" }}>
-                                {v.variant}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Compact sizes */}
-            <div style={{ marginTop: 16 }}>
-                <div style={{
-                    fontSize: 9, fontWeight: 700, color: '#64748b',
-                    textTransform: 'uppercase', letterSpacing: 0.5,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    marginBottom: 8,
-                }}>
-                    Compact (S size)
-                </div>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    {EXPECTATION_VARIANTS.map(v => (
-                        EXPECTATION_STATES.map(s => (
-                            <ExpectationNode key={`${v.variant}-${s.status}`} data={{
-                                label: v.label, variant: v.variant, status: s.status,
-                                color: v.color, width: 60, height: 50,
-                            }} />
-                        ))
-                    ))}
-                </div>
-            </div>
-        </section>
+            </section>
+        </ReactFlowProvider>
     )
 }
 
