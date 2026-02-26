@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
-        "preview": "vite preview",
+        "preview": "vite preview --port 4173",
+        "local": "pnpm build && pnpm preview",
         "lint": "eslint .",
         "test": "node packages/test-runner/bin/test-runner.mjs all --allow-missing-project",
         "test:scenario": "node packages/test-runner/bin/test-runner.mjs scenario",
