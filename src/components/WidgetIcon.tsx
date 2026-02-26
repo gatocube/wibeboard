@@ -35,7 +35,7 @@ export type WidgetIconName =
 const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'agent': Sparkles, 'script-js': Terminal, 'script-ts': Terminal,
     'script-sh': Terminal, 'script-py': Terminal, 'group': Package,
-    'note': StickyNote,
+    'informer': StickyNote,
     'note-sticker': StickyNote, 'note-group': Package, 'note-label': StickyNote,
     'bot': Bot, 'api': Globe, 'webhook': Zap, 'workflow': Workflow,
     'function': Braces, 'code': Code2, 'file': FileCode2, 'doc': FileText,
@@ -65,7 +65,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
 export const WIDGET_ICON_COLORS: Record<string, string> = {
     'agent': '#8b5cf6', 'script-js': '#f7df1e', 'script-ts': '#3178c6',
     'script-sh': '#89e051', 'script-py': '#3776ab', 'group': '#6366f1',
-    'expectation': '#10b981', 'note': '#f59e0b', 'note-sticker': '#fbbf24',
+    'expectation': '#10b981', 'informer': '#f59e0b', 'note-sticker': '#fbbf24',
     'note-group': '#6366f1', 'note-label': '#94a3b8',
     'bot': '#8b5cf6', 'api': '#06b6d4', 'webhook': '#f97316',
     'workflow': '#a855f7', 'function': '#ec4899', 'code': '#60a5fa',

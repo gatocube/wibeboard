@@ -19,7 +19,7 @@ import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import { JobNode } from '@/widgets/wibeglow/JobNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
 import { PlaceholderNode } from '@/widgets/wibeglow/PlaceholderNode'
-import type { WidgetTemplate } from '@/engine/widget-registry'
+import type { WidgetPreset } from '@/engine/widget-registry'
 
 // ── Node types ───────────────────────────────────────────────────────────────
 
@@ -498,7 +498,7 @@ function AIScriptInner() {
 
     // ── Node created via FlowStudio connector ───────────────────────────────
 
-    const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetTemplate, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
+    const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetPreset, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
         const nodeData: Record<string, any> = {
             label: template.defaultData.label || template.name,
             ...template.defaultData,

@@ -1,6 +1,6 @@
 export { JobNode } from './JobNode'
 export { GroupNode } from './GroupNode'
-export { NoteNode } from './NoteNode'
+export { InformerNode } from './InformerNode'
 export { ExpectationNode } from './ExpectationNode'
 export { PlaceholderNode } from './PlaceholderNode'
 export { ArtifactNode } from './ArtifactNode'

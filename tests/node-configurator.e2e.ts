@@ -46,11 +46,11 @@ test.describe('Node Configurator', () => {
         const select = page.locator('[data-testid="widget-type-select"]')
         await expect(select).toBeVisible({ timeout: 5_000 })
 
-        // Switch to 'note' widget
-        await select.selectOption('note')
+        // Switch to 'informer' widget
+        await select.selectOption('informer')
         await page.waitForTimeout(300)
 
-        // Visual editor should now show note-specific fields (content)
+        // Visual editor should now show informer-specific fields (content)
         await expect(page.locator('[data-testid="field-content"]')).toBeVisible({ timeout: 3_000 })
     })
 
@@ -58,15 +58,15 @@ test.describe('Node Configurator', () => {
         await goto(page)
 
         // Click on first Note template tile in the compact picker sidebar
-        const noteWidget = page.locator('[data-testid="widget-note-0"]')
+        const noteWidget = page.locator('[data-testid="widget-informer-0"]')
         await expect(noteWidget).toBeVisible({ timeout: 5_000 })
         await noteWidget.click()
 
         await page.waitForTimeout(300)
 
-        // Widget type dropdown should now show 'note'
+        // Widget type dropdown should now show 'informer'
         const select = page.locator('[data-testid="widget-type-select"]')
-        await expect(select).toHaveValue('note', { timeout: 3_000 })
+        await expect(select).toHaveValue('informer', { timeout: 3_000 })
 
         // Note-specific fields should appear
         await expect(page.locator('[data-testid="field-content"]')).toBeVisible({ timeout: 3_000 })

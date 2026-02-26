@@ -17,15 +17,15 @@ import { WidgetPicker } from '@/flow-studio'
 import {
     widgetRegistry,
     type WidgetDefinition,
-    type WidgetTemplate,
+    type WidgetPreset,
     GRID_CELL,
 } from '@/widgets/widget-registry'
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
-// Theme node components — use unified JobNode/NoteNode directly
-import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, NoteNode as WibeGlowNote, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser, StartingNode as WibeGlowStarting, SubFlowNode as WibeGlowSubFlow } from '@/widgets/wibeglow'
-import { JobNode as PixelJob, NoteNode as PixelNote } from '@/widgets/pixel'
-import { JobNode as GhubJob, NoteNode as GhubNote } from '@/widgets/ghub'
+// Theme node components — use unified JobNode/InformerNode directly
+import { JobNode as WibeGlowJob, GroupNode as WibeGlowGroup, InformerNode as WibeGlowInformer, ExpectationNode as WibeGlowExpectation, UserNode as WibeGlowUser, StartingNode as WibeGlowStarting, SubFlowNode as WibeGlowSubFlow } from '@/widgets/wibeglow'
+import { JobNode as PixelJob, InformerNode as PixelInformer } from '@/widgets/pixel'
+import { JobNode as GhubJob, InformerNode as GhubInformer } from '@/widgets/ghub'
 import { RawNode } from '@/widgets/RawNode'
 
 // ── Status + knock controls ────────────────────────────────────────────────────
@@ -89,8 +89,8 @@ function getSizes(widget: WidgetDefinition): SizeDef[] {
     const iconSize = GRID_CELL * 3
     return [
         { label: 'S', width: iconSize, height: iconSize, gridLabel: '3×3' },
-        { label: 'M', width: widget.defaultWidth, height: widget.defaultHeight, gridLabel: `${Math.round(widget.defaultWidth / GRID_CELL)}×${Math.round(widget.defaultHeight / GRID_CELL)}` },
-        { label: 'L', width: widget.defaultWidth * 1.5, height: widget.defaultHeight * 2, gridLabel: `${Math.round(widget.defaultWidth * 1.5 / GRID_CELL)}×${Math.round(widget.defaultHeight * 2 / GRID_CELL)}` },
+        { label: 'M', width: widgetRegistry.getDefaultWidthPx(widget.type), height: widgetRegistry.getDefaultHeightPx(widget.type), gridLabel: `${Math.round(widgetRegistry.getDefaultWidthPx(widget.type) / GRID_CELL)}×${Math.round(widgetRegistry.getDefaultHeightPx(widget.type) / GRID_CELL)}` },
+        { label: 'L', width: widgetRegistry.getDefaultWidthPx(widget.type) * 1.5, height: widgetRegistry.getDefaultHeightPx(widget.type) * 2, gridLabel: `${Math.round(widgetRegistry.getDefaultWidthPx(widget.type) * 1.5 / GRID_CELL)}×${Math.round(widgetRegistry.getDefaultHeightPx(widget.type) * 2 / GRID_CELL)}` },
     ]
 }
 
@@ -102,7 +102,7 @@ const THEME_COMPONENTS: ThemeComponents = {
     wibeglow: {
         job: WibeGlowJob,
         group: WibeGlowGroup,
-        note: WibeGlowNote,
+        note: WibeGlowInformer,
         expectation: WibeGlowExpectation,
         user: WibeGlowUser,
         starting: WibeGlowStarting,
@@ -110,11 +110,11 @@ const THEME_COMPONENTS: ThemeComponents = {
     },
     pixel: {
         job: PixelJob,
-        note: PixelNote,
+        note: PixelInformer,
     },
     ghub: {
         job: GhubJob,
-        note: GhubNote,
+        note: GhubInformer,
     },
 }
 
@@ -126,7 +126,7 @@ function getComponent(theme: TemplateName, widgetType: string): React.ComponentT
 
 function buildData(
     widget: WidgetDefinition,
-    template: WidgetTemplate,
+    template: WidgetPreset,
     status: Status,
     knockSide: KnockSide,
     width: number,
@@ -154,7 +154,7 @@ function buildData(
     // Job: AI agent
     if (widget.type === 'job' && isAI) {
         base.agent = template.defaultData.agent || 'Claude 3.5'
-        base.color = template.defaultData.color || widget.color
+        base.color = template.defaultData.color || widget.ui.color
         base.task = status !== 'idle' ? 'Processing authentication module...' : undefined
         base.state = {
             ...base.state,
@@ -176,7 +176,7 @@ function buildData(
         const langLabels: Record<string, string> = { js: 'JavaScript', ts: 'TypeScript', sh: 'Shell', py: 'Python' }
         base.agent = langLabels[subType || 'js'] || subType
         base.language = subType
-        base.color = widget.subTypes?.find(s => s.value === subType)?.color || widget.color
+        base.color = widget.subTypes?.find(s => s.value === subType)?.color || widget.ui.color
         base.configured = true
         base.code = template.defaultData.code || '// empty'
         base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : status === 'running' ? ['> Running...'] : []
@@ -192,13 +192,13 @@ function buildData(
 
     // Group-specific
     if (widget.type === 'group') {
-        base.color = template.defaultData.color || widget.color
+        base.color = template.defaultData.color || widget.ui.color
     }
 
     // Note-specific
-    if (widget.type === 'note') {
+    if (widget.type === 'informer') {
         base.subType = subType || 'sticker'
-        base.color = template.defaultData.color || widget.color
+        base.color = template.defaultData.color || widget.ui.color
         base.content = template.defaultData.content || ''
     }
 
@@ -227,8 +227,8 @@ export function TestWidgetsPage() {
 
 function WidgetGalleryInner() {
     const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('job') ?? null)
-    const [selectedTemplate, setSelectedTemplate] = useState<WidgetTemplate | null>(
-        widgetRegistry.get('job')?.templates[0] ?? null
+    const [selectedTemplate, setSelectedTemplate] = useState<WidgetPreset | null>(
+        widgetRegistry.get('job')?.presets[0] ?? null
     )
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)
@@ -246,7 +246,7 @@ function WidgetGalleryInner() {
 
     const themes = templateRegistry.getAll()
 
-    const handleSelect = useCallback((widget: WidgetDefinition, template: WidgetTemplate) => {
+    const handleSelect = useCallback((widget: WidgetDefinition, template: WidgetPreset) => {
         setSelectedWidget(widget)
         setSelectedTemplate(template)
         setStatus('idle')
@@ -634,9 +634,9 @@ function WidgetGalleryInner() {
                 {/* Selected widget info */}
                 {selectedWidget && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                        <span style={{ fontSize: 18 }}>{selectedWidget.icon}</span>
+                        <span style={{ fontSize: 18 }}>{selectedWidget.ui.icons.default}</span>
                         <div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: selectedWidget.color, fontFamily: 'Inter' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: selectedWidget.ui.color, fontFamily: 'Inter' }}>
                                 {selectedWidget.label}
                             </div>
                             <div style={{ fontSize: 8, color: '#64748b', fontFamily: 'Inter' }}>

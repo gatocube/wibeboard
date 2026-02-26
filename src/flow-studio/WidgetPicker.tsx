@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { widgetRegistry, type WidgetDefinition, type WidgetTemplate, type WidgetCategory } from '@/engine/widget-registry'
+import { widgetRegistry, type WidgetDefinition, type WidgetPreset, type WidgetCategory } from '@/engine/widget-registry'
 import { WidgetIcon, CATEGORY_ICONS } from '@/components/WidgetIcon'
 import { Package } from 'lucide-react'
 
@@ -57,7 +57,7 @@ function pushRecent(type: string) {
 interface WidgetPickerProps {
     rectSize: { width: number; height: number }
     gridSize?: { cols: number; rows: number }
-    onSelect: (widget: WidgetDefinition, template: WidgetTemplate) => void
+    onSelect: (widget: WidgetDefinition, template: WidgetPreset) => void
     onCancel: () => void
     onHoverWidget?: (widget: WidgetDefinition | null) => void
     embedded?: boolean
@@ -114,15 +114,15 @@ export function WidgetPicker({
     }
 
     // ── Handlers ──
-    const handleSelect = (widget: WidgetDefinition, template: WidgetTemplate) => {
+    const handleSelect = (widget: WidgetDefinition, template: WidgetPreset) => {
         pushRecent(widget.type)
         setRecentTypes(getRecentTypes())
         onSelect(widget, template)
     }
 
     const handleWidgetClick = (widget: WidgetDefinition) => {
-        if (widget.templates.length === 1 || compact) {
-            handleSelect(widget, widget.templates[0])
+        if (widget.presets.length === 1 || compact) {
+            handleSelect(widget, widget.presets[0])
         } else {
             setExpandedWidget(expandedWidget === widget.type ? null : widget.type)
         }
@@ -210,7 +210,7 @@ export function WidgetPicker({
                                     draggable
                                     onDragStart={e => {
                                         e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                            type: widget.type, template: widget.templates[0],
+                                            type: widget.type, template: widget.presets[0],
                                         }))
                                         e.dataTransfer.effectAllowed = 'move'
                                     }}
@@ -219,8 +219,8 @@ export function WidgetPicker({
                                     onMouseLeave={() => onHoverWidget?.(null)}
                                     style={{
                                         width: 36, height: 36, borderRadius: 8,
-                                        background: `${widget.color}15`,
-                                        border: `1px solid ${widget.color}33`,
+                                        background: `${widget.ui.color}15`,
+                                        border: `1px solid ${widget.ui.color}33`,
                                         display: 'flex', flexDirection: 'column',
                                         alignItems: 'center', justifyContent: 'center',
                                         cursor: 'pointer',
@@ -228,17 +228,17 @@ export function WidgetPicker({
                                         gap: 1,
                                     }}
                                     onMouseOver={e => {
-                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}25`
-                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}55`
+                                        (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}25`
+                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}55`
                                             ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)'
                                     }}
                                     onMouseOut={e => {
-                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}15`
-                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}33`
+                                        (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}15`
+                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}33`
                                             ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                     }}
                                 >
-                                    <WidgetIcon type={widget.icon} size={14} color={widget.color} />
+                                    <WidgetIcon type={widget.ui.icons.default} size={14} color={widget.ui.color} />
                                     <span style={{ fontSize: 6, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
                                         {widget.label.length > 5 ? widget.label.slice(0, 5) : widget.label}
                                     </span>
@@ -344,16 +344,16 @@ export function WidgetPicker({
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
                             {filtered.flatMap(widget =>
-                                widget.templates.map((tmpl, i) => {
-                                    const label = widget.templates.length === 1
+                                widget.presets.map((tmpl, i) => {
+                                    const label = widget.presets.length === 1
                                         ? widget.label
                                         : tmpl.name
                                     const truncLabel = label.length > 7 ? label.slice(0, 7) : label
                                     return (
                                         <div
                                             key={`${widget.type}-${i}`}
-                                            data-testid={`widget-${widget.type}${widget.templates.length > 1 ? `-${i}` : ''}`}
-                                            title={`${widget.label}${widget.templates.length > 1 ? ` — ${tmpl.name}` : ''}: ${tmpl.description}`}
+                                            data-testid={`widget-${widget.type}${widget.presets.length > 1 ? `-${i}` : ''}`}
+                                            title={`${widget.label}${widget.presets.length > 1 ? ` — ${tmpl.name}` : ''}: ${tmpl.description}`}
                                             draggable
                                             onDragStart={e => {
                                                 e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
@@ -366,8 +366,8 @@ export function WidgetPicker({
                                             onMouseLeave={() => onHoverWidget?.(null)}
                                             style={{
                                                 width: 48, height: 48, borderRadius: 8,
-                                                background: `${widget.color}15`,
-                                                border: `1px solid ${widget.color}33`,
+                                                background: `${widget.ui.color}15`,
+                                                border: `1px solid ${widget.ui.color}33`,
                                                 display: 'flex', flexDirection: 'column',
                                                 alignItems: 'center', justifyContent: 'center',
                                                 cursor: 'pointer',
@@ -375,17 +375,17 @@ export function WidgetPicker({
                                                 gap: 2,
                                             }}
                                             onMouseOver={e => {
-                                                (e.currentTarget as HTMLElement).style.background = `${widget.color}25`
-                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}55`
+                                                (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}25`
+                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}55`
                                                     ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
                                             }}
                                             onMouseOut={e => {
-                                                (e.currentTarget as HTMLElement).style.background = `${widget.color}15`
-                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}33`
+                                                (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}15`
+                                                    ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.ui.color}33`
                                                     ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                             }}
                                         >
-                                            <WidgetIcon type={tmpl.icon || widget.icon} size={16} color={widget.color} />
+                                            <WidgetIcon type={(tmpl.ui?.icons?.default || widget.ui.icons.default)} size={16} color={widget.ui.color} />
                                             <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
                                                 {truncLabel}
                                             </span>
@@ -441,7 +441,7 @@ export function WidgetPicker({
                                                     draggable
                                                     onDragStart={e => {
                                                         e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                                            type: widget.type, template: widget.templates[0],
+                                                            type: widget.type, template: widget.presets[0],
                                                         }))
                                                         e.dataTransfer.effectAllowed = 'move'
                                                     }}
@@ -453,7 +453,7 @@ export function WidgetPicker({
                                                     }}
                                                     onMouseEnter={() => {
                                                         onHoverWidget?.(widget)
-                                                        if (widget.templates.length <= 1) setExpandedWidget(null)
+                                                        if (widget.presets.length <= 1) setExpandedWidget(null)
                                                     }}
                                                     onMouseLeave={() => onHoverWidget?.(null)}
                                                     onClick={() => handleWidgetClick(widget)}
@@ -468,12 +468,12 @@ export function WidgetPicker({
                                                     <div style={{
                                                         width: 28, height: 28,
                                                         borderRadius: 8,
-                                                        background: `${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}15`,
-                                                        border: `1.5px solid ${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}33`,
+                                                        background: `${widget.ui.color || CATEGORY_COLORS[widget.category] || '#475569'}15`,
+                                                        border: `1.5px solid ${widget.ui.color || CATEGORY_COLORS[widget.category] || '#475569'}33`,
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         flexShrink: 0,
                                                     }}>
-                                                        <WidgetIcon type={widget.icon} size={14} color={widget.color} />
+                                                        <WidgetIcon type={widget.ui.icons.default} size={14} color={widget.ui.color} />
                                                     </div>
                                                     <div style={{ flex: 1 }}>
                                                         <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
@@ -495,21 +495,21 @@ export function WidgetPicker({
 
                                                 {/* Expanded templates */}
                                                 <AnimatePresence>
-                                                    {expandedWidget === widget.type && widget.templates.length > 1 && (
+                                                    {expandedWidget === widget.type && widget.presets.length > 1 && (
                                                         <motion.div
                                                             initial={{ height: 0, opacity: 0 }}
                                                             animate={{ height: 'auto', opacity: 1 }}
                                                             exit={{ height: 0, opacity: 0 }}
                                                             style={{ overflow: 'hidden', paddingLeft: 36 }}
                                                         >
-                                                            {widget.templates.map((tmpl, i) => (
+                                                            {widget.presets.map((tmpl, i) => (
                                                                 <div
                                                                     key={i}
                                                                     data-testid={`template-${widget.type}-${i}`}
                                                                     style={{
                                                                         padding: '4px 12px', cursor: 'pointer',
                                                                         fontSize: 9, color: '#94a3b8',
-                                                                        borderLeft: `2px solid ${widget.color}33`,
+                                                                        borderLeft: `2px solid ${widget.ui.color}33`,
                                                                         transition: 'all 0.1s',
                                                                     }}
                                                                     onClick={e => {

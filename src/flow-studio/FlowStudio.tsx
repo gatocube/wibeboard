@@ -18,7 +18,7 @@ import {
 } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { GRID_CELL, MIN_GRID, widgetRegistry, type WidgetTemplate } from '@/engine/widget-registry'
+import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry, type WidgetPreset } from '@/engine/widget-registry'
 
 import type { FlowStudioProps, ThemeKey, NodeSize } from './types'
 import { useFlowStudioStore } from './FlowStudioStore'
@@ -210,12 +210,12 @@ export const FlowStudio = observer(function FlowStudio({
     // ── Direct node creation from widget data ───────────────────────────────────
     const createNodeFromWidget = useCallback((
         widgetType: string,
-        template: WidgetTemplate,
+        template: WidgetPreset,
         position: { x: number; y: number },
         sourceNodeId: string | null = null,
     ) => {
-        const defaultW = MIN_GRID * 4 * GRID_CELL
-        const defaultH = MIN_GRID * 2 * GRID_CELL
+        const defaultW = MIN_NODE_SIZE * 4 * GRID_CELL
+        const defaultH = MIN_NODE_SIZE * 2 * GRID_CELL
 
         // Auto-space: find a non-overlapping position (3 grid units from nearest)
         const safePos = findNonOverlappingPosition(nodes, defaultW, defaultH, position)
@@ -250,7 +250,7 @@ export const FlowStudio = observer(function FlowStudio({
     }, [nodes, onNodesChange])
 
     // ── Sidebar widget pick handler ─────────────────────────────────────────────
-    const handleSidebarSelect = useCallback((_widget: { type: string }, template: WidgetTemplate) => {
+    const handleSidebarSelect = useCallback((_widget: { type: string }, template: WidgetPreset) => {
         // Place at center of current viewport
         const converter = screenToFlowRef.current
         const center = converter

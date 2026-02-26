@@ -3,7 +3,7 @@
  */
 
 import type { Node, Edge, NodeTypes, OnNodesChange, Viewport } from '@xyflow/react'
-import type { WidgetTemplate } from '@/engine/widget-registry'
+import type { WidgetPreset } from '@/engine/widget-registry'
 
 // ── Visual types ────────────────────────────────────────────────────────────────
 
@@ -49,7 +49,7 @@ export interface FlowStudioProps {
     onNodeCreated?: (
         nodeId: string,
         widgetType: string,
-        template: WidgetTemplate,
+        template: WidgetPreset,
         rect: { x: number; y: number; width: number; height: number },
         sourceNodeId: string | null,
     ) => void

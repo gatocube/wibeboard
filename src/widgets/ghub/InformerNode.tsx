@@ -213,13 +213,13 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
 
 // ── Main NoteNode component ─────────────────────────────────────────────────────
 
-export function NoteNode({ data }: { data: any }) {
+export function InformerNode({ data }: { data: any }) {
     const subType = data.subType || 'sticker'
     const w = data.width || 240
     const h = data.height || 160
 
     return (
-        <BaseNode data={data} type="note" subType={subType}>
+        <BaseNode data={data} type="informer" subType={subType}>
             {subType === 'group'
                 ? <GroupNoteNode data={data} w={w} h={h} />
                 : subType === 'label'

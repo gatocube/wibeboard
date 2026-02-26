@@ -61,7 +61,7 @@ const CONFIG_ACTIONS: SubButton[] = [
 
 const ATTACH_TYPES: SubButton[] = [
     { key: 'expectation', label: 'Expect', icon: ClipboardCheck, color: '#22d3ee' },
-    { key: 'note', label: 'Note', icon: StickyNote, color: '#fbbf24' },
+    { key: 'informer', label: 'Informer', icon: StickyNote, color: '#fbbf24' },
 ]
 
 const SCRIPT_TYPES: SubButton[] = [

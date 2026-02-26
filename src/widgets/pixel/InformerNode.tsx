@@ -192,7 +192,7 @@ function LabelNote({ data, w, h }: { data: any; w: number; h: number }) {
 
 // ── Main NoteNode ───────────────────────────────────────────────────────────────
 
-export function NoteNode({ data }: { data: any }) {
+export function InformerNode({ data }: { data: any }) {
     const w = data.width || 160
     const h = data.height || 100
     const subType = data.subType || 'sticker'
@@ -208,7 +208,7 @@ export function NoteNode({ data }: { data: any }) {
         : {}
 
     return (
-        <BaseNode data={data} type="note" subType={subType}>
+        <BaseNode data={data} type="informer" subType={subType}>
             <motion.div
                 animate={knockAnimation}
                 transition={knockTransition}

@@ -237,13 +237,13 @@ function LabelNode({ data, w, h }: { data: any; w: number; h: number }) {
 
 // ── Main NoteNode component ─────────────────────────────────────────────────────
 
-export function NoteNode({ data }: { data: any }) {
+export function InformerNode({ data }: { data: any }) {
     const w = data.width || 160
     const h = data.height || 100
     const subType = data.subType || 'sticker'
 
     return (
-        <BaseNode data={data} type="note" subType={subType}>
+        <BaseNode data={data} type="informer" subType={subType}>
             <div style={{ position: 'relative' }}>
                 <Handle type="target" position={Position.Left} style={{
                     background: 'transparent', border: 'none', width: 1, height: 1,

@@ -38,26 +38,24 @@ const SPACING = GRID_CELL * 5  // 100px
 function getNodeWidth(node: Node): number {
     return (typeof (node.style as any)?.width === 'number' ? (node.style as any).width : null)
         ?? (node.data?.width as number)
-        ?? widgetRegistry.get(node.type || '')?.defaultWidth
-        ?? 200
+        ?? widgetRegistry.getDefaultWidthPx(node.type || '')
 }
 
 /** Get a node's height from its data, style, or registry defaults */
 function getNodeHeight(node: Node): number {
     return (typeof (node.style as any)?.height === 'number' ? (node.style as any).height : null)
         ?? (node.data?.height as number)
-        ?? widgetRegistry.get(node.type || '')?.defaultHeight
-        ?? 120
+        ?? widgetRegistry.getDefaultHeightPx(node.type || '')
 }
 
-/** Get default width for a widget type from the registry */
+/** Get default width in px for a widget type from the registry */
 function getDefaultWidth(widgetType: string): number {
-    return widgetRegistry.get(widgetType)?.defaultWidth ?? 200
+    return widgetRegistry.getDefaultWidthPx(widgetType)
 }
 
-/** Get default height for a widget type from the registry */
+/** Get default height in px for a widget type from the registry */
 function getDefaultHeight(widgetType: string): number {
-    return widgetRegistry.get(widgetType)?.defaultHeight ?? 120
+    return widgetRegistry.getDefaultHeightPx(widgetType)
 }
 
 // ── Types ────────────────────────────────────────────────────────────────────

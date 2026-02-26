@@ -14,7 +14,7 @@
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/engine/widget-registry'
+import { widgetRegistry, GRID_CELL, type WidgetDefinition, type WidgetPreset } from '@/engine/widget-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { CodeEditor } from '@/kit'
@@ -22,7 +22,7 @@ import type { CodeLanguage } from '@/kit'
 
 // Widget node components for live preview
 import {
-    JobNode, GroupNode, NoteNode, ExpectationNode,
+    JobNode, GroupNode, InformerNode, ExpectationNode,
     UserNode, SubFlowNode, StartingNode, ArtifactNode,
 } from '@/widgets/wibeglow'
 
@@ -32,7 +32,7 @@ import {
 const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     job: JobNode,
     group: GroupNode,
-    note: NoteNode,
+    informer: InformerNode,
     expectation: ExpectationNode,
     user: UserNode,
     subflow: SubFlowNode,
@@ -43,7 +43,7 @@ const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
 // ── Manifest generator ──────────────────────────────────────────────────────────
 
 function generateManifest(def: WidgetDefinition) {
-    const tpl = def.templates[0]
+    const tpl = def.presets[0]
     const properties: Record<string, object> = {}
     const required: string[] = []
 
@@ -75,16 +75,21 @@ function generateManifest(def: WidgetDefinition) {
         version: '1.0.0',
         label: def.label,
         description: def.description,
-        icon: def.icon,
-        color: def.color,
+        icon: def.ui.icons.default,
+        color: def.ui.color,
         category: def.category,
         tags: def.tags,
         subTypes: def.subTypes || [],
-        dimensions: {
-            minWidth: def.minWidth, minHeight: def.minHeight,
-            defaultWidth: def.defaultWidth, defaultHeight: def.defaultHeight,
+        ui: {
+            icons: def.ui.icons,
+            color: def.ui.color,
+            defaultSize: def.ui.defaultSize,       // grid units
+            defaultSizePx: {                        // computed pixels
+                w: def.ui.defaultSize.w * GRID_CELL,
+                h: def.ui.defaultSize.h * GRID_CELL,
+            },
         },
-        templates: def.templates.map(t => ({
+        templates: def.presets.map(t => ({
             name: t.name, description: t.description, defaultData: t.defaultData,
         })),
         schema: {
@@ -282,7 +287,7 @@ export function NodeConfiguratorPage() {
         [allWidgets, selectedType],
     )
 
-    const template = widgetDef.templates[templateIdx] || widgetDef.templates[0]
+    const template = widgetDef.presets[templateIdx] || widgetDef.presets[0]
 
     // Re-init nodeData when widget/template changes
     useMemo(() => {
@@ -306,9 +311,9 @@ export function NodeConfiguratorPage() {
     }, [])
 
     // Widget picker selection → auto-populate everything
-    const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: WidgetTemplate) => {
+    const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: WidgetPreset) => {
         setSelectedType(widget.type)
-        const idx = widget.templates.indexOf(tmpl)
+        const idx = widget.presets.indexOf(tmpl)
         setTemplateIdx(idx >= 0 ? idx : 0)
         setNodeData({ ...tmpl.defaultData })
         setMode('visual')
@@ -335,8 +340,8 @@ export function NodeConfiguratorPage() {
     }, [])
 
     // ── Preview data ──
-    const previewW = widgetDef.defaultWidth || 200
-    const previewH = widgetDef.defaultHeight || 120
+    const previewW = widgetDef.ui.defaultSize.w * GRID_CELL || 200
+    const previewH = widgetDef.ui.defaultSize.h * GRID_CELL || 120
     const previewData = useMemo(
         () => buildPreviewData(nodeData, previewW, previewH, false),
         [nodeData, previewW, previewH],
@@ -443,7 +448,7 @@ export function NodeConfiguratorPage() {
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <WidgetIcon type={widgetDef.icon} size={14} />
+                            <WidgetIcon type={widgetDef.ui.icons.default} size={14} />
                             <span>{widgetDef.label}</span>
                         </div>
                         <span style={{
@@ -472,11 +477,11 @@ export function NodeConfiguratorPage() {
                         </div>
 
                         {/* Template selector */}
-                        {widgetDef.templates.length > 1 && (
+                        {widgetDef.presets.length > 1 && (
                             <div>
                                 <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Template</div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {widgetDef.templates.map((tpl, i) => (
+                                    {widgetDef.presets.map((tpl, i) => (
                                         <button
                                             key={i}
                                             data-testid={`template-${i}`}
@@ -490,7 +495,7 @@ export function NodeConfiguratorPage() {
                                                 fontFamily: 'Inter, sans-serif',
                                             }}
                                         >
-                                            <WidgetIcon type={widgetDef.icon} size={14} />
+                                            <WidgetIcon type={widgetDef.ui.icons.default} size={14} />
                                             <div>
                                                 <div style={{
                                                     fontSize: 11, fontWeight: 600,
@@ -634,18 +639,18 @@ function FallbackPreview({ nodeData, widgetDef }: {
             display: 'flex', alignItems: 'center', gap: 12,
             padding: '16px 20px',
             background: 'rgba(15,15,26,0.8)',
-            border: `1.5px solid ${widgetDef.color}44`,
+            border: `1.5px solid ${widgetDef.ui.color}44`,
             borderRadius: 12,
-            boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px ${widgetDef.color}11`,
+            boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px ${widgetDef.ui.color}11`,
             width: '100%', height: '100%', boxSizing: 'border-box',
         }}>
             <div style={{
                 width: 36, height: 36, borderRadius: 8,
-                background: `${widgetDef.color}15`,
+                background: `${widgetDef.ui.color}15`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
             }}>
-                <WidgetIcon type={widgetDef.icon} size={18} />
+                <WidgetIcon type={widgetDef.ui.icons.default} size={18} />
             </div>
             <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>
@@ -735,8 +740,8 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     const isCode = fieldKey === 'code'
     const codeLanguage: CodeLanguage = useMemo(() => {
         if (!isCode) return 'text'
-        const lang = widgetDef.templates[0]?.defaultData?.language
-            || widgetDef.templates[0]?.defaultData?.subType
+        const lang = widgetDef.presets[0]?.defaultData?.language
+            || widgetDef.presets[0]?.defaultData?.subType
         if (lang === 'ts') return 'typescript'
         if (lang === 'js') return 'javascript'
         if (lang === 'py') return 'python'

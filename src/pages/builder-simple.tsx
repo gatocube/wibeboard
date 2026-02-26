@@ -20,7 +20,7 @@ import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
-import { widgetRegistry, type WidgetTemplate } from '@/engine/widget-registry'
+import { widgetRegistry, type WidgetPreset } from '@/engine/widget-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
 import { AgentMessenger } from '@/engine/AgentMessenger'
 import { runScriptInBrowser } from '@/engine/script-runner'
@@ -78,27 +78,27 @@ const api = new FlowStudioApi()
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
-        const tpl = def?.templates[0]
+        const tpl = def?.presets[0]
         return {
             nodeType: 'user',
             data: {
                 ...tpl?.defaultData,
                 label: tpl?.defaultData.label || 'User',
-                width: def?.defaultWidth || 160,
-                height: def?.defaultHeight || 100,
+                width: widgetRegistry.getDefaultWidthPx(def?.type || ''),
+                height: widgetRegistry.getDefaultHeightPx(def?.type || ''),
             },
         }
     }
     if (widgetType === 'subflow') {
         const def = widgetRegistry.get('subflow')
-        const tpl = def?.templates[0]
+        const tpl = def?.presets[0]
         return {
             nodeType: 'subflow',
             data: {
                 ...tpl?.defaultData,
                 label: tpl?.defaultData.label || 'SubFlow',
-                width: def?.defaultWidth || 200,
-                height: def?.defaultHeight || 120,
+                width: widgetRegistry.getDefaultWidthPx(def?.type || ''),
+                height: widgetRegistry.getDefaultHeightPx(def?.type || ''),
             },
         }
     }
@@ -106,7 +106,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         const [prefix, variant] = widgetType.split(':')
         const def = widgetRegistry.get('job')
         const subType = prefix === 'ai' ? 'ai' : variant
-        const tpl = def?.templates.find(t => t.defaultData.subType === subType) || def?.templates[0]
+        const tpl = def?.presets.find(t => t.defaultData.subType === subType) || def?.presets[0]
         const label = tpl?.defaultData.label || `${variant} Script`
         return {
             nodeType: 'job',
@@ -114,8 +114,8 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
                 ...tpl?.defaultData,
                 subType,
                 label,
-                width: def?.defaultWidth || 200,
-                height: def?.defaultHeight || 120,
+                width: widgetRegistry.getDefaultWidthPx(def?.type || ''),
+                height: widgetRegistry.getDefaultHeightPx(def?.type || ''),
                 configured: true,
                 sandbox: 'browser',
                 code: `// ${label}\nmessenger.send('system', 'text', 'Hello from ${label}')`,
@@ -124,15 +124,15 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     // Fallback: treat as job with default JS script
     const def = widgetRegistry.get('job')
-    const tpl = def?.templates.find(t => t.defaultData.subType === 'js') || def?.templates[0]
+    const tpl = def?.presets.find(t => t.defaultData.subType === 'js') || def?.presets[0]
     const label = tpl?.defaultData.label || 'Script'
     return {
         nodeType: 'job',
         data: {
             ...tpl?.defaultData,
             label,
-            width: def?.defaultWidth || 200,
-            height: def?.defaultHeight || 120,
+            width: widgetRegistry.getDefaultWidthPx(def?.type || ''),
+            height: widgetRegistry.getDefaultHeightPx(def?.type || ''),
             configured: true,
             sandbox: 'browser',
             code: `// ${label}\nmessenger.send('system', 'text', 'Hello from ${label}')`,
@@ -330,7 +330,7 @@ function BuilderSimpleInner() {
     const handleNodeCreated = useCallback((
         nodeId: string,
         widgetType: string,
-        _template: WidgetTemplate,
+        _template: WidgetPreset,
         rect: { x: number; y: number; width: number; height: number },
     ) => {
         const { nodeType, data } = resolveWidgetType(widgetType)

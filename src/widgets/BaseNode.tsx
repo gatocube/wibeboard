@@ -13,7 +13,7 @@
  *   └─ JobNode           type="job"     — does work
  *      └─ subType="ai"                  — AI agent job (rainbow border)
  *      └─ subType="script"              — code execution job
- *   └─ NoteNode          type="note"
+ *   └─ InformerNode          type="informer"
  *      └─ subType="sticker"             — colored sticky note
  *   └─ GroupNode         type="group"   — grouping container
  */
