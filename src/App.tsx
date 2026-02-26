@@ -53,7 +53,20 @@ export function App() {
     }
     const [page, setPage] = useState<Page>(initialPage)
     const isWideScreen = typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
-    const [sidebarOpen, setSidebarOpen] = useState(isWideScreen)
+    const [sidebarOpen, _setSidebarOpen] = useState(() => {
+        try {
+            const stored = localStorage.getItem('wibeboard:sidebar-open')
+            if (stored !== null) return stored === '1'
+        } catch { /* ignore */ }
+        return isWideScreen
+    })
+    const setSidebarOpen = (v: boolean | ((prev: boolean) => boolean)) => {
+        _setSidebarOpen(prev => {
+            const next = typeof v === 'function' ? v(prev) : v
+            try { localStorage.setItem('wibeboard:sidebar-open', next ? '1' : '0') } catch { /* ignore */ }
+            return next
+        })
+    }
 
     const navigate = (p: Page) => {
         setPage(p)
