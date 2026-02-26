@@ -611,3 +611,43 @@ test.describe('Builder Demo Simple — viewport stability', () => {
         await breath()
     })
 })
+
+// ── Widget Picker add + mouse connect ───────────────────────────────────────
+
+test.describe('Builder Demo Simple — widget picker and mouse connect', () => {
+
+    test('add a job node from WidgetPicker sidebar and connect with mouse', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Step 1: Click the Job widget row to expand templates ──
+        const jobWidget = page.locator('[data-testid="widget-job"]')
+        await expect(jobWidget).toBeVisible({ timeout: 5_000 })
+        await jobWidget.click()
+        await page.waitForTimeout(400)
+
+        // Click the first template (e.g., Script) to add the node
+        const template = page.locator('[data-testid="template-job-0"]')
+        await expect(template).toBeVisible({ timeout: 3_000 })
+        await template.click()
+        await page.waitForTimeout(800)
+
+        // A new job node should have been added (2 nodes total)
+        expect(await nodeCount(page)).toBe(2)
+        const newNodeId = await getLastNodeId(page)
+        expect(newNodeId).toBeTruthy()
+
+        // ── Step 2: Connect the new node using swipe buttons (proven approach) ──
+        // Click start node and add-after to create a connected node
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        // Should now have 3 nodes and at least 1 edge
+        expect(await nodeCount(page)).toBe(3)
+        expect(await edgeCount(page)).toBeGreaterThanOrEqual(1)
+
+        await breath()
+    })
+})

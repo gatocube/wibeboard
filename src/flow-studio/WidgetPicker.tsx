@@ -79,7 +79,15 @@ export function WidgetPicker({
     const [selectedCategory, setSelectedCategory] = useState<WidgetCategory | string | null>(null)
     const [expandedWidget, setExpandedWidget] = useState<string | null>(null)
     const [recentTypes, setRecentTypes] = useState<string[]>(getRecentTypes)
+    const [, forceUpdate] = useState(0)
+    const [dragFromIdx, setDragFromIdx] = useState<number | null>(null)
+    const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+
+    // Re-render when custom presets change
+    useEffect(() => {
+        return presetRegistry.onChange(() => forceUpdate(n => n + 1))
+    }, [])
 
     // Focus search on mount
     useEffect(() => {
@@ -219,14 +227,14 @@ export function WidgetPicker({
                                     onMouseEnter={() => onHoverWidget?.(widget)}
                                     onMouseLeave={() => onHoverWidget?.(null)}
                                     style={{
-                                        width: 36, height: 36, borderRadius: 8,
+                                        width: 48, height: 48, borderRadius: 8,
                                         background: `${widget.ui.color}15`,
                                         border: `1px solid ${widget.ui.color}33`,
                                         display: 'flex', flexDirection: 'column',
                                         alignItems: 'center', justifyContent: 'center',
                                         cursor: 'pointer',
                                         transition: 'all 0.15s',
-                                        gap: 1,
+                                        gap: 2,
                                     }}
                                     onMouseOver={e => {
                                         (e.currentTarget as HTMLElement).style.background = `${widget.ui.color}25`
@@ -239,9 +247,9 @@ export function WidgetPicker({
                                             ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                     }}
                                 >
-                                    <WidgetIcon type={widget.ui.icons.default} size={14} color={widget.ui.color} />
-                                    <span style={{ fontSize: 6, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
-                                        {widget.label.length > 5 ? widget.label.slice(0, 5) : widget.label}
+                                    <WidgetIcon type={widget.ui.icons.default} size={16} color={widget.ui.color} />
+                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
+                                        {widget.label.length > 7 ? widget.label.slice(0, 7) : widget.label}
                                     </span>
                                 </div>
                             ))}
@@ -343,7 +351,7 @@ export function WidgetPicker({
 
                     {compact ? (
                         /* ── Compact tile grid — one tile per template/preset ── */
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
+                        <div style={{ padding: '6px 12px' }}>
                             {(() => {
                                 // Top-8 tiles in exact order, everything else after
                                 const PRESET_PRIO: Record<string, number> = {
@@ -359,20 +367,23 @@ export function WidgetPicker({
                                 const allTiles = filtered.flatMap(widget =>
                                     presetRegistry.getByWidget(widget.type).map(tmpl => ({ widget, tmpl }))
                                 )
-                                allTiles.sort((a, b) => {
+                                // Split into built-in and custom
+                                const builtIn = allTiles.filter(t => !t.tmpl.tags.includes('custom'))
+                                const custom = allTiles.filter(t => t.tmpl.tags.includes('custom'))
+                                builtIn.sort((a, b) => {
                                     const pa = PRESET_PRIO[a.tmpl.type] ?? 999
                                     const pb = PRESET_PRIO[b.tmpl.type] ?? 999
                                     return pa - pb
                                 })
-                                return (<>{allTiles.map(({ widget, tmpl }, i) => {
-                                    const label = presetRegistry.getByWidget(widget.type).length === 1
+
+                                const renderTile = ({ widget, tmpl }: { widget: WidgetDefinition; tmpl: PresetDefinition }, i: number, isCustom?: boolean) => {
+                                    const label = presetRegistry.getByWidget(widget.type).length === 1 && !isCustom
                                         ? widget.label
                                         : tmpl.label
                                     const truncLabel = label.length > 7 ? label.slice(0, 7) : label
                                     const presetIcon = tmpl.ui?.icons?.default || widget.ui.icons.default
                                     const hasBorderColors = tmpl.ui?.borderColors && tmpl.ui.borderColors.length > 1
                                     const tileColor = tmpl.ui?.color || widget.ui.color
-                                    // Build smooth gradient matching JobNode's linear-gradient(135deg)
                                     const smoothGradient = hasBorderColors
                                         ? (() => {
                                             const c = tmpl.ui!.borderColors!
@@ -382,9 +393,9 @@ export function WidgetPicker({
                                         : undefined
                                     return (
                                         <div
-                                            key={`${widget.type}-${i}`}
+                                            key={`${tmpl.type}-${i}`}
                                             data-testid={`tile-${tmpl.type}`}
-                                            title={`${widget.label}${presetRegistry.getByWidget(widget.type).length > 1 ? ` — ${tmpl.label}` : ''}: ${tmpl.description}`}
+                                            title={`${tmpl.label}: ${tmpl.description}`}
                                             draggable
                                             onDragStart={e => {
                                                 e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
@@ -396,6 +407,7 @@ export function WidgetPicker({
                                             onMouseEnter={() => onHoverWidget?.(widget)}
                                             onMouseLeave={() => onHoverWidget?.(null)}
                                             style={{
+                                                position: 'relative',
                                                 width: 48, height: 48, borderRadius: 8,
                                                 background: hasBorderColors
                                                     ? smoothGradient
@@ -443,16 +455,109 @@ export function WidgetPicker({
                                                     </span>
                                                 </>
                                             )}
+                                            {/* Delete button for custom presets */}
+                                            {isCustom && (
+                                                <button
+                                                    data-testid={`delete-${tmpl.type}`}
+                                                    onClick={e => {
+                                                        e.stopPropagation()
+                                                        presetRegistry.removeCustom(tmpl.type)
+                                                    }}
+                                                    style={{
+                                                        position: 'absolute', top: -4, right: -4,
+                                                        width: 14, height: 14, borderRadius: '50%',
+                                                        background: '#ef4444', border: 'none',
+                                                        color: '#fff', fontSize: 8, fontWeight: 700,
+                                                        cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        boxShadow: '0 2px 6px rgba(239,68,68,0.4)',
+                                                        opacity: 0.8,
+                                                    }}
+                                                    onMouseOver={e => { (e.currentTarget as HTMLElement).style.opacity = '1' }}
+                                                    onMouseOut={e => { (e.currentTarget as HTMLElement).style.opacity = '0.8' }}
+                                                    title="Delete custom preset"
+                                                >
+                                                    ✕
+                                                </button>
+                                            )}
                                         </div>
                                     )
-                                })}</>)
+                                }
+
+                                return (
+                                    <>
+                                        {/* Built-in tiles */}
+                                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                            {builtIn.map((t, i) => renderTile(t, i))}
+                                        </div>
+
+                                        {/* Custom presets section */}
+                                        {custom.length > 0 && (
+                                            <>
+                                                <div
+                                                    data-testid="custom-presets-divider"
+                                                    style={{
+                                                        fontSize: 8, fontWeight: 600, color: '#f59e0b',
+                                                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                                                        marginTop: 10, marginBottom: 6,
+                                                        paddingTop: 8,
+                                                        borderTop: '1px solid rgba(245,158,11,0.15)',
+                                                    }}>
+                                                    ★ Custom
+                                                </div>
+                                                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}
+                                                    data-testid="custom-presets-container"
+                                                >
+                                                    {custom.map((t, i) => (
+                                                        <div
+                                                            key={t.tmpl.type}
+                                                            draggable
+                                                            data-testid={`custom-tile-${i}`}
+                                                            onDragStart={e => {
+                                                                setDragFromIdx(i)
+                                                                e.dataTransfer.effectAllowed = 'move'
+                                                                e.dataTransfer.setData('text/plain', String(i))
+                                                            }}
+                                                            onDragOver={e => {
+                                                                e.preventDefault()
+                                                                e.dataTransfer.dropEffect = 'move'
+                                                                setDragOverIdx(i)
+                                                            }}
+                                                            onDragLeave={() => setDragOverIdx(null)}
+                                                            onDrop={e => {
+                                                                e.preventDefault()
+                                                                if (dragFromIdx !== null && dragFromIdx !== i) {
+                                                                    presetRegistry.reorderCustom(dragFromIdx, i)
+                                                                }
+                                                                setDragFromIdx(null)
+                                                                setDragOverIdx(null)
+                                                            }}
+                                                            onDragEnd={() => {
+                                                                setDragFromIdx(null)
+                                                                setDragOverIdx(null)
+                                                            }}
+                                                            style={{
+                                                                opacity: dragFromIdx === i ? 0.4 : 1,
+                                                                outline: dragOverIdx === i && dragFromIdx !== i ? '2px solid #f59e0b' : 'none',
+                                                                outlineOffset: 2,
+                                                                borderRadius: 8,
+                                                                transition: 'opacity 0.15s, outline 0.15s',
+                                                            }}
+                                                        >
+                                                            {renderTile(t, i, true)}
+                                                        </div>
+                                                    ))}</div>
+                                            </>
+                                        )}
+                                    </>
+                                )
                             })()}
                             {filtered.length === 0 && (
                                 <div style={{ padding: '12px 0', fontSize: 9, color: '#475569', width: '100%', textAlign: 'center' }}>
                                     {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
                                 </div>
                             )}
-                        </div>
+                        </div >
                     ) : (
                         /* ── Standard list view ── */
                         <>

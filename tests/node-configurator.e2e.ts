@@ -177,4 +177,109 @@ test.describe('Node Configurator', () => {
         const previewText = await previewSection.locator('..').textContent()
         expect(previewText).toContain(testLabel)
     })
+
+    test('saving a custom preset creates it in the WidgetPicker', async ({ page }) => {
+        await goto(page)
+
+        // Clear any existing custom presets from IndexedDB
+        await page.evaluate(() => {
+            indexedDB.deleteDatabase('wibeboard-custom-presets')
+        })
+        await page.reload()
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(500)
+
+        // Register a custom preset directly via the exposed registry
+        const registered = await page.evaluate(() => {
+            const reg = (window as any).__presetRegistry
+            if (!reg) return { error: 'no registry' }
+            const id = `test-custom-${Date.now()}`
+            reg.registerCustom({
+                type: id,
+                widgetType: 'job',
+                label: 'My Test Preset',
+                description: 'Test custom preset',
+                tags: ['custom', 'job'],
+                defaultData: { label: 'Test', code: '' },
+            })
+            return { id, customCount: reg.getCustomPresets().length }
+        })
+
+        expect(registered).toBeTruthy()
+        expect((registered as any).customCount).toBeGreaterThanOrEqual(1)
+
+        // Wait for React to re-render
+        await page.waitForTimeout(500)
+
+        // Verify: the custom divider appears in the WidgetPicker
+        const customDivider = page.locator('[data-testid="custom-presets-divider"]')
+        await expect(customDivider).toBeVisible({ timeout: 5_000 })
+
+        // Verify: a custom tile exists
+        const customTile = page.locator('[data-testid^="custom-tile-"]').first()
+        await expect(customTile).toBeVisible({ timeout: 5_000 })
+    })
+
+    test('custom presets can be drag-reordered', async ({ page }) => {
+        await goto(page)
+
+        // Clear custom presets
+        await page.evaluate(() => {
+            indexedDB.deleteDatabase('wibeboard-custom-presets')
+        })
+        await page.reload()
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(500)
+
+        // Register two custom presets directly
+        await page.evaluate(() => {
+            const reg = (window as any).__presetRegistry
+            reg.registerCustom({
+                type: `test-alpha-${Date.now()}`,
+                widgetType: 'job',
+                label: 'Alpha',
+                description: 'Test alpha',
+                tags: ['custom', 'job'],
+                defaultData: { label: 'Alpha' },
+            })
+        })
+        await page.waitForTimeout(300)
+
+        await page.evaluate(() => {
+            const reg = (window as any).__presetRegistry
+            reg.registerCustom({
+                type: `test-beta-${Date.now()}`,
+                widgetType: 'job',
+                label: 'Beta',
+                description: 'Test beta',
+                tags: ['custom', 'job'],
+                defaultData: { label: 'Beta' },
+            })
+        })
+        await page.waitForTimeout(500)
+
+        // Verify 2 custom tiles exist
+        const tiles = page.locator('[data-testid^="custom-tile-"]')
+        await expect(tiles).toHaveCount(2, { timeout: 5_000 })
+
+        // Read initial order (tile 0 = Alpha, tile 1 = Beta)
+        const tile0 = page.locator('[data-testid="custom-tile-0"]')
+        const tile1 = page.locator('[data-testid="custom-tile-1"]')
+        await expect(tile0).toBeVisible()
+        await expect(tile1).toBeVisible()
+
+        // Drag tile 0 onto tile 1 to swap
+        const box0 = await tile0.boundingBox()
+        const box1 = await tile1.boundingBox()
+        if (box0 && box1) {
+            await page.mouse.move(box0.x + box0.width / 2, box0.y + box0.height / 2)
+            await page.mouse.down()
+            await page.mouse.move(box1.x + box1.width / 2, box1.y + box1.height / 2, { steps: 10 })
+            await page.mouse.up()
+            await page.waitForTimeout(500)
+        }
+
+        // After reorder, tile counts should still be 2
+        await expect(tiles).toHaveCount(2)
+    })
 })

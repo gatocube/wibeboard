@@ -248,9 +248,16 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
 
 // ── Preset Registry class ───────────────────────────────────────────────────────
 
+import { customPresetStore } from './custom-preset-store'
+
 export class PresetRegistry extends Registry<PresetDefinition> {
+    private _listeners: (() => void)[] = []
+
     constructor(presets: Omit<PresetDefinition, 'id'>[]) {
         super(presets.map(p => [p.type, { ...p, id: p.type }] as [string, PresetDefinition]))
+        // Load persisted custom presets and subscribe to store changes
+        this._syncFromStore()
+        customPresetStore.onChange(() => this._syncFromStore())
     }
 
     /** Get all presets for a widget type */
@@ -263,9 +270,7 @@ export class PresetRegistry extends Registry<PresetDefinition> {
         return this.getAll().filter(p => p.widgetType === widgetType && p.subType === subType)
     }
 
-    /** Get the default preset for a widget type.
-     *  If defaultPresetId is provided (from widget.defaultPreset), returns that specific preset.
-     *  Otherwise returns the first preset for the widget type. */
+    /** Get the default preset for a widget type. */
     getDefault(widgetType: string, defaultPresetId?: string): PresetDefinition | undefined {
         if (defaultPresetId) {
             const preset = this.get(defaultPresetId)
@@ -273,6 +278,72 @@ export class PresetRegistry extends Registry<PresetDefinition> {
         }
         return this.getAll().find(p => p.widgetType === widgetType)
     }
+
+    /** Get all custom presets (ordered as stored) */
+    getCustomPresets(): PresetDefinition[] {
+        return customPresetStore.getAll().map(p => ({
+            ...p, id: p.type,
+            ui: p.ui as any,
+        }))
+    }
+
+    /** Register a custom preset and persist via Automerge */
+    registerCustom(preset: Omit<PresetDefinition, 'id'>): PresetDefinition {
+        const full: PresetDefinition = { ...preset, id: preset.type }
+        if (!full.tags.includes('custom')) full.tags = [...full.tags, 'custom']
+        this.register(full.type, full)
+        // Persist to Automerge store
+        const { id, ...stored } = full
+        customPresetStore.add(stored as any)
+        this._notify()
+        return full
+    }
+
+    /** Remove a custom preset and persist */
+    removeCustom(type: string): boolean {
+        const preset = this.get(type)
+        if (!preset || !preset.tags.includes('custom')) return false
+        const ok = this.unregister(type)
+        if (ok) {
+            customPresetStore.remove(type)
+            this._notify()
+        }
+        return ok
+    }
+
+    /** Reorder custom presets (drag-to-reorder) */
+    reorderCustom(from: number, to: number) {
+        customPresetStore.reorder(from, to)
+        this._notify()
+    }
+
+    /** Subscribe to changes (custom preset add/remove/reorder) */
+    onChange(listener: () => void): () => void {
+        this._listeners.push(listener)
+        return () => { this._listeners = this._listeners.filter(l => l !== listener) }
+    }
+
+    private _notify() {
+        for (const l of this._listeners) l()
+    }
+
+    /** Sync custom presets from the Automerge store into the registry */
+    private _syncFromStore() {
+        // Remove old custom presets from registry
+        for (const p of this.getAll()) {
+            if (p.tags.includes('custom')) this.unregister(p.type)
+        }
+        // Re-add from store (preserving order)
+        for (const p of customPresetStore.getAll()) {
+            this.register(p.type, { ...p, id: p.type, ui: p.ui as any })
+        }
+        this._notify()
+    }
 }
 
 export const presetRegistry = new PresetRegistry(PRESETS)
+
+// Expose for E2E testing
+if (typeof window !== 'undefined') {
+    ; (window as any).__presetRegistry = presetRegistry
+}

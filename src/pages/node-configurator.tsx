@@ -18,8 +18,9 @@ import { widgetRegistry, GRID_CELL, type WidgetDefinition } from '@/engine/widge
 import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
-import { CodeEditor } from '@/kit'
+import { CodeEditor, IconSelector } from '@/kit'
 import type { CodeLanguage } from '@/kit'
+import { generateId } from '@/engine/core'
 
 // Widget node components for live preview
 import {
@@ -571,6 +572,53 @@ export function NodeConfiguratorPage() {
                         )}
                     </div>
                 </div>
+
+                {/* ── Save as Custom Preset ── */}
+                <div style={S.card}>
+                    <div style={{ ...S.cardBody, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <button
+                            data-testid="save-preset-btn"
+                            onClick={() => {
+                                const name = prompt('Preset name:', nodeData.label || 'My Preset')
+                                if (!name) return
+                                const presetType = `custom-${generateId('preset')}`
+                                presetRegistry.registerCustom({
+                                    type: presetType,
+                                    widgetType: widgetDef.type,
+                                    subType: nodeData.subType,
+                                    label: name,
+                                    description: `Custom ${widgetDef.label} preset`,
+                                    tags: ['custom', widgetDef.type],
+                                    defaultData: { ...nodeData },
+                                    ui: nodeData.icon ? { icons: { default: nodeData.icon } } : undefined,
+                                })
+                            }}
+                            style={{
+                                padding: '8px 16px', borderRadius: 8,
+                                border: '1px solid rgba(245,158,11,0.3)',
+                                background: 'rgba(245,158,11,0.08)',
+                                color: '#f59e0b',
+                                cursor: 'pointer',
+                                fontSize: 11, fontWeight: 600,
+                                fontFamily: 'Inter, sans-serif',
+                                transition: 'all 0.15s',
+                            }}
+                            onMouseOver={e => {
+                                (e.currentTarget as HTMLElement).style.background = 'rgba(245,158,11,0.15)'
+                                    ; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,158,11,0.5)'
+                            }}
+                            onMouseOut={e => {
+                                (e.currentTarget as HTMLElement).style.background = 'rgba(245,158,11,0.08)'
+                                    ; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,158,11,0.3)'
+                            }}
+                        >
+                            ★ Save as Custom Preset
+                        </button>
+                        <div style={{ fontSize: 9, color: '#64748b' }}>
+                            Saves current settings as a reusable preset in the Widget Picker.
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* ── Column 3: WidgetPicker ── */}
@@ -761,6 +809,25 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
                     ))}
                 </select>
                 <div style={S.fieldHint}>enum</div>
+            </div>
+        )
+    }
+
+    // Icon field → IconSelector dropdown
+    if (fieldKey === 'icon' && t === 'string') {
+        return (
+            <div style={S.fieldRow}>
+                <label style={S.fieldLabel}>
+                    {fieldKey}
+                    <span style={{ fontSize: 8, color: '#f59e0b', marginLeft: 6, fontWeight: 400 }}>
+                        icon picker
+                    </span>
+                </label>
+                <IconSelector
+                    selected={String(value)}
+                    onSelect={id => handleChange(id)}
+                />
+                {error && <div style={{ color: '#ef4444', fontSize: 9, marginTop: 4 }}>{error}</div>}
             </div>
         )
     }
