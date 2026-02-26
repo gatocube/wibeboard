@@ -8,7 +8,7 @@ import { breath } from '../packages/test-runner/src/human.mjs'
 test.describe('Plugins Page', () => {
     test.beforeEach(async ({ page }) => {
         // Clear plugin localStorage state so each test starts clean
-        await page.goto('http://localhost:5173/wibeboard/?page=plugins')
+        await page.goto('/?page=plugins')
         await page.evaluate(() => {
             localStorage.removeItem('plugin_enabled')
             localStorage.removeItem('plugin_settings_hello-world')
@@ -113,7 +113,7 @@ test.describe('Plugins Page', () => {
         })
 
         // Navigate directly to the pop-out URL
-        await page.goto('http://localhost:5173/wibeboard/?page=plugin-popout&pluginId=hello-world')
+        await page.goto('/?page=plugin-popout&pluginId=hello-world')
         await breath()
 
         // Should render in standalone container (no sidebar, no nav)
@@ -137,7 +137,7 @@ test.describe('Plugins Page', () => {
 
 test.describe('AI Chat Plugin', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('http://localhost:5173/wibeboard/?page=plugins')
+        await page.goto('/?page=plugins')
         await page.evaluate(() => {
             localStorage.removeItem('plugin_enabled')
             localStorage.removeItem('plugin_settings_ai-chat')
@@ -199,7 +199,7 @@ test.describe('AI Chat Plugin', () => {
 
 test.describe('React Icons Plugin', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('http://localhost:5173/wibeboard/?page=plugins')
+        await page.goto('/?page=plugins')
         await page.evaluate(() => {
             localStorage.removeItem('plugin_enabled')
             localStorage.removeItem('plugin_settings_react-icons')
@@ -231,7 +231,7 @@ test.describe('React Icons Plugin', () => {
         await breath()
 
         // Navigate to UI Kit page (has IconSelector) and check Plugin filter + plugin badge
-        await page.goto('http://localhost:5173/wibeboard/?page=ui-kit')
+        await page.goto('/?page=ui-kit')
         await breath()
 
         // Click the Plugin filter tab
@@ -255,7 +255,7 @@ test.describe('React Icons Plugin', () => {
         await breath()
 
         // Navigate to UI Kit page (has IconSelector)
-        await page.goto('http://localhost:5173/wibeboard/?page=ui-kit')
+        await page.goto('/?page=ui-kit')
         await breath()
 
         // Plugin filter should exist but show 0 plugin icons

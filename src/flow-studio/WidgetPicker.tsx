@@ -345,27 +345,16 @@ export function WidgetPicker({
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
                             {(() => {
-                                // Fine-grained priority per preset type
+                                // Top-8 tiles in exact order, everything else after
                                 const PRESET_PRIO: Record<string, number> = {
-                                    // Scripts first
-                                    'job-default': 10, 'job-script': 11, 'job-js': 12,
-                                    'job-ts': 13, 'job-sh': 14, 'job-py': 15,
-                                    // AI presets
-                                    'job-ai': 20, 'job-planner': 21, 'job-worker': 22, 'job-reviewer': 23,
-                                    // User
-                                    'user-code-reviewer': 30, 'user-approval': 31,
-                                    // SubFlow
-                                    'subflow-default': 40, 'subflow-ai-pipeline': 41,
-                                    // Informer
-                                    'informer-sticker': 50, 'informer-pink-sticker': 51,
-                                    'informer-section': 52, 'informer-heading': 53,
-                                    'informer-caption': 54, 'informer-web': 55,
-                                    // Expectation
-                                    'expectation-artifact': 60, 'expectation-tool-call': 61, 'expectation-pr': 62,
-                                    // Group
-                                    'group-pipeline': 70, 'group-stage': 71,
-                                    // Starting
-                                    'starting-default': 80,
+                                    'job-script': 0,               // Script
+                                    'job-ai': 1,                   // AI
+                                    'user-code-reviewer': 2,       // User
+                                    'subflow-default': 3,          // Subflow
+                                    'informer-sticker': 4,         // Info
+                                    'expectation-artifact': 5,     // Artifact
+                                    'expectation-tool-call': 6,    // Tool
+                                    'informer-web': 7,             // Webpage
                                 }
                                 const allTiles = filtered.flatMap(widget =>
                                     presetRegistry.getByWidget(widget.type).map(tmpl => ({ widget, tmpl }))

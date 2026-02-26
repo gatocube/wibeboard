@@ -112,7 +112,7 @@ type Mode = 'visual' | 'raw' | 'manifest'
 
 const S = {
     page: {
-        minHeight: '100%', display: 'flex', overflow: 'auto',
+        height: '100vh', display: 'flex', overflow: 'hidden',
         background: '#0a0a14', fontFamily: 'Inter, sans-serif', color: '#e2e8f0',
     } as CSSProperties,
 

@@ -9,6 +9,9 @@ node_modules/
 # Build
 dist/
 
+# Environment
+.env
+
 # Editor
 .vscode/*
 !.vscode/extensions.json

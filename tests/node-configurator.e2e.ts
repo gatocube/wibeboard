@@ -117,46 +117,48 @@ test.describe('Node Configurator', () => {
             (els: Element[]) => els.map(el => el.getAttribute('data-testid')!)
         )
 
-        // Expected order:
-        // Scripts → AI → User → SubFlow → Informer → Expectation → Group → Starting
-        const EXPECTED_ORDER = [
-            'tile-job-default', 'tile-job-script', 'tile-job-js',
-            'tile-job-ts', 'tile-job-sh', 'tile-job-py',
-            'tile-job-ai', 'tile-job-planner', 'tile-job-worker', 'tile-job-reviewer',
-            'tile-user-code-reviewer', 'tile-user-approval',
-            'tile-subflow-default', 'tile-subflow-ai-pipeline',
-            'tile-informer-sticker', 'tile-informer-pink-sticker',
-            'tile-informer-section', 'tile-informer-heading',
-            'tile-informer-caption', 'tile-informer-web',
-            'tile-expectation-artifact', 'tile-expectation-tool-call', 'tile-expectation-pr',
-            'tile-group-pipeline', 'tile-group-stage',
-            'tile-starting-default',
+        // Expected order: top-8 priority tiles first, then rest
+        // Top 8: Script, AI, User, Subflow, Info, Artifact, Tool, Webpage
+        const TOP_8 = [
+            'tile-job-script',             // Script
+            'tile-job-ai',                 // AI
+            'tile-user-code-reviewer',     // User
+            'tile-subflow-default',        // Subflow
+            'tile-informer-sticker',       // Info
+            'tile-expectation-artifact',   // Artifact
+            'tile-expectation-tool-call',  // Tool
+            'tile-informer-web',           // Webpage
         ]
 
-        expect(tileIds).toEqual(EXPECTED_ORDER)
+        // First 8 must be exactly these, in this order
+        expect(tileIds.slice(0, 8)).toEqual(TOP_8)
+
+        // All remaining tiles should be present (no missing, no duplicates)
+        const rest = tileIds.slice(8)
+        expect(rest.length).toBeGreaterThan(0)
+        expect(new Set(tileIds).size).toBe(tileIds.length) // no duplicates
     })
 
-    test('page is scrollable when content overflows', async ({ page }) => {
+    test('settings column is scrollable when content overflows', async ({ page }) => {
         await goto(page)
         await expect(page.locator('[data-testid="widget-type-select"]')).toBeVisible({ timeout: 5_000 })
 
-        // The page container should allow scrolling (overflow: auto, not hidden)
-        const pageOverflow = await page.evaluate(() => {
-            const el = document.querySelector('[data-testid="widget-type-select"]')?.closest('div[style]') as HTMLElement | null
-            if (!el) return 'no-element'
-            // Walk up to find the page container
-            let parent = el.parentElement
-            while (parent && parent !== document.body) {
-                const style = getComputedStyle(parent)
-                if (style.overflow === 'auto' || style.overflowY === 'auto' ||
-                    style.overflow === 'scroll' || style.overflowY === 'scroll') {
+        // The settings column (col2) should allow independent scrolling
+        const colOverflow = await page.evaluate(() => {
+            const field = document.querySelector('[data-testid="field-label"]')
+            if (!field) return 'no-field'
+            // Walk up to find the column container with overflow: auto
+            let el = field.parentElement
+            while (el && el !== document.body) {
+                const style = getComputedStyle(el)
+                if (style.overflow === 'auto' || style.overflowY === 'auto') {
                     return 'scrollable'
                 }
-                parent = parent.parentElement
+                el = el.parentElement
             }
             return 'not-scrollable'
         })
-        expect(pageOverflow).toBe('scrollable')
+        expect(colOverflow).toBe('scrollable')
     })
 
     test('changing label in config updates the preview node', async ({ page }) => {

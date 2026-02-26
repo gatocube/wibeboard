@@ -19,7 +19,7 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'qwen2.5-coder:7b'
 
 test.describe('AI Chat Plugin — Integration', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('http://localhost:5173/wibeboard/?page=plugins')
+        await page.goto('/?page=plugins')
         await page.evaluate(
             ({ url, model }) => {
                 localStorage.removeItem('plugin_enabled')

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Integrations Page', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('http://localhost:5173/wibeboard/?page=integrations')
+        await page.goto('/?page=integrations')
     })
 
     test('GitHub card shows enabled input and disabled test button when no token set', async ({ page }) => {
@@ -56,7 +56,7 @@ test.describe('Integrations Page', () => {
 
     test('custom integrations JSON editor saves and shows Ollama card', async ({ page }) => {
         // Navigate to integrations page via nav
-        await page.goto('http://localhost:5173/wibeboard/?page=integrations')
+        await page.goto('/?page=integrations')
 
         // Find the custom integrations JSON editor
         const textarea = page.locator('textarea')
