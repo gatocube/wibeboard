@@ -13,6 +13,7 @@
  */
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
+import { ReactFlowProvider } from '@xyflow/react'
 import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/engine/widget-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
@@ -366,11 +367,13 @@ export function NodeConfiguratorPage() {
                             width: previewW, height: previewH,
                             position: 'relative',
                         }}>
-                            {PreviewComponent ? (
-                                <PreviewComponent data={previewData} />
-                            ) : (
-                                <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
-                            )}
+                            <ReactFlowProvider>
+                                {PreviewComponent ? (
+                                    <PreviewComponent data={previewData} />
+                                ) : (
+                                    <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
+                                )}
+                            </ReactFlowProvider>
                         </div>
                     </div>
                 </div>
@@ -393,11 +396,13 @@ export function NodeConfiguratorPage() {
                             width: previewW, height: previewH,
                             position: 'relative',
                         }}>
-                            {PreviewComponent ? (
-                                <PreviewComponent data={debugPreviewData} />
-                            ) : (
-                                <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
-                            )}
+                            <ReactFlowProvider>
+                                {PreviewComponent ? (
+                                    <PreviewComponent data={debugPreviewData} />
+                                ) : (
+                                    <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
+                                )}
+                            </ReactFlowProvider>
                         </div>
                     </div>
                 </div>
