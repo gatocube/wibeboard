@@ -20,7 +20,7 @@ import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
-import { widgetRegistry } from '@/engine/widget-registry'
+import { widgetRegistry, type WidgetTemplate } from '@/engine/widget-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
 import { AgentMessenger } from '@/engine/AgentMessenger'
 import { runScriptInBrowser } from '@/engine/script-runner'
@@ -326,6 +326,25 @@ function BuilderSimpleInner() {
         }))
     }, [mutateState])
 
+    // ── Sidebar widget picker: create node from widget ──
+    const handleNodeCreated = useCallback((
+        nodeId: string,
+        widgetType: string,
+        _template: WidgetTemplate,
+        rect: { x: number; y: number; width: number; height: number },
+    ) => {
+        const { nodeType, data } = resolveWidgetType(widgetType)
+        mutateState((prevNodes, prevEdges) => ({
+            nodes: [...prevNodes, {
+                id: nodeId,
+                type: nodeType,
+                position: { x: rect.x, y: rect.y },
+                data: { ...data, width: rect.width, height: rect.height },
+            }],
+            edges: prevEdges,
+        }))
+    }, [mutateState])
+
     // ── Add Before handler ──
     const handleAddBefore = useCallback((targetNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
@@ -568,6 +587,7 @@ function BuilderSimpleInner() {
                     defaultViewport={{ x: 0, y: 0, zoom: DEFAULT_ZOOM }}
                     onAddAfter={handleAddAfter}
                     onAddBefore={handleAddBefore}
+                    onNodeCreated={handleNodeCreated}
                     onConfigure={handleConfigure}
                     onRename={handleRename}
                     hideBeforeButton={hideBeforeButton}
