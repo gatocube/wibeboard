@@ -9,7 +9,7 @@
  * Mode selector and event log float over the canvas.
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { SwipeButtons, type SwipeButtonsActivation } from '@/kit'
 
 // ── Activation mode pill selector ───────────────────────────────────────────────
@@ -103,7 +103,7 @@ function EventLog({ log }: { log: string[] }) {
 
 // ── Mock node ───────────────────────────────────────────────────────────────────
 
-function MockNode({ id, label, color, icon, selected, onClick, onMouseEnter, style }: {
+function MockNode({ id, label, color, icon, selected, onClick, onMouseEnter, onHold, onTouchSelect, style }: {
     id: string
     label: string
     color: string
@@ -111,14 +111,60 @@ function MockNode({ id, label, color, icon, selected, onClick, onMouseEnter, sty
     selected: boolean
     onClick: () => void
     onMouseEnter?: () => void
+    onHold?: () => void
+    onTouchSelect?: () => void
     style?: React.CSSProperties
 }) {
+    const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const didHoldRef = useRef(false)
+
+    const handlePointerDown = useCallback((_e: React.PointerEvent) => {
+        if (!onHold) return
+        didHoldRef.current = false
+        holdTimerRef.current = setTimeout(() => {
+            didHoldRef.current = true
+            onHold()
+            holdTimerRef.current = null
+        }, 500)
+    }, [onHold])
+
+    const handlePointerUp = useCallback((_e: React.PointerEvent) => {
+        if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+        }
+    }, [])
+
+    const handlePointerCancel = useCallback(() => {
+        if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+        }
+    }, [])
+
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        // Don't fire click if hold just completed
+        if (didHoldRef.current) { didHoldRef.current = false; return }
+        onClick()
+    }, [onClick])
+
+    const handleTouchStart = useCallback((_e: React.TouchEvent) => {
+        if (onTouchSelect) {
+            onTouchSelect()
+        }
+    }, [onTouchSelect])
+
     return (
         <div
             data-id={id}
             data-testid={`mock-node-${id}`}
-            onClick={(e) => { e.stopPropagation(); onClick() }}
+            onClick={handleClick}
             onMouseEnter={onMouseEnter}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onTouchStart={handleTouchStart}
             style={{
                 position: 'absolute',
                 width: 120, height: 60,
@@ -130,6 +176,8 @@ function MockNode({ id, label, color, icon, selected, onClick, onMouseEnter, sty
                 cursor: 'pointer',
                 transition: 'all 0.15s',
                 boxShadow: selected ? `0 0 20px ${color}22` : 'none',
+                touchAction: 'none',
+                userSelect: 'none',
                 ...style,
             }}
         >
@@ -170,6 +218,74 @@ export function ButtonsMenuPage() {
 
     const hoverNode = useCallback((id: string) => {
         if (mode === 'swipe') setSelectedId(id)
+    }, [mode])
+
+    const holdNode = useCallback((id: string) => {
+        if (mode === 'hold') setSelectedId(id)
+    }, [mode])
+
+    const touchSelectNode = useCallback((id: string) => {
+        if (mode === 'swipe') setSelectedId(id)
+    }, [mode])
+
+    // ── Document-level pointer listener for hold & swipe from node element ──
+    // CDP touch simulation dispatches pointerdown/pointerup at the document level,
+    // bypassing React synthetic events. This listener ensures hold and swipe modes
+    // work correctly with both real touch and CDP-simulated events.
+    const holdTimerDocRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    useEffect(() => {
+        function findNodeId(target: EventTarget | null): string | null {
+            const el = (target as HTMLElement)?.closest?.('[data-id]')
+            return el?.getAttribute('data-id') ?? null
+        }
+
+        function findNodeIdFromPoint(x: number, y: number): string | null {
+            const el = document.elementFromPoint(x, y) as HTMLElement | null
+            return el?.closest?.('[data-id]')?.getAttribute('data-id') ?? null
+        }
+
+        function handleDown(nodeId: string | null) {
+            if (!nodeId) return
+            if (mode === 'swipe') setSelectedId(nodeId)
+            if (mode === 'hold') {
+                holdTimerDocRef.current = setTimeout(() => {
+                    setSelectedId(nodeId)
+                    holdTimerDocRef.current = null
+                }, 500)
+            }
+        }
+
+        function handleUp() {
+            if (holdTimerDocRef.current) {
+                clearTimeout(holdTimerDocRef.current)
+                holdTimerDocRef.current = null
+            }
+        }
+
+        // Native pointer events (mouse + real touch on modern browsers)
+        function handlePointerDown(e: PointerEvent) {
+            handleDown(findNodeId(e.target))
+        }
+
+        // Native touch events (CDP simulated touch)
+        function handleTouchStart(e: TouchEvent) {
+            const touch = e.touches[0]
+            if (touch) handleDown(findNodeIdFromPoint(touch.clientX, touch.clientY))
+        }
+
+        document.addEventListener('pointerdown', handlePointerDown)
+        document.addEventListener('pointerup', handleUp)
+        document.addEventListener('pointercancel', handleUp)
+        document.addEventListener('touchstart', handleTouchStart, { passive: true })
+        document.addEventListener('touchend', handleUp, { passive: true })
+        return () => {
+            document.removeEventListener('pointerdown', handlePointerDown)
+            document.removeEventListener('pointerup', handleUp)
+            document.removeEventListener('pointercancel', handleUp)
+            document.removeEventListener('touchstart', handleTouchStart)
+            document.removeEventListener('touchend', handleUp)
+            if (holdTimerDocRef.current) clearTimeout(holdTimerDocRef.current)
+        }
     }, [mode])
 
     const currentLabel = selectedId === 'center-node' ? centerLabel
@@ -226,6 +342,8 @@ export function ButtonsMenuPage() {
                 selected={selectedId === 'left-node'}
                 onClick={() => selectNode('left-node')}
                 onMouseEnter={() => hoverNode('left-node')}
+                onHold={() => holdNode('left-node')}
+                onTouchSelect={() => touchSelectNode('left-node')}
                 style={{ top: 32, left: 32, width: 48, height: 48, padding: '0 6px', justifyContent: 'center' }}
             />
 
@@ -238,6 +356,8 @@ export function ButtonsMenuPage() {
                 selected={selectedId === 'center-node'}
                 onClick={() => selectNode('center-node')}
                 onMouseEnter={() => hoverNode('center-node')}
+                onHold={() => holdNode('center-node')}
+                onTouchSelect={() => touchSelectNode('center-node')}
                 style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
             />
 
@@ -250,6 +370,8 @@ export function ButtonsMenuPage() {
                 selected={selectedId === 'right-node'}
                 onClick={() => selectNode('right-node')}
                 onMouseEnter={() => hoverNode('right-node')}
+                onHold={() => holdNode('right-node')}
+                onTouchSelect={() => touchSelectNode('right-node')}
                 style={{ top: '50%', right: 32, transform: 'translateY(-50%)' }}
             />
 

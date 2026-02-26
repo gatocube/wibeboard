@@ -253,7 +253,44 @@ test.describe('SwipeButtons activation modes', () => {
     // ═══════════════════════════════════════════════════════════════════════
 
     // Note: swipe mode is hover-based (mouse only). Touch devices use click mode.
-    // No touch test needed for swipe mode.
+    // However, touchStart on the node should also select it for touch accessibility.
+
+    test('swipe/touch: touching node selects it and shows menu', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+        // Dispatch a touchstart event directly on the node element.
+        // CDP Input.dispatchTouchEvent doesn't reliably trigger document-level
+        // touchstart listeners, so we dispatch programmatically.
+        await page.evaluate(() => {
+            const el = document.querySelector('[data-id="center-node"]') as HTMLElement
+            if (el) {
+                const rect = el.getBoundingClientRect()
+                const touch = new Touch({
+                    identifier: 0,
+                    target: el,
+                    clientX: rect.left + rect.width / 2,
+                    clientY: rect.top + rect.height / 2,
+                })
+                el.dispatchEvent(new TouchEvent('touchstart', {
+                    bubbles: true, cancelable: true, touches: [touch],
+                }))
+            }
+        })
+        await page.waitForTimeout(300)
+        await expectMenuVisible(page)
+    })
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // HOLD MODE — Long-press on node element
+    // ═══════════════════════════════════════════════════════════════════════
+
+    test('hold: long-press on node element opens menu', async ({ page }) => {
+        await selectMode(page, 'Hold')
+        const center = await getCenter(page, 'mock-node-center-node')
+
+        // Long-press on the node itself (not a menu button)
+        await touchLongPress(page, center.x, center.y, 600)
+        await expectMenuVisible(page)
+    })
 
 
     // ═══════════════════════════════════════════════════════════════════════
