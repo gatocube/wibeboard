@@ -278,16 +278,6 @@ const WIDGETS: WidgetDefinition[] = [
     },
 ]
 
-// ── Backward compatibility helpers ─────────────────────────────────────────────
-
-/** Map old compound types → { type, subType } */
-function resolveType(typeStr: string): { type: string; subType?: string } {
-    if (typeStr === 'agent') return { type: 'job', subType: 'ai' }
-    if (typeStr.startsWith('script-')) return { type: 'job', subType: typeStr.replace('script-', '') }
-    if (typeStr.startsWith('note-')) return { type: 'note', subType: typeStr.replace('note-', '') }
-    return { type: typeStr }
-}
-
 // ── Registry API ───────────────────────────────────────────────────────────────
 
 class WidgetRegistry {
@@ -299,12 +289,7 @@ class WidgetRegistry {
     }
 
     get(type: string): WidgetDefinition | undefined {
-        // Direct match first
-        const direct = this.widgets.find(w => w.type === type)
-        if (direct) return direct
-        // Try resolving old compound type
-        const { type: resolved } = resolveType(type)
-        return this.widgets.find(w => w.type === resolved)
+        return this.widgets.find(w => w.type === type)
     }
 
     getByType(type: string): WidgetDefinition | undefined {

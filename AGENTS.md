@@ -7,6 +7,7 @@
 - PRs: create against main branch unless specified otherwise
 
 Check aslo agents/testing-strategy.md
+Check agents/DEPRECATION-POLICY.md
 Check docs/ARCHITECTURE.md
 
 After you finished you current task you must check the agents/tasks/ folder for tasks that are not marked as done and pick the next one.

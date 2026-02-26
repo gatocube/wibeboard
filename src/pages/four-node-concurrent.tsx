@@ -14,9 +14,9 @@ import {
 } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
-import { AgentNode } from '@/widgets/wibeglow/AgentNode'
+import { JobNode } from '@/widgets/wibeglow/JobNode'
 
-const nodeTypes = { agent: AgentNode }
+const nodeTypes = { agent: JobNode }
 
 // ── Step definitions ─────────────────────────────────────────────────────────
 

@@ -21,10 +21,10 @@ import {
 } from '@xyflow/react'
 import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-store'
 import { StepPlayer } from '@/engine/step-player'
-import { AgentNode as WibeGlowAgent } from '@/widgets/wibeglow/AgentNode'
+import { JobNode as WibeGlowJob } from '@/widgets/wibeglow/JobNode'
 import { ArtifactNode as WibeGlowArtifact } from '@/widgets/wibeglow/ArtifactNode'
-import { AgentNode as PixelAgent } from '@/widgets/pixel/AgentNode'
-import { AgentNode as GHubAgent } from '@/widgets/ghub/AgentNode'
+import { JobNode as PixelJob } from '@/widgets/pixel/JobNode'
+import { JobNode as GHubJob } from '@/widgets/ghub/JobNode'
 
 // ── Theme configs ────────────────────────────────────────────────────────────
 
@@ -38,9 +38,9 @@ const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
 }
 
 const THEME_NODE_TYPES: Record<ThemeKey, NodeTypes> = {
-    wibeglow: { agent: WibeGlowAgent, artifact: WibeGlowArtifact },
-    pixel: { agent: PixelAgent, artifact: WibeGlowArtifact },
-    ghub: { agent: GHubAgent, artifact: WibeGlowArtifact },
+    wibeglow: { agent: WibeGlowJob, artifact: WibeGlowArtifact },
+    pixel: { agent: PixelJob, artifact: WibeGlowArtifact },
+    ghub: { agent: GHubJob, artifact: WibeGlowArtifact },
 }
 
 const THEME_BG: Record<ThemeKey, { color: string; bg: string }> = {

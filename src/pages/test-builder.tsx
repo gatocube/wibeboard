@@ -7,7 +7,7 @@
 
 import { ReactFlowProvider, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { AgentNode, ScriptNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
+import { JobNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import type { WidgetTemplate } from '@/engine/widget-registry'
@@ -16,11 +16,12 @@ import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
 
 // ── Node types ──
 const nodeTypes = {
-    agent: AgentNode,
-    'script-js': ScriptNode,
-    'script-ts': ScriptNode,
-    'script-sh': ScriptNode,
-    'script-py': ScriptNode,
+    agent: JobNode,
+    job: JobNode,
+    'script-js': JobNode,
+    'script-ts': JobNode,
+    'script-sh': JobNode,
+    'script-py': JobNode,
     group: GroupNode,
     placeholder: PlaceholderNode,
 }

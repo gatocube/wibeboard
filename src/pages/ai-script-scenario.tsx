@@ -16,8 +16,7 @@ import { StepStore, type StepDef, type FlowState } from '@/engine/automerge-stor
 import { StepPlayer } from '@/engine/step-player'
 import { FlowStudio, NodeConfigPanel, type NodeSize, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
-import { AgentNode } from '@/widgets/wibeglow/AgentNode'
-import { ScriptNode } from '@/widgets/wibeglow/ScriptNode'
+import { JobNode } from '@/widgets/wibeglow/JobNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
 import { PlaceholderNode } from '@/widgets/wibeglow/PlaceholderNode'
 import type { WidgetTemplate } from '@/engine/widget-registry'
@@ -34,11 +33,12 @@ const SIZE_PRESETS: Record<NodeSize, { w: number; h: number; gap: number }> = {
 }
 
 const NODE_TYPES: NodeTypes = {
-    agent: AgentNode,
-    'script-js': ScriptNode,
-    'script-ts': ScriptNode,
-    'script-sh': ScriptNode,
-    'script-py': ScriptNode,
+    agent: JobNode,
+    job: JobNode,
+    'script-js': JobNode,
+    'script-ts': JobNode,
+    'script-sh': JobNode,
+    'script-py': JobNode,
     user: UserNode,
     placeholder: PlaceholderNode,
 }
