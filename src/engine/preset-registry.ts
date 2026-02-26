@@ -49,13 +49,33 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
     },
     {
+        type: 'job-default', widgetType: 'job', subType: 'js',
+        label: 'Job', description: 'Default job — JavaScript script',
+        tags: ['job', 'javascript', 'js', 'default'],
+        ui: { icons: { default: 'briefcase', working: 'loader-2' } },
+        defaultData: {
+            label: 'Job', subType: 'js', language: 'js',
+            code: `export function activate(ctx) {\n   console.log('Hello from Job');\n}`,
+        },
+    },
+    {
+        type: 'job-script', widgetType: 'job', subType: 'js',
+        label: 'Script', description: 'Generic script preset',
+        tags: ['script', 'javascript', 'js', 'code'],
+        ui: { icons: { default: 'file-code', working: 'loader-2' } },
+        defaultData: {
+            label: 'Script', subType: 'js', language: 'js',
+            code: `export function activate(ctx) {\n   console.log('Hello from script');\n}`,
+        },
+    },
+    {
         type: 'job-js', widgetType: 'job', subType: 'js',
-        label: 'JS Script', description: 'JavaScript with activate() entry',
+        label: 'JS', description: 'JavaScript with activate() entry',
         tags: ['script', 'javascript', 'js', 'code'],
         ui: { icons: { default: 'file-code', working: 'loader-2' } },
         defaultData: {
             label: 'script.js', subType: 'js', language: 'js',
-            code: `export function activate(ctx) {\n   console.log('Hello from', ctx.node.name);\n}`,
+            code: `export function activate(ctx) {\n   console.log('Hello from js');\n}`,
         },
     },
     {

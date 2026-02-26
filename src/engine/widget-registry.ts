@@ -47,7 +47,7 @@ export interface WidgetDefinition extends RegistryItem {
 const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     {
         type: 'job',
-        defaultPreset: 'job-js',
+        defaultPreset: 'job-default',
         label: 'Job',
         category: 'Job',
         tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
