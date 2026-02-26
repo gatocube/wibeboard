@@ -15,6 +15,8 @@ export interface WidgetTemplate {
     name: string
     description: string
     defaultData: Record<string, any>
+    /** Optional per-template icon override (falls back to widget-level icon) */
+    icon?: string
 }
 
 export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Note' | 'Expectation' | 'Starting' | 'SubFlow'
@@ -43,7 +45,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'job',
         label: 'Job',
-        icon: 'sparkles',
+        icon: 'briefcase',
         category: 'Job',
         tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
         description: 'AI agent or code script that executes tasks',
@@ -61,21 +63,25 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Planner',
                 description: 'Strategic planning agent',
+                icon: 'brain',
                 defaultData: { label: 'Planner', subType: 'ai', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Worker',
                 description: 'Task execution agent',
+                icon: 'wrench',
                 defaultData: { label: 'Worker', subType: 'ai', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'Reviewer',
                 description: 'Code review agent',
+                icon: 'search',
                 defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
             },
             {
                 name: 'JS Script',
                 description: 'JavaScript with activate() entry',
+                icon: 'file-code',
                 defaultData: {
                     label: 'script.js', subType: 'js', language: 'js',
                     code: `export function activate(ctx) {\n   console.log('Hello from', ctx.node.name);\n}`,
@@ -84,6 +90,7 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'TS Script',
                 description: 'TypeScript with type-safe activate()',
+                icon: 'file-code',
                 defaultData: {
                     label: 'script.ts', subType: 'ts', language: 'ts',
                     code: `export function activate(ctx: Context) {\n   console.log('Hello from', ctx.node.name);\n}`,
@@ -92,6 +99,7 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Shell Script',
                 description: 'Shell script for system commands',
+                icon: 'terminal',
                 defaultData: {
                     label: 'script.sh', subType: 'sh', language: 'sh',
                     code: `#!/bin/bash\necho "Hello from $NODE_NAME"`,
@@ -100,6 +108,7 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Python Script',
                 description: 'Python for data processing and ML',
+                icon: 'file-type',
                 defaultData: {
                     label: 'script.py', subType: 'py', language: 'py',
                     code: `def activate(ctx):\n    print(f"Hello from {ctx.node.name}")`,
@@ -159,7 +168,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'user',
         label: 'User',
-        icon: 'user',
+        icon: 'user-circle',
         category: 'Job',
         tags: ['user', 'human', 'review', 'approval', 'gate', 'interaction'],
         description: 'Human interaction node for reviews, approvals, and manual gates',
@@ -228,7 +237,7 @@ const WIDGETS: WidgetDefinition[] = [
     {
         type: 'expectation',
         label: 'Expectation',
-        icon: 'check-circle-2',
+        icon: 'clipboard-check',
         category: 'Expectation',
         tags: ['expectation', 'assert', 'verify', 'check', 'artifact', 'tool', 'test'],
         description: 'Asserts that an agent produces an artifact or calls a tool',

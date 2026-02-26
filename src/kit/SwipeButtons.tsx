@@ -22,7 +22,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Cpu, Code, UserCircle, Trash2, FileCode, Terminal, FileType, Brain, Wrench, Search, Paperclip, Clock, StickyNote, Briefcase, ClipboardCheck, Workflow } from 'lucide-react'
+import { Plus, Settings, Sparkles, Code, UserCircle, Trash2, FileCode, Terminal, FileType, Brain, Wrench, Search, Paperclip, Clock, StickyNote, Briefcase, ClipboardCheck, Workflow } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ const ADD_NODE_TYPES: SubButton[] = [
 const JOB_TYPES: SubButton[] = [
     { key: 'user', label: 'User', icon: UserCircle, color: '#f59e0b' },
     { key: 'script', label: 'Script', icon: Code, color: '#89e051' },
-    { key: 'ai', label: 'AI', icon: Cpu, color: '#8b5cf6' },
+    { key: 'ai', label: 'AI', icon: Sparkles, color: '#8b5cf6' },
 ]
 
 const AI_ROLES: SubButton[] = [

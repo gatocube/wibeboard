@@ -385,7 +385,7 @@ export function WidgetPicker({
                                                     ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                             }}
                                         >
-                                            <WidgetIcon type={widget.type} size={16} />
+                                            <WidgetIcon type={tmpl.icon || widget.icon} size={16} />
                                             <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
                                                 {truncLabel}
                                             </span>

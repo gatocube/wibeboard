@@ -22,7 +22,8 @@ import {
     Target, Crosshair, Mic, Volume2,
     AlertTriangle, CheckCircle, Circle, CircleDot, Loader2, Timer, XCircle,
     Search, Clock, Magnet, Telescope, Satellite,
-    Rewind, type LucideProps,
+    Rewind, Briefcase, ClipboardCheck, UserCircle, Brain, Wrench,
+    FileCode, FileType, type LucideProps,
 } from 'lucide-react'
 
 // ── Icon mapping ────────────────────────────────────────────────────────────────
@@ -53,6 +54,10 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'mic': Mic, 'volume': Volume2, 'sleep': Hourglass, 'timer': Timer, 'clock': Clock,
     'starting': Play,
     'subflow': Workflow,
+    // Unified icons (matching SwipeButtons)
+    'briefcase': Briefcase, 'clipboard-check': ClipboardCheck,
+    'user-circle': UserCircle, 'brain': Brain, 'wrench': Wrench,
+    'file-code': FileCode, 'file-type': FileType, 'sparkles': Sparkles,
 }
 
 export const WIDGET_ICON_COLORS: Record<string, string> = {
