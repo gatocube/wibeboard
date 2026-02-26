@@ -345,25 +345,26 @@ export function WidgetPicker({
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
                             {(() => {
-                                // Priority order for tiles
-                                const TILE_PRIORITY: Record<string, number> = {
-                                    'Script': 0, 'AI': 1, 'User': 2, 'Subflow': 3,
-                                    'Info': 4, 'Artifact': 5, 'Tool': 6, 'Expectation': 7,
+                                // Priority: Script presets → AI presets → User → SubFlow → Informer → Expectation → rest
+                                const typePrio = (w: WidgetDefinition, t: PresetDefinition): number => {
+                                    if (w.type === 'job' && t.subType !== 'ai') return 0   // Script/JS/TS/SH/PY
+                                    if (w.type === 'job' && t.subType === 'ai') return 1   // AI/Planner/Worker/Reviewer
+                                    if (w.type === 'user') return 2
+                                    if (w.type === 'subflow') return 3
+                                    if (w.type === 'informer') return 4
+                                    if (w.type === 'expectation') return 5
+                                    return 99
                                 }
-                                const MAX_PRIO = 999
-                                // Flatten all presets into sortable entries
-                                const allTiles = filtered.flatMap(widget => {
-                                    const presets = presetRegistry.getByWidget(widget.type)
-                                    return presets.map(tmpl => ({ widget, tmpl }))
-                                })
-                                // Sort by priority (label match), then default-first within same priority
+                                const allTiles = filtered.flatMap(widget =>
+                                    presetRegistry.getByWidget(widget.type).map(tmpl => ({ widget, tmpl }))
+                                )
                                 allTiles.sort((a, b) => {
-                                    const aPrio = TILE_PRIORITY[a.tmpl.label] ?? MAX_PRIO
-                                    const bPrio = TILE_PRIORITY[b.tmpl.label] ?? MAX_PRIO
-                                    if (aPrio !== bPrio) return aPrio - bPrio
-                                    const aDefault = a.tmpl.type === a.widget.defaultPreset ? -1 : 0
-                                    const bDefault = b.tmpl.type === b.widget.defaultPreset ? -1 : 0
-                                    return aDefault - bDefault
+                                    const pa = typePrio(a.widget, a.tmpl)
+                                    const pb = typePrio(b.widget, b.tmpl)
+                                    if (pa !== pb) return pa - pb
+                                    const da = a.tmpl.type === a.widget.defaultPreset ? -1 : 0
+                                    const db = b.tmpl.type === b.widget.defaultPreset ? -1 : 0
+                                    return da - db
                                 })
                                 return (<>{allTiles.map(({ widget, tmpl }, i) => {
                                     const label = presetRegistry.getByWidget(widget.type).length === 1
@@ -427,7 +428,7 @@ export function WidgetPicker({
                                             {hasBorderColors ? (
                                                 <div style={{
                                                     width: '100%', height: '100%', borderRadius: 7,
-                                                    background: `${tileColor}15`,
+                                                    background: '#1a1b2e',
                                                     display: 'flex', flexDirection: 'column',
                                                     alignItems: 'center', justifyContent: 'center', gap: 2,
                                                 }}>
