@@ -37,9 +37,28 @@ Wideboard supports 3 visual themes — every widget implements all 3:
 | **ghub** | GitHub-style | Minimal | Day + Night |
 | **wibeglow** | Modern dark + glow | Full | Dark only |
 
+## Experimental Renderers
+
+Besides the default ReactFlow canvas, wibeboard includes 4 experimental renderers
+selectable from the ⚙ settings panel:
+
+| Renderer | Description |
+|----------|-------------|
+| **3D** ⚗️ | Three.js 3D scene with orbit controls |
+| **ASCII** ⚗️ | 3D scene rendered as ASCII art |
+| **Mermaid** ⚗️ | Flow → Mermaid flowchart → SVG |
+| **Mobile** ⚗️ | Vertical layout with sidebar icons |
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the project structure and design decisions.
+
+## Tests
+
+32 E2E tests across 3 suites:
+- `pages-smoke.e2e.ts` — 9 page smoke tests + color and settings assertions
+- `builder-simple.e2e.ts` — Flow builder interactions
+- `node-configurator.e2e.ts` — Widget configurator and custom presets
 
 ## License
 

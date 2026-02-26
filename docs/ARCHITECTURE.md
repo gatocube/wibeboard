@@ -47,11 +47,16 @@ wibeboard/
 │   │   ├── WidgetPicker.tsx       # Sidebar widget picker
 │   │   ├── NodeButtonsMenu.tsx    # Radial menu for node actions
 │   │   ├── NodeConfigPanel.tsx    # Node configuration panel
-│   │   ├── StudioSettings.tsx     # Settings panel (theme, grid)
+│   │   ├── StudioSettings.tsx     # Settings panel (theme, grid, renderer)
 │   │   ├── ZoomAutosize.tsx       # Zoom-based node resizing
 │   │   ├── resolve-collisions.ts  # Collision detection + auto-spacing
-│   │   ├── types.ts               # Shared types
-│   │   └── index.ts               # Barrel exports
+│   │   ├── types.ts               # Shared types (RendererType, etc.)
+│   │   ├── index.ts               # Barrel exports
+│   │   └── renderers/
+│   │       ├── ThreeFiberRenderer.tsx  # 3D renderer (Three.js)
+│   │       ├── AsciiRenderer.tsx      # ASCII art renderer
+│   │       ├── MermaidRenderer.tsx     # Mermaid flowchart renderer
+│   │       └── MobileRenderer.tsx     # Mobile-adapted vertical layout
 │   │
 │   ├── kit/
 │   │   ├── SwipeButtons.tsx       # Radial action menu (After, Before, Configure)
@@ -78,9 +83,8 @@ wibeboard/
 │
 ├── tests/
 │   ├── builder-simple.e2e.ts      # Simple builder: add, delete, reconnect, spacing
-│   ├── flow-studio.e2e.ts         # FlowStudio: drag-drop, edit toggle, script run
-│   ├── pages-smoke.scenario.e2e.ts # Smoke tests for all pages
-│   ├── swipe-buttons.e2e.ts       # SwipeButtons radial menu
+│   ├── node-configurator.e2e.ts   # Configurator: widget switching, custom presets
+│   ├── pages-smoke.e2e.ts         # Smoke tests for all pages + color/settings assertions
 │   └── ...                        # Scenario + integration tests
 │
 ├── public/
@@ -146,8 +150,27 @@ Self-contained ReactFlow wrapper providing:
 - **Drag-and-drop** node creation from picker
 - **Collision avoidance** — auto-spacing on drag-stop (O(n²) algorithm)
 - **SwipeButtons** radial menu for node actions (Add After/Before, Configure)
+- **Renderer selection** — switch between ReactFlow and 4 experimental renderers
+
+Settings button is always accessible via a floating overlay when using
+non-ReactFlow renderers.
 
 See [docs/flow-studio.md](flow-studio.md) for full component documentation.
+
+### Experimental Renderers
+Four experimental renderers (`src/flow-studio/renderers/`) complement the default ReactFlow canvas:
+- **ThreeFiberRenderer** — nodes as 3D metallic boxes via `@react-three/fiber`
+- **AsciiRenderer** — same 3D scene rendered as ASCII art via `@react-three/drei`
+- **MermaidRenderer** — converts flow to Mermaid syntax → SVG
+- **MobileRenderer** — vertical layout, tools in left sidebar, info in right sidebar
+
+Renderer type is stored in `FlowStudioStore.renderer` (persisted to `localStorage`).
+The `RendererType` union is defined in `types.ts`.
+
+### Custom Widget Presets
+Users can save custom presets from the Node Configurator page.
+Custom presets are marked with a "custom" tag and appear after built-in widgets
+in the Widget Picker. Drag-to-reorder is supported via the Automerge CRDT store.
 
 ### FlowStudioApi (`engine/FlowStudioApi.ts`)
 High-level API that owns:
@@ -206,6 +229,8 @@ A third job (`publish-stats`) merges JSON results and deploys a stats dashboard 
 - **CodeMirror 6** — code editing in configurator
 - **Vite 7** — dev server and build
 - **Playwright** — E2E testing
+- **@react-three/fiber** + **drei** — 3D rendering (experimental)
+- **mermaid** — flowchart rendering (experimental)
 
 ## Inspiration
 
