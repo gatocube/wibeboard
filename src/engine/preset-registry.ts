@@ -28,6 +28,17 @@ export interface PresetDefinition extends RegistryItem {
 const PRESETS: Omit<PresetDefinition, 'id'>[] = [
     // ── Job presets ──
     {
+        type: 'job-ai', widgetType: 'job', subType: 'ai',
+        label: 'AI', description: 'AI Agent — Worker preset with multicolor border',
+        tags: ['agent', 'ai', 'worker', 'default'],
+        ui: { icons: { default: 'sparkles', working: 'loader-2' }, borderColors: ['#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b'] },
+        defaultData: {
+            label: 'AI Agent', subType: 'ai', language: 'js',
+            code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
+            color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0,
+        },
+    },
+    {
         type: 'job-planner', widgetType: 'job', subType: 'ai',
         label: 'Planner', description: 'Strategic planning agent',
         tags: ['agent', 'planner', 'ai', 'strategy'],

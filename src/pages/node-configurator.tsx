@@ -482,34 +482,51 @@ export function NodeConfiguratorPage() {
                             <div>
                                 <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Template</div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {presetRegistry.getByWidget(widgetDef.type).map((tpl, i) => (
-                                        <button
-                                            key={i}
-                                            data-testid={`template-${i}`}
-                                            onClick={() => handleTemplateChange(i)}
-                                            style={{
-                                                display: 'flex', alignItems: 'center', gap: 10,
-                                                padding: '8px 12px', borderRadius: 8, border: 'none',
-                                                background: i === templateIdx
-                                                    ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.02)',
-                                                cursor: 'pointer', textAlign: 'left',
-                                                fontFamily: 'Inter, sans-serif',
-                                            }}
-                                        >
-                                            <WidgetIcon type={widgetDef.ui.icons.default} size={14} />
-                                            <div>
-                                                <div style={{
-                                                    fontSize: 11, fontWeight: 600,
-                                                    color: i === templateIdx ? '#c084fc' : '#e2e8f0',
-                                                }}>
-                                                    {tpl.label}
+                                    {presetRegistry.getByWidget(widgetDef.type).map((tpl, i) => {
+                                        const presetIcon = tpl.ui?.icons?.default || widgetDef.ui.icons.default
+                                        const hasBorderColors = tpl.ui?.borderColors && tpl.ui.borderColors.length > 1
+                                        const gradientBorder = hasBorderColors
+                                            ? `linear-gradient(135deg, ${tpl.ui!.borderColors!.join(', ')})`
+                                            : undefined
+                                        return (
+                                            <button
+                                                key={i}
+                                                data-testid={`template-${i}`}
+                                                onClick={() => handleTemplateChange(i)}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: 10,
+                                                    padding: hasBorderColors ? '2px' : '8px 12px',
+                                                    borderRadius: 8, border: 'none',
+                                                    background: hasBorderColors
+                                                        ? gradientBorder
+                                                        : i === templateIdx
+                                                            ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.02)',
+                                                    cursor: 'pointer', textAlign: 'left',
+                                                    fontFamily: 'Inter, sans-serif',
+                                                }}
+                                            >
+                                                <div style={hasBorderColors ? {
+                                                    display: 'flex', alignItems: 'center', gap: 10,
+                                                    padding: '6px 10px', borderRadius: 6, width: '100%',
+                                                    background: i === templateIdx
+                                                        ? 'rgba(139,92,246,0.15)' : '#0a0a14',
+                                                } : undefined}>
+                                                    <WidgetIcon type={presetIcon} size={14} />
+                                                    <div>
+                                                        <div style={{
+                                                            fontSize: 11, fontWeight: 600,
+                                                            color: i === templateIdx ? '#c084fc' : '#e2e8f0',
+                                                        }}>
+                                                            {tpl.label}
+                                                        </div>
+                                                        <div style={{ fontSize: 9, color: '#64748b' }}>
+                                                            {tpl.description}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: 9, color: '#64748b' }}>
-                                                    {tpl.description}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    ))}
+                                            </button>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         )}

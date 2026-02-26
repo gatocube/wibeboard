@@ -60,6 +60,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'briefcase': Briefcase, 'clipboard-check': ClipboardCheck,
     'user-circle': UserCircle, 'brain': Brain, 'wrench': Wrench,
     'file-code': FileCode, 'file-type': FileType, 'sparkles': Sparkles,
+    'terminal': Terminal, 'search': Search, 'loader-2': Loader2,
     // Widget type aliases (so widget.type lookups also work)
     'job': Briefcase, 'expectation': ClipboardCheck,
     'sticky-note': StickyNote, 'check-circle-2': CheckCircle2,
@@ -93,6 +94,7 @@ export const WIDGET_ICON_COLORS: Record<string, string> = {
     'subflow': '#6366f1',
     'sticky-note': '#fbbf24', 'check-circle-2': '#10b981',
     'user': '#f59e0b', 'package': '#6366f1', 'globe': '#06b6d4',
+    'terminal': '#22c55e', 'search': '#f59e0b', 'loader-2': '#64748b',
 }
 
 // ── Build IconRegistry instance from existing maps ──────────────────────────────
