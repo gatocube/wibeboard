@@ -32,6 +32,7 @@ import { resolveCollisions, findNonOverlappingPosition } from './resolve-collisi
 import { ThreeFiberRenderer } from './renderers/ThreeFiberRenderer'
 import { AsciiFlowRenderer } from './renderers/AsciiRenderer'
 import { MermaidRenderer } from './renderers/MermaidRenderer'
+import { MobileRenderer } from './renderers/MobileRenderer'
 
 // ── Theme backgrounds ───────────────────────────────────────────────────────────
 
@@ -288,6 +289,8 @@ export const FlowStudio = observer(function FlowStudio({
                     <AsciiFlowRenderer nodes={nodes} edges={edges} />
                 ) : store.renderer === 'mermaid' ? (
                     <MermaidRenderer nodes={nodes} edges={edges} />
+                ) : store.renderer === 'mobile' ? (
+                    <MobileRenderer nodes={nodes} edges={edges} />
                 ) : (
                     <ReactFlow
                         nodes={nodes}

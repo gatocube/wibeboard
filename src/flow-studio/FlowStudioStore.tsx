@@ -42,7 +42,7 @@ export class FlowStudioStore {
             const savedDebug = localStorage.getItem('flowstudio_debug_mode')
             if (savedDebug === '1') this.debugMode = true
             const savedRenderer = localStorage.getItem('flowstudio_renderer') as RendererType | null
-            if (savedRenderer && ['reactflow', 'three-fiber', 'ascii', 'mermaid'].includes(savedRenderer)) {
+            if (savedRenderer && ['reactflow', 'three-fiber', 'ascii', 'mermaid', 'mobile'].includes(savedRenderer)) {
                 this.renderer = savedRenderer
             }
         } catch (e) { }

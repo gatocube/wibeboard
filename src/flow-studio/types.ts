@@ -10,7 +10,7 @@ import type { PresetDefinition } from '@/engine/preset-registry'
 export type NodeSize = 'S' | 'M' | 'L'
 export type ThemeKey = 'wibeglow' | 'pixel' | 'ghub'
 export type ThemeMode = 'dark' | 'light'
-export type RendererType = 'reactflow' | 'three-fiber' | 'ascii' | 'mermaid'
+export type RendererType = 'reactflow' | 'three-fiber' | 'ascii' | 'mermaid' | 'mobile'
 
 // ── FlowStudio props ────────────────────────────────────────────────────────────
 

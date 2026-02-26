@@ -203,6 +203,7 @@ export const StudioSettings = observer(function StudioSettings({
                         { key: 'three-fiber' as RendererType, label: '3D', color: '#f59e0b', experimental: true },
                         { key: 'ascii' as RendererType, label: 'ASCII', color: '#a78bfa', experimental: true },
                         { key: 'mermaid' as RendererType, label: 'Mermaid', color: '#22c55e', experimental: true },
+                        { key: 'mobile' as RendererType, label: 'Mobile', color: '#3b82f6', experimental: true },
                     ]).map(({ key, label, color, experimental }) => (
                         <button
                             key={key}
