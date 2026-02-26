@@ -136,21 +136,25 @@ function ensureHoldKeyframe() {
  * Touch-drag tracking for swipe mode.
  * On iPad, pointerEnter doesn't fire during a touch drag. Instead, we
  * track touchmove → elementFromPoint to detect which button the finger
- * is hovering, then programmatically trigger hover/expand.
+ * is hovering, then call onSwipeHit(testId) to expand sub-menus.
  *
  * Also handles pointermove for CDP-based testing (Chromium converts
  * touch to pointer events).
+ *
+ * Note: We call onSwipeHit instead of dispatching synthetic PointerEvent
+ * because React's event delegation doesn't catch programmatically
+ * dispatched native DOM events.
  */
 function useTouchSwipe(
-    containerRef: React.RefObject<HTMLDivElement | null>,
     activationMode: SwipeButtonsActivation,
+    onSwipeHit: (testId: string | null) => void,
 ) {
     const lastHitRef = useRef<string | null>(null)
     const activePointerRef = useRef<number | null>(null)
+    const lastHighlightRef = useRef<HTMLElement | null>(null)
 
     useEffect(() => {
-        const container = containerRef.current
-        if (!container || activationMode !== 'swipe') return
+        if (activationMode !== 'swipe') return
 
         // ── Shared hit-test logic ──
         function hitTest(x: number, y: number) {
@@ -160,12 +164,21 @@ function useTouchSwipe(
             const testId = btn?.getAttribute('data-testid') || null
 
             if (testId !== lastHitRef.current) {
-                lastHitRef.current = testId
-                if (btn) {
-                    btn.dispatchEvent(new PointerEvent('pointerenter', {
-                        bubbles: true, clientX: x, clientY: y,
-                    }))
+                // Remove highlight from previous button
+                if (lastHighlightRef.current) {
+                    const prev = lastHighlightRef.current
+                    prev.style.borderColor = ''
+                    prev.style.boxShadow = ''
+                    lastHighlightRef.current = null
                 }
+                lastHitRef.current = testId
+                // Highlight new button and call onSwipeHit
+                if (btn && testId) {
+                    btn.style.borderColor = 'rgba(255,255,255,0.3)'
+                    btn.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(255,255,255,0.1)'
+                    lastHighlightRef.current = btn
+                }
+                onSwipeHit(testId)
             }
         }
 
@@ -174,6 +187,11 @@ function useTouchSwipe(
             const btn = el?.closest('[data-testid]') as HTMLElement | null
             if (btn) btn.click()
             lastHitRef.current = null
+            if (lastHighlightRef.current) {
+                lastHighlightRef.current.style.borderColor = ''
+                lastHighlightRef.current.style.boxShadow = ''
+                lastHighlightRef.current = null
+            }
         }
 
         // ── Touch events (real iPad) ──
@@ -229,7 +247,7 @@ function useTouchSwipe(
             document.removeEventListener('pointermove', handlePointerMove)
             document.removeEventListener('pointerup', handlePointerUp)
         }
-    }, [containerRef, activationMode])
+    }, [activationMode, onSwipeHit])
 }
 
 export function SwipeButtons(props: SwipeButtonsProps) {
@@ -250,12 +268,45 @@ export function SwipeButtons(props: SwipeButtonsProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [nodeRect, setNodeRect] = useState<DOMRect | null>(null)
 
-    // Touch-drag tracking for swipe mode
-    useTouchSwipe(containerRef, activationMode)
-
     const resetSubs = useCallback(() => {
         setJobExpanded(null); setScriptExpanded(null); setAiExpanded(null); setAttachExpanded(false)
     }, [])
+
+    // Touch-drag tracking for swipe mode
+    // Handle swipe hit — map testId to expand actions
+    const handleSwipeHit = useCallback((testId: string | null) => {
+        if (!testId) return
+        // First-level buttons
+        if (testId === 'swipe-btn-add-after') {
+            setExpanded('after'); resetSubs()
+        } else if (testId === 'swipe-btn-add-before') {
+            setExpanded('before'); resetSubs()
+        } else if (testId === 'swipe-btn-configure') {
+            setExpanded('config')
+        }
+        // After sub-buttons
+        else if (testId === 'ext-after-job') {
+            setJobExpanded('after'); setScriptExpanded(null); setAiExpanded(null)
+        } else if (testId.startsWith('ext-after-script-')) {
+            setScriptExpanded('after')
+        } else if (testId.startsWith('ext-after-ai-')) {
+            setAiExpanded('after')
+        }
+        // Before sub-buttons
+        else if (testId === 'ext-before-job') {
+            setJobExpanded('before'); setScriptExpanded(null); setAiExpanded(null)
+        } else if (testId.startsWith('ext-before-script-')) {
+            setScriptExpanded('before')
+        } else if (testId.startsWith('ext-before-ai-')) {
+            setAiExpanded('before')
+        }
+        // Config sub-buttons
+        else if (testId === 'ext-cfg-attach') {
+            setAttachExpanded(true)
+        }
+    }, [resetSubs])
+
+    useTouchSwipe(activationMode, handleSwipeHit)
 
     // Track node screen position
     useEffect(() => {

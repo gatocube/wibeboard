@@ -279,6 +279,40 @@ test.describe('SwipeButtons activation modes', () => {
         await expectMenuVisible(page)
     })
 
+    test('swipe/touch: dragging finger from node to After expands sub-menu', async ({ page }) => {
+        await selectMode(page, 'Swipe')
+
+        // Hover the node with mouse to select it (shows first-level buttons)
+        await page.getByTestId('mock-node-center-node').hover()
+        await expectMenuVisible(page)
+
+        // Get coordinates for the touch-drag
+        const nodeCenter = await getCenter(page, 'mock-node-center-node')
+        const afterCenter = await getCenter(page, 'swipe-btn-add-after')
+
+        // Simulate touch-drag via programmatic PointerEvents.
+        // useTouchSwipe registers document-level listeners that handle
+        // pointerdown/pointermove with pointerType='touch'.
+        await page.evaluate(({ nx, ny, ax, ay }) => {
+            // Step 1: pointerdown with touch type → sets activePointerRef
+            document.dispatchEvent(new PointerEvent('pointerdown', {
+                bubbles: true, clientX: nx, clientY: ny,
+                pointerType: 'touch', pointerId: 42,
+            }))
+            // Step 2: pointermove to After button → triggers hitTest → onSwipeHit
+            document.dispatchEvent(new PointerEvent('pointermove', {
+                bubbles: true, clientX: ax, clientY: ay,
+                pointerType: 'touch', pointerId: 42,
+            }))
+        }, { nx: nodeCenter.x, ny: nodeCenter.y, ax: afterCenter.x, ay: afterCenter.y })
+        await page.waitForTimeout(300)
+
+        // After sub-menu should now be visible
+        await expect(page.getByTestId('ext-after-subflow')).toBeVisible({ timeout: 3_000 })
+        await expect(page.getByTestId('ext-after-job')).toBeVisible()
+        await expect(page.getByTestId('ext-after-recent')).toBeVisible()
+    })
+
     // ═══════════════════════════════════════════════════════════════════════
     // HOLD MODE — Long-press on node element
     // ═══════════════════════════════════════════════════════════════════════
