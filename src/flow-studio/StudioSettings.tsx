@@ -6,7 +6,7 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Settings, Sun, Moon, ZoomIn, MousePointer2, Hand, Pointer } from 'lucide-react'
-import type { ThemeKey } from './types'
+import type { ThemeKey, RendererType } from './types'
 import { useFlowStudioStore, type ControlMode } from './FlowStudioStore'
 
 export const StudioSettings = observer(function StudioSettings({
@@ -45,7 +45,7 @@ export const StudioSettings = observer(function StudioSettings({
                     data-testid="settings-panel"
                     style={{
                         position: 'absolute', top: '100%', right: 0, marginTop: 6,
-                        width: 200,
+                        width: 200, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto',
                         background: 'rgba(15,15,26,0.97)',
                         border: '1px solid rgba(255,255,255,0.08)',
                         borderRadius: 10, padding: '10px 0',
@@ -191,6 +191,49 @@ export const StudioSettings = observer(function StudioSettings({
                             </div>
                         </div>
                     </label>
+
+                    <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '6px 0' }} />
+
+                    {/* Renderer selector */}
+                    <div style={{ padding: '4px 12px', fontSize: 9, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                        Renderer
+                    </div>
+                    {([
+                        { key: 'reactflow' as RendererType, label: 'ReactFlow', color: '#8b5cf6' },
+                        { key: 'three-fiber' as RendererType, label: '3D', color: '#f59e0b', experimental: true },
+                        { key: 'ascii' as RendererType, label: 'ASCII', color: '#a78bfa', experimental: true },
+                        { key: 'mermaid' as RendererType, label: 'Mermaid', color: '#22c55e', experimental: true },
+                    ]).map(({ key, label, color, experimental }) => (
+                        <button
+                            key={key}
+                            data-testid={`renderer-${key}`}
+                            onClick={() => store.setRenderer(key)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                                padding: '6px 12px', border: 'none', cursor: 'pointer',
+                                background: store.renderer === key ? `${color}18` : 'transparent',
+                                color: store.renderer === key ? color : '#94a3b8',
+                                fontSize: 11, fontWeight: store.renderer === key ? 600 : 400,
+                                fontFamily: 'Inter', textAlign: 'left',
+                            }}
+                        >
+                            <div style={{
+                                width: 8, height: 8, borderRadius: '50%',
+                                background: color,
+                                opacity: store.renderer === key ? 1 : 0.4,
+                            }} />
+                            {label}
+                            {experimental && (
+                                <span style={{
+                                    fontSize: 7, padding: '1px 4px', borderRadius: 3,
+                                    background: `${color}22`, color, fontWeight: 600,
+                                    marginLeft: 'auto',
+                                }}>
+                                    ⚗️
+                                </span>
+                            )}
+                        </button>
+                    ))}
 
                     <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '6px 0' }} />
 

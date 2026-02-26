@@ -29,6 +29,9 @@ import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { WidgetPicker } from './WidgetPicker'
 import { SwipeButtons } from '@/kit/SwipeButtons'
 import { resolveCollisions, findNonOverlappingPosition } from './resolve-collisions'
+import { ThreeFiberRenderer } from './renderers/ThreeFiberRenderer'
+import { AsciiFlowRenderer } from './renderers/AsciiRenderer'
+import { MermaidRenderer } from './renderers/MermaidRenderer'
 
 // ── Theme backgrounds ───────────────────────────────────────────────────────────
 
@@ -279,94 +282,102 @@ export const FlowStudio = observer(function FlowStudio({
         >
             {/* Canvas area */}
             <div style={{ flex: 1, position: 'relative', height: '100%' }}>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    nodeTypes={nodeTypes}
-                    onNodesChange={onNodesChange}
-                    onNodeDragStop={editMode ? handleNodeDragStop : undefined}
-                    nodesDraggable={nodesDraggable || editMode}
-                    nodesConnectable={nodesConnectable}
-                    panOnDrag={panOnDrag}
-                    zoomOnScroll={zoomOnScroll}
-                    fitView={fitView}
-                    defaultViewport={defaultViewport}
-                    proOptions={{ hideAttribution: true }}
-                    style={{ background: 'transparent' }}
-                    onDrop={editMode ? (e) => {
-                        e.preventDefault()
-                        const raw = e.dataTransfer.getData('application/flowstudio-widget')
-                        if (!raw) return
-                        try {
-                            const { type, template } = JSON.parse(raw)
-                            const converter = screenToFlowRef.current
-                            const position = converter
-                                ? converter({ x: e.clientX, y: e.clientY })
-                                : { x: e.clientX, y: e.clientY }
-                            createNodeFromWidget(type, template, position)
-                        } catch { /* ignore */ }
-                    } : undefined}
-                    onDragOver={editMode ? (e) => {
-                        if (e.dataTransfer.types.includes('application/flowstudio-widget')) {
+                {store.renderer === 'three-fiber' ? (
+                    <ThreeFiberRenderer nodes={nodes} edges={edges} />
+                ) : store.renderer === 'ascii' ? (
+                    <AsciiFlowRenderer nodes={nodes} edges={edges} />
+                ) : store.renderer === 'mermaid' ? (
+                    <MermaidRenderer nodes={nodes} edges={edges} />
+                ) : (
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        nodeTypes={nodeTypes}
+                        onNodesChange={onNodesChange}
+                        onNodeDragStop={editMode ? handleNodeDragStop : undefined}
+                        nodesDraggable={nodesDraggable || editMode}
+                        nodesConnectable={nodesConnectable}
+                        panOnDrag={panOnDrag}
+                        zoomOnScroll={zoomOnScroll}
+                        fitView={fitView}
+                        defaultViewport={defaultViewport}
+                        proOptions={{ hideAttribution: true }}
+                        style={{ background: 'transparent' }}
+                        onDrop={editMode ? (e) => {
                             e.preventDefault()
-                            e.dataTransfer.dropEffect = 'move'
-                        }
-                    } : undefined}
-                >
-                    <Background color={gridColor} gap={gridGap} size={1} />
+                            const raw = e.dataTransfer.getData('application/flowstudio-widget')
+                            if (!raw) return
+                            try {
+                                const { type, template } = JSON.parse(raw)
+                                const converter = screenToFlowRef.current
+                                const position = converter
+                                    ? converter({ x: e.clientX, y: e.clientY })
+                                    : { x: e.clientX, y: e.clientY }
+                                createNodeFromWidget(type, template, position)
+                            } catch { /* ignore */ }
+                        } : undefined}
+                        onDragOver={editMode ? (e) => {
+                            if (e.dataTransfer.types.includes('application/flowstudio-widget')) {
+                                e.preventDefault()
+                                e.dataTransfer.dropEffect = 'move'
+                            }
+                        } : undefined}
+                    >
+                        <Background color={gridColor} gap={gridGap} size={1} />
 
-                    {/* Bridge: exposes screenToFlowPosition via ref */}
-                    <ScreenToFlowBridge converterRef={screenToFlowRef} />
+                        {/* Bridge: exposes screenToFlowPosition via ref */}
+                        <ScreenToFlowBridge converterRef={screenToFlowRef} />
 
-                    {/* Zoom autosize watcher */}
-                    <ZoomAutosizeWatcher
-                        enabled={store.zoomAutosize}
-                        onSizeChange={handleSizeChange}
-                    />
-
-                    {/* React Flow Built-in Controls (Zoom/Lock) */}
-                    <Controls position="bottom-left" style={{ margin: 16 }} />
-
-                    {/* Conditional Minimap */}
-                    {store.showMinimap && (
-                        <MiniMap
-                            position="bottom-right"
-                            style={{
-                                background: 'rgba(15,15,26,0.9)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                borderRadius: 8,
-                                margin: 16
-                            }}
-                            nodeColor="rgba(139,92,246,0.5)"
-                            maskColor="rgba(0,0,0,0.5)"
+                        {/* Zoom autosize watcher */}
+                        <ZoomAutosizeWatcher
+                            enabled={store.zoomAutosize}
+                            onSizeChange={handleSizeChange}
                         />
-                    )}
 
-                    {/* Settings gear + edit toggle — top-right */}
-                    <Panel position="top-right">
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-                            <button
-                                data-testid="edit-mode-toggle"
-                                onClick={() => setEditMode(m => !m)}
+                        {/* React Flow Built-in Controls (Zoom/Lock) */}
+                        <Controls position="bottom-left" style={{ margin: 16 }} />
+
+                        {/* Conditional Minimap */}
+                        {store.showMinimap && (
+                            <MiniMap
+                                position="bottom-right"
                                 style={{
-                                    padding: '4px 10px', borderRadius: 6,
-                                    border: editMode ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.08)',
-                                    background: editMode ? 'rgba(139,92,246,0.15)' : 'rgba(15,15,26,0.8)',
-                                    color: editMode ? '#c084fc' : '#64748b',
-                                    fontSize: 10, fontWeight: 600, fontFamily: 'Inter, sans-serif',
-                                    cursor: 'pointer', backdropFilter: 'blur(8px)',
+                                    background: 'rgba(15,15,26,0.9)',
+                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    borderRadius: 8,
+                                    margin: 16
                                 }}
-                            >
-                                {editMode ? '✏️ Edit' : '👁 View'}
-                            </button>
-                            <StudioSettings
-                                onThemeChange={handleThemeChange}
+                                nodeColor="rgba(139,92,246,0.5)"
+                                maskColor="rgba(0,0,0,0.5)"
                             />
-                        </div>
-                    </Panel>
+                        )}
 
-                    {children}
-                </ReactFlow>
+                        {/* Settings gear + edit toggle — top-right */}
+                        <Panel position="top-right">
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                                <button
+                                    data-testid="edit-mode-toggle"
+                                    onClick={() => setEditMode(m => !m)}
+                                    style={{
+                                        padding: '4px 10px', borderRadius: 6,
+                                        border: editMode ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                                        background: editMode ? 'rgba(139,92,246,0.15)' : 'rgba(15,15,26,0.8)',
+                                        color: editMode ? '#c084fc' : '#64748b',
+                                        fontSize: 10, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                                        cursor: 'pointer', backdropFilter: 'blur(8px)',
+                                    }}
+                                >
+                                    {editMode ? '✏️ Edit' : '👁 View'}
+                                </button>
+                                <StudioSettings
+                                    onThemeChange={handleThemeChange}
+                                />
+                            </div>
+                        </Panel>
+
+                        {children}
+                    </ReactFlow>
+                )}
             </div>
 
             {/* Sidebar — right side */}

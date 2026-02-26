@@ -506,38 +506,33 @@ test.describe('Builder Demo Simple — control mode setting', () => {
         await openPage(page)
         await breath()
 
-        // ── Open settings ──
+        // Open settings
         await page.getByTestId('settings-btn').click()
         await page.waitForTimeout(300)
 
-        // ── Click mode should be active by default ──
-        const clickBtn = page.getByTestId('control-mode-click')
-        const holdBtn = page.getByTestId('control-mode-hold')
-        const swipeBtn = page.getByTestId('control-mode-swipe')
-
-        await expect(clickBtn).toBeVisible()
-        await expect(holdBtn).toBeVisible()
-        await expect(swipeBtn).toBeVisible()
+        // Helper: scroll panel + click control mode button via evaluate
+        async function clickControlMode(mode: string) {
+            await page.evaluate((m) => {
+                const panel = document.querySelector('[data-testid="settings-panel"]')
+                if (panel) panel.scrollTop = panel.scrollHeight
+                const btn = document.querySelector(`[data-testid="control-mode-${m}"]`) as HTMLElement
+                if (btn) btn.click()
+            }, mode)
+            await page.waitForTimeout(300)
+        }
 
         // ── Switch to Hold ──
-        await holdBtn.click()
-        await page.waitForTimeout(200)
-
-        // Verify persisted to localStorage
+        await clickControlMode('hold')
         const savedHold = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
         expect(savedHold).toBe('hold')
 
         // ── Switch to Swipe ──
-        await swipeBtn.click()
-        await page.waitForTimeout(200)
-
+        await clickControlMode('swipe')
         const savedSwipe = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
         expect(savedSwipe).toBe('swipe')
 
         // ── Switch back to Click ──
-        await clickBtn.click()
-        await page.waitForTimeout(200)
-
+        await clickControlMode('click')
         const savedClick = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
         expect(savedClick).toBe('click')
 

@@ -7,7 +7,7 @@
 
 import { makeAutoObservable, action } from 'mobx'
 import { createContext, useContext } from 'react'
-import type { ThemeKey, ThemeMode, NodeSize } from './types'
+import type { ThemeKey, ThemeMode, NodeSize, RendererType } from './types'
 
 export type ControlMode = 'click' | 'hold' | 'swipe'
 
@@ -22,6 +22,7 @@ export class FlowStudioStore {
     showMinimap: boolean = false
     controlMode: ControlMode = 'click'
     debugMode: boolean = false
+    renderer: RendererType = 'reactflow'
 
     // ── Node selection (player buttons / SwipeButtons menu) ──
     selectedNodeId: string | null = null
@@ -40,6 +41,10 @@ export class FlowStudioStore {
             }
             const savedDebug = localStorage.getItem('flowstudio_debug_mode')
             if (savedDebug === '1') this.debugMode = true
+            const savedRenderer = localStorage.getItem('flowstudio_renderer') as RendererType | null
+            if (savedRenderer && ['reactflow', 'three-fiber', 'ascii', 'mermaid'].includes(savedRenderer)) {
+                this.renderer = savedRenderer
+            }
         } catch (e) { }
 
         makeAutoObservable(this, {
@@ -50,6 +55,7 @@ export class FlowStudioStore {
             setShowMinimap: action,
             setControlMode: action,
             setDebugMode: action,
+            setRenderer: action,
             setSelectedNodeId: action,
             toggleSelectedNode: action,
             clearSelectedNode: action,
@@ -92,6 +98,13 @@ export class FlowStudioStore {
         this.debugMode = enabled
         try {
             localStorage.setItem('flowstudio_debug_mode', enabled ? '1' : '0')
+        } catch (e) { }
+    }
+
+    setRenderer(renderer: RendererType) {
+        this.renderer = renderer
+        try {
+            localStorage.setItem('flowstudio_renderer', renderer)
         } catch (e) { }
     }
 
