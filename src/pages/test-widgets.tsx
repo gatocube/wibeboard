@@ -242,6 +242,7 @@ function WidgetGalleryInner() {
     const [pixelTui, setPixelTui] = useState(false)     // Pixel: pixel/TUI
     const [activeSubType, setActiveSubType] = useState<string | undefined>('ai')
     const [showRaw, setShowRaw] = useState(false)
+    const [debugMode, setDebugMode] = useState(false)
 
     const themes = templateRegistry.getAll()
 
@@ -463,6 +464,7 @@ function WidgetGalleryInner() {
                     { label: 'Animations', value: showAnimations, set: setShowAnimations },
                     { label: 'Thinking', value: showThinking, set: setShowThinking },
                     { label: 'Raw', value: showRaw, set: setShowRaw },
+                    { label: '🐛 Debug', value: debugMode, set: setDebugMode },
                     ].map(toggle => (
                         <button
                             key={toggle.label}
@@ -603,6 +605,12 @@ function WidgetGalleryInner() {
                                                     } else if (['js', 'ts', 'sh', 'py'].includes(activeSubType || '')) {
                                                         data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
                                                     }
+                                                }
+
+                                                // Debug mode overlay
+                                                if (debugMode) {
+                                                    data.debugMode = true
+                                                    data._debugId = `${selectedWidget.type}-${size.label}`
                                                 }
 
                                                 // Pass theme metadata for ctx.ui

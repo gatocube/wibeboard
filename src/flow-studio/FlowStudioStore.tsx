@@ -21,6 +21,7 @@ export class FlowStudioStore {
     currentSize: NodeSize = 'M'
     showMinimap: boolean = false
     controlMode: ControlMode = 'click'
+    debugMode: boolean = false
 
     // ── Node selection (player buttons / SwipeButtons menu) ──
     selectedNodeId: string | null = null
@@ -37,6 +38,8 @@ export class FlowStudioStore {
             if (savedControl === 'click' || savedControl === 'hold' || savedControl === 'swipe') {
                 this.controlMode = savedControl
             }
+            const savedDebug = localStorage.getItem('flowstudio_debug_mode')
+            if (savedDebug === '1') this.debugMode = true
         } catch (e) { }
 
         makeAutoObservable(this, {
@@ -46,6 +49,7 @@ export class FlowStudioStore {
             setCurrentSize: action,
             setShowMinimap: action,
             setControlMode: action,
+            setDebugMode: action,
             setSelectedNodeId: action,
             toggleSelectedNode: action,
             clearSelectedNode: action,
@@ -81,6 +85,13 @@ export class FlowStudioStore {
         this.controlMode = mode
         try {
             localStorage.setItem('flowstudio_control_mode', mode)
+        } catch (e) { }
+    }
+
+    setDebugMode(enabled: boolean) {
+        this.debugMode = enabled
+        try {
+            localStorage.setItem('flowstudio_debug_mode', enabled ? '1' : '0')
         } catch (e) { }
     }
 

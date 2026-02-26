@@ -161,6 +161,37 @@ export const StudioSettings = observer(function StudioSettings({
                         </div>
                     </label>
 
+                    {/* Debug mode toggle */}
+                    <label
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                            padding: '6px 12px', cursor: 'pointer',
+                        }}
+                    >
+                        <span style={{ color: store.debugMode ? '#22c55e' : '#94a3b8', fontSize: 11, fontFamily: 'Inter' }}>🐛 Debug Mode</span>
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
+                                checked={store.debugMode}
+                                onChange={(e) => store.setDebugMode(e.target.checked)}
+                                data-testid="debug-mode-toggle"
+                            />
+                            <div style={{
+                                width: 28, height: 16,
+                                background: store.debugMode ? '#22c55e' : 'rgba(255,255,255,0.1)',
+                                borderRadius: 12, transition: 'background 0.2s', position: 'relative'
+                            }}>
+                                <div style={{
+                                    width: 12, height: 12, background: '#fff', borderRadius: '50%',
+                                    position: 'absolute', top: 2, left: store.debugMode ? 14 : 2,
+                                    transition: 'left 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                }} />
+                            </div>
+                        </div>
+                    </label>
+
                     <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '6px 0' }} />
 
                     {/* Control mode */}

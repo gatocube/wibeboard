@@ -21,6 +21,7 @@
 import type { ReactNode } from 'react'
 import type { NodeContext, NodeUI } from '@/engine/NodeContext'
 import { NodeCtxProvider } from '@/engine/NodeContext'
+import { DebugOverlay } from '@/widgets/DebugOverlay'
 
 export interface BaseNodeProps {
     /** Raw data from ReactFlow */
@@ -46,7 +47,7 @@ function buildUI(data: any): NodeUI {
     return { themeName: 'wibeglow', themeType: 'night' }
 }
 
-export function BaseNode({ data, children }: BaseNodeProps) {
+export function BaseNode({ data, type, subType, children }: BaseNodeProps) {
     const rawCtx = data.ctx as { nodeId?: string; messenger?: any } | undefined
     const ui = buildUI(data)
 
@@ -67,7 +68,17 @@ export function BaseNode({ data, children }: BaseNodeProps) {
 
     return (
         <NodeCtxProvider value={ctx}>
-            {typeof children === 'function' ? children(ctx) : children}
+            <div style={{ position: 'relative' }}>
+                {typeof children === 'function' ? children(ctx) : children}
+                {data.debugMode && (
+                    <DebugOverlay
+                        data={data}
+                        nodeId={rawCtx?.nodeId || data._debugId}
+                        type={type}
+                        subType={subType}
+                    />
+                )}
+            </div>
         </NodeCtxProvider>
     )
 }
