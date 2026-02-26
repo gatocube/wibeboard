@@ -10,10 +10,12 @@ import { IntegrationsPage } from '@/pages/integrations'
 import { UIKitPage } from '@/pages/ui-kit'
 import { ButtonsMenuPage } from '@/pages/buttons-menu'
 import NodeConfiguratorPage from '@/pages/node-configurator'
+import { PluginsPage } from '@/pages/plugins'
 import { FpsMeter } from '@/components/FpsMeter'
-import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key, Settings } from 'lucide-react'
+import { PluginSidePanel, PluginBottomBar } from '@/plugins'
+import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key, Settings, Puzzle } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator'
+type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator' | 'plugins'
 
 interface NavItem {
     id: Page
@@ -35,6 +37,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'ui-kit', label: 'UI Kit', icon: <Layers size={14} />, description: 'Reusable components & demos' },
     { id: 'buttons-menu', label: 'Buttons Menu', icon: <Layers size={14} />, description: 'Node action menus' },
     { id: 'node-configurator', label: 'Node Configurator', icon: <Settings size={14} />, description: 'Explore & configure node types' },
+    { id: 'plugins', label: 'Plugins', icon: <Puzzle size={14} />, description: 'Manage plugins & extensions' },
 ]
 
 export function App() {
@@ -42,7 +45,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator'].includes(p)) {
+        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -66,7 +69,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator'].includes(p)) {
+            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -238,20 +241,27 @@ export function App() {
                     </div>
                 </div>
 
-                {/* Page content */}
-                <div style={{ flex: 1, overflow: 'hidden' }}>
-                    {page === 'home' && <HomePage onNavigate={navigate} />}
-                    {page === 'builder' && <TestBuilderPage />}
-                    {page === 'builder-simple' && <BuilderSimplePage />}
-                    {page === 'two-node' && <TwoNodeScenarioPage />}
-                    {page === 'four-node' && <FourNodeConcurrentPage />}
-                    {page === 'ai-script' && <AIScriptScenarioPage />}
-                    {page === 'widgets' && <TestWidgetsPage />}
-                    {page === 'icons' && <IconsGalleryPage />}
-                    {page === 'integrations' && <IntegrationsPage />}
-                    {page === 'ui-kit' && <UIKitPage />}
-                    {page === 'buttons-menu' && <ButtonsMenuPage />}
-                    {page === 'node-configurator' && <NodeConfiguratorPage />}
+                {/* Page content + plugin slots */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+                        <div style={{ flex: 1, overflow: 'hidden' }}>
+                            {page === 'home' && <HomePage onNavigate={navigate} />}
+                            {page === 'builder' && <TestBuilderPage />}
+                            {page === 'builder-simple' && <BuilderSimplePage />}
+                            {page === 'two-node' && <TwoNodeScenarioPage />}
+                            {page === 'four-node' && <FourNodeConcurrentPage />}
+                            {page === 'ai-script' && <AIScriptScenarioPage />}
+                            {page === 'widgets' && <TestWidgetsPage />}
+                            {page === 'icons' && <IconsGalleryPage />}
+                            {page === 'integrations' && <IntegrationsPage />}
+                            {page === 'ui-kit' && <UIKitPage />}
+                            {page === 'buttons-menu' && <ButtonsMenuPage />}
+                            {page === 'node-configurator' && <NodeConfiguratorPage />}
+                            {page === 'plugins' && <PluginsPage />}
+                        </div>
+                        <PluginSidePanel />
+                    </div>
+                    <PluginBottomBar />
                 </div>
             </div>
         </div>

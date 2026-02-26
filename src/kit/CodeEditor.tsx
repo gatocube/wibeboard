@@ -21,12 +21,15 @@ import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldGutter 
 import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
 import { python } from '@codemirror/lang-python'
+import { markdown } from '@codemirror/lang-markdown'
+import { yaml, yamlFrontmatter } from '@codemirror/lang-yaml'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { lintGutter } from '@codemirror/lint'
+import { languages } from '@codemirror/language-data'
 
 // ── Language map ────────────────────────────────────────────────────────────────
 
-export type CodeLanguage = 'json' | 'javascript' | 'typescript' | 'python' | 'shell' | 'text'
+export type CodeLanguage = 'json' | 'javascript' | 'typescript' | 'python' | 'yaml' | 'markdown' | 'shell' | 'text'
 
 function langExtension(lang: CodeLanguage): Extension[] {
     switch (lang) {
@@ -34,6 +37,8 @@ function langExtension(lang: CodeLanguage): Extension[] {
         case 'javascript': return [javascript()]
         case 'typescript': return [javascript({ typescript: true })]
         case 'python': return [python()]
+        case 'yaml': return [yaml()]
+        case 'markdown': return [yamlFrontmatter({ content: markdown({ codeLanguages: languages }) })]
         case 'shell': return [] // no shell grammar, fallback to plain text
         case 'text': return []
     }

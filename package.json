@@ -10,15 +10,20 @@
         "lint": "eslint .",
         "test": "node packages/test-runner/bin/test-runner.mjs all --allow-missing-project",
         "test:scenario": "node packages/test-runner/bin/test-runner.mjs scenario",
-        "test:e2e": "node packages/test-runner/bin/test-runner.mjs e2e --allow-missing-project"
+        "test:e2e": "node packages/test-runner/bin/test-runner.mjs e2e --allow-missing-project",
+        "test:integration": "TEST_INTEGRATION=1 npx playwright test"
     },
     "dependencies": {
         "@automerge/automerge": "^3.2.4",
         "@codemirror/commands": "^6.10.2",
+        "@codemirror/lang-html": "^6.4.11",
         "@codemirror/lang-javascript": "^6.2.4",
         "@codemirror/lang-json": "^6.0.2",
+        "@codemirror/lang-markdown": "^6.5.0",
         "@codemirror/lang-python": "^6.2.1",
+        "@codemirror/lang-yaml": "^6.1.2",
         "@codemirror/language": "^6.12.2",
+        "@codemirror/language-data": "^6.5.2",
         "@codemirror/lint": "^6.9.4",
         "@codemirror/state": "^6.5.4",
         "@codemirror/theme-one-dark": "^6.1.3",

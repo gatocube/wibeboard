@@ -29,11 +29,29 @@ Uses `breath()` pauses from `packages/test-runner/src/human.mjs`.
 | `four-node.scenario.e2e.ts` | `?page=four-node` | Four-node concurrent scenario |
 | `gallery.scenario.e2e.ts` | `?page=widgets` | Widget gallery smoke test |
 | `pages-smoke.scenario.e2e.ts` | *(all pages)* | Smoke test — every page loads |
+| `plugins.e2e.ts` | `?page=plugins` | Plugin toggle reactivity, permissions badge, source viewer |
+| `plugins.integration.e2e.ts` | `?page=plugins` | **Integration** — AI chat with live Ollama |
 
 ## Running Tests
 
 ```bash
-npx playwright test                          # all tests, headless
+npx playwright test                          # all tests, headless (excludes *.integration.e2e.ts)
 npx playwright test builder-simple           # single file
 TEST_RUNNER_HUMAN=1 npx playwright test      # human mode (headed, sequential)
 ```
+
+## Integration Tests
+
+Integration tests (e.g. LLM communication) use the `*.integration.e2e.ts` suffix
+and are **excluded from default runs and CI**.
+
+```bash
+npm run test:integration                                     # run integration tests
+TEST_RUNNER_HUMAN=1 npm run test:integration                 # human mode
+OLLAMA_URL=http://host:11434 npm run test:integration        # custom Ollama URL
+```
+
+Environment variables:
+- `OLLAMA_URL` — Ollama base URL (default: `http://localhost:11434`)
+- `OLLAMA_MODEL` — Ollama model name (default: `qwen2.5-coder:7b`)
+

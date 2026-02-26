@@ -1,10 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const isHuman = process.env.TEST_RUNNER_HUMAN === '1'
+const isIntegration = process.env.TEST_INTEGRATION === '1'
 
 export default defineConfig({
     testDir: './tests',
-    testMatch: '**/*.e2e.ts',
+    testMatch: isIntegration ? '**/*.integration.e2e.ts' : '**/*.e2e.ts',
+    testIgnore: isIntegration ? [] : ['**/*.integration.e2e.ts'],
     fullyParallel: !isHuman,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
