@@ -238,7 +238,7 @@ export function WidgetPicker({
                                             ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                     }}
                                 >
-                                    <WidgetIcon type={widget.icon} size={14} />
+                                    <WidgetIcon type={widget.icon} size={14} color={widget.color} />
                                     <span style={{ fontSize: 6, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
                                         {widget.label.length > 5 ? widget.label.slice(0, 5) : widget.label}
                                     </span>
@@ -385,7 +385,7 @@ export function WidgetPicker({
                                                     ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                             }}
                                         >
-                                            <WidgetIcon type={tmpl.icon || widget.icon} size={16} />
+                                            <WidgetIcon type={tmpl.icon || widget.icon} size={16} color={widget.color} />
                                             <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
                                                 {truncLabel}
                                             </span>
@@ -473,7 +473,7 @@ export function WidgetPicker({
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         flexShrink: 0,
                                                     }}>
-                                                        <WidgetIcon type={widget.icon} size={14} />
+                                                        <WidgetIcon type={widget.icon} size={14} color={widget.color} />
                                                     </div>
                                                     <div style={{ flex: 1 }}>
                                                         <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
