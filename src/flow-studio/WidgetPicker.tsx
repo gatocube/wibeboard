@@ -344,14 +344,28 @@ export function WidgetPicker({
                     {compact ? (
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
-                            {filtered.flatMap(widget => {
-                                const presets = [...presetRegistry.getByWidget(widget.type)]
-                                    .sort((a, b) => {
-                                        const aIsDefault = a.type === widget.defaultPreset ? -1 : 0
-                                        const bIsDefault = b.type === widget.defaultPreset ? -1 : 0
-                                        return aIsDefault - bIsDefault
-                                    })
-                                return presets.map((tmpl, i) => {
+                            {(() => {
+                                // Priority order for tiles
+                                const TILE_PRIORITY: Record<string, number> = {
+                                    'Script': 0, 'AI': 1, 'User': 2, 'Subflow': 3,
+                                    'Info': 4, 'Artifact': 5, 'Tool': 6, 'Expectation': 7,
+                                }
+                                const MAX_PRIO = 999
+                                // Flatten all presets into sortable entries
+                                const allTiles = filtered.flatMap(widget => {
+                                    const presets = presetRegistry.getByWidget(widget.type)
+                                    return presets.map(tmpl => ({ widget, tmpl }))
+                                })
+                                // Sort by priority (label match), then default-first within same priority
+                                allTiles.sort((a, b) => {
+                                    const aPrio = TILE_PRIORITY[a.tmpl.label] ?? MAX_PRIO
+                                    const bPrio = TILE_PRIORITY[b.tmpl.label] ?? MAX_PRIO
+                                    if (aPrio !== bPrio) return aPrio - bPrio
+                                    const aDefault = a.tmpl.type === a.widget.defaultPreset ? -1 : 0
+                                    const bDefault = b.tmpl.type === b.widget.defaultPreset ? -1 : 0
+                                    return aDefault - bDefault
+                                })
+                                return (<>{allTiles.map(({ widget, tmpl }, i) => {
                                     const label = presetRegistry.getByWidget(widget.type).length === 1
                                         ? widget.label
                                         : tmpl.label
@@ -432,8 +446,8 @@ export function WidgetPicker({
                                             )}
                                         </div>
                                     )
-                                })
-                            })}
+                                })}</>)
+                            })()}
                             {filtered.length === 0 && (
                                 <div style={{ padding: '12px 0', fontSize: 9, color: '#475569', width: '100%', textAlign: 'center' }}>
                                     {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
