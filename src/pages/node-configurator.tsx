@@ -1,19 +1,42 @@
 /**
- * Node Configurator — standalone page to explore & configure node types.
+ * Node Configurator — 3-column explorer & configurator for widget types.
  *
  * Layout:
- *  Left:   Widget type selector + template selector + node preview + info
- *  Right:  Settings panel with Visual / Raw / Manifest tabs
+ *  Column 1 (left):   Live widget preview (normal) + preview (debug mode)
+ *  Column 2 (center): Widget type selector + template + Visual / Raw / Manifest editor
+ *  Column 3 (right):  Embedded WidgetPicker — clicking a widget auto-populates everything
  *
- * Visual mode fields are fully editable — changes update node data live.
- * Manifest = JSON schema + metadata (description, tags, version, etc.)
+ * Data model (from docs/node-types.md):
+ *   Identity: id, type, subType, preset, label
+ *   State:    status, currentTask, thought, progress, execTime, callsCount
+ *   Config:   ui (theme, transform, icons), script, sandbox, timeout, retries
  */
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
-import { widgetRegistry, type WidgetDefinition } from '@/widgets/widget-registry'
+import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/widgets/widget-registry'
+import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { CodeEditor } from '@/kit'
 import type { CodeLanguage } from '@/kit'
+
+// Widget node components for live preview
+import {
+    JobNode, GroupNode, NoteNode, ExpectationNode,
+    UserNode, SubFlowNode, StartingNode, ArtifactNode,
+} from '@/widgets/wibeglow'
+
+// ── Node component map ──────────────────────────────────────────────────────────
+
+const NODE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = {
+    job: JobNode,
+    group: GroupNode,
+    note: NoteNode,
+    expectation: ExpectationNode,
+    user: UserNode,
+    subflow: SubFlowNode,
+    starting: StartingNode,
+    artifact: ArtifactNode,
+}
 
 // ── Manifest generator ──────────────────────────────────────────────────────────
 
@@ -56,15 +79,11 @@ function generateManifest(def: WidgetDefinition) {
         tags: def.tags,
         subTypes: def.subTypes || [],
         dimensions: {
-            minWidth: def.minWidth,
-            minHeight: def.minHeight,
-            defaultWidth: def.defaultWidth,
-            defaultHeight: def.defaultHeight,
+            minWidth: def.minWidth, minHeight: def.minHeight,
+            defaultWidth: def.defaultWidth, defaultHeight: def.defaultHeight,
         },
         templates: def.templates.map(t => ({
-            name: t.name,
-            description: t.description,
-            defaultData: t.defaultData,
+            name: t.name, description: t.description, defaultData: t.defaultData,
         })),
         schema: {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -85,21 +104,26 @@ type Mode = 'visual' | 'raw' | 'manifest'
 
 const S = {
     page: {
-        height: '100%', overflow: 'auto',
-        background: '#0a0a14', padding: '24px 32px',
-        fontFamily: 'Inter, sans-serif', color: '#e2e8f0',
+        height: '100%', display: 'flex', overflow: 'hidden',
+        background: '#0a0a14', fontFamily: 'Inter, sans-serif', color: '#e2e8f0',
     } as CSSProperties,
 
-    layout: {
-        display: 'flex', gap: 24, alignItems: 'flex-start',
+    col1: {
+        width: 300, flexShrink: 0, overflow: 'auto',
+        borderRight: '1px solid rgba(255,255,255,0.06)',
+        padding: 16, display: 'flex', flexDirection: 'column' as const, gap: 16,
     } as CSSProperties,
 
-    left: {
-        width: 340, flexShrink: 0,
+    col2: {
+        flex: 1, minWidth: 0, overflow: 'auto', padding: 16,
         display: 'flex', flexDirection: 'column' as const, gap: 16,
     } as CSSProperties,
 
-    right: { flex: 1, minWidth: 0 } as CSSProperties,
+    col3: {
+        width: 260, flexShrink: 0,
+        borderLeft: '1px solid rgba(255,255,255,0.06)',
+        overflow: 'hidden', display: 'flex', flexDirection: 'column' as const,
+    } as CSSProperties,
 
     card: {
         background: 'rgba(15,15,26,0.95)',
@@ -136,16 +160,6 @@ const S = {
         background: active ? 'rgba(139,92,246,0.6)' : 'transparent',
         color: active ? '#fff' : '#64748b',
         transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
-    }),
-
-    textarea: (hasError: boolean): CSSProperties => ({
-        width: '100%', minHeight: 320,
-        background: 'rgba(0,0,0,0.3)', color: '#a5f3fc',
-        border: `1px solid ${hasError ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
-        borderRadius: 8, padding: 12, fontSize: 12,
-        fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-        resize: 'vertical' as const, lineHeight: 1.5,
-        outline: 'none', boxSizing: 'border-box' as const,
     }),
 
     fieldRow: {
@@ -201,6 +215,54 @@ const S = {
     fieldHint: {
         fontSize: 8, color: '#475569', marginTop: 1,
     } as CSSProperties,
+
+    sectionHeader: {
+        fontSize: 9, fontWeight: 700 as const,
+        textTransform: 'uppercase' as const,
+        letterSpacing: '0.8px',
+        color: '#8b5cf6', marginBottom: 10, marginTop: 6,
+        paddingBottom: 4,
+        borderBottom: '1px solid rgba(139,92,246,0.15)',
+    } as CSSProperties,
+}
+
+// ── Categorize node data fields by docs/node-types.md schema ─────────────────
+
+const IDENTITY_FIELDS = new Set(['label', 'subType', 'preset', 'agent', 'language', 'color'])
+const STATE_FIELDS = new Set(['status', 'currentTask', 'thought', 'progress', 'execTime', 'callsCount', 'totalRuns'])
+const INTERNAL_FIELDS = new Set(['width', 'height', 'debugMode', '_debugId', '_themeName', '_themeType',
+    'dayMode', 'staticMode', 'tuiMode', 'onRunScript', 'onSaveScript', 'onResize',
+    'onSelectWidget', 'onCancelSelector', 'onHoverWidget', 'editMode', 'ctx'])
+
+function categorizeField(key: string): 'identity' | 'state' | 'config' | 'internal' {
+    if (INTERNAL_FIELDS.has(key)) return 'internal'
+    if (IDENTITY_FIELDS.has(key)) return 'identity'
+    if (STATE_FIELDS.has(key)) return 'state'
+    return 'config'
+}
+
+// ── Build preview data for live rendering ───────────────────────────────────────
+
+function buildPreviewData(
+    nodeData: Record<string, any>,
+    widgetDef: WidgetDefinition,
+    width: number,
+    height: number,
+    debugMode: boolean,
+): Record<string, any> {
+    return {
+        ...nodeData,
+        width,
+        height,
+        debugMode,
+        _debugId: 'cfg-preview',
+        state: nodeData.state || {
+            status: nodeData.status || 'idle',
+            progress: nodeData.progress || 0,
+            execTime: nodeData.execTime || '—',
+            callsCount: nodeData.callsCount || 0,
+        },
+    }
 }
 
 // ── Component ────────────────────────────────────────────────────────────────────
@@ -221,18 +283,20 @@ export function NodeConfiguratorPage() {
 
     const template = widgetDef.templates[templateIdx] || widgetDef.templates[0]
 
-    // Initialize node data when widget/template changes
-    const initData = useCallback(() => {
-        return { ...template.defaultData }
+    // Re-init nodeData when widget/template changes
+    useMemo(() => {
+        setNodeData({ ...template.defaultData })
     }, [template])
 
-    // Reset on type change
+    const manifest = useMemo(() => generateManifest(widgetDef), [widgetDef])
+
+    // ── Handlers ──
+
     const handleTypeChange = useCallback((type: string) => {
         setSelectedType(type)
         setTemplateIdx(0)
         setMode('visual')
         setParseError(null)
-        // nodeData will be reset via effect
     }, [])
 
     const handleTemplateChange = useCallback((idx: number) => {
@@ -240,13 +304,15 @@ export function NodeConfiguratorPage() {
         setParseError(null)
     }, [])
 
-    // Re-init nodeData when widget/template changes
-    useMemo(() => {
-        setNodeData(initData())
-    }, [initData])
-
-
-    const manifest = useMemo(() => generateManifest(widgetDef), [widgetDef])
+    // Widget picker selection → auto-populate everything
+    const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: WidgetTemplate) => {
+        setSelectedType(widget.type)
+        const idx = widget.templates.indexOf(tmpl)
+        setTemplateIdx(idx >= 0 ? idx : 0)
+        setNodeData({ ...tmpl.defaultData })
+        setMode('visual')
+        setParseError(null)
+    }, [])
 
     const handleModeSwitch = useCallback((m: Mode) => {
         if (m === 'raw') setRawJson(JSON.stringify(nodeData, null, 2))
@@ -256,49 +322,136 @@ export function NodeConfiguratorPage() {
 
     const handleRawChange = useCallback((val: string) => {
         setRawJson(val)
-        try {
-            JSON.parse(val)
-            setParseError(null)
-        } catch (err: any) {
-            setParseError(err.message)
-        }
+        try { JSON.parse(val); setParseError(null) } catch (err: any) { setParseError(err.message) }
     }, [])
 
     const handleRawApply = useCallback(() => {
-        try {
-            const parsed = JSON.parse(rawJson)
-            setNodeData(parsed)
-            setParseError(null)
-        } catch (err: any) {
-            setParseError(err.message)
-        }
+        try { setNodeData(JSON.parse(rawJson)); setParseError(null) } catch (err: any) { setParseError(err.message) }
     }, [rawJson])
 
-    // Update a single field in nodeData
     const updateField = useCallback((key: string, value: any) => {
         setNodeData(prev => ({ ...prev, [key]: value }))
     }, [])
 
+    // ── Preview data ──
+    const previewW = widgetDef.defaultWidth || 200
+    const previewH = widgetDef.defaultHeight || 120
+    const previewData = useMemo(
+        () => buildPreviewData(nodeData, widgetDef, previewW, previewH, false),
+        [nodeData, widgetDef, previewW, previewH],
+    )
+    const debugPreviewData = useMemo(
+        () => buildPreviewData(nodeData, widgetDef, previewW, previewH, true),
+        [nodeData, widgetDef, previewW, previewH],
+    )
+
+    const PreviewComponent = NODE_COMPONENTS[widgetDef.type]
+
     return (
         <div style={S.page}>
-            <h1 style={{
-                fontSize: 20, fontWeight: 800, color: '#8b5cf6',
-                fontFamily: "'JetBrains Mono', monospace",
-                marginBottom: 4,
-            }}>
-                Node Configurator
-            </h1>
-            <p style={{ fontSize: 11, color: '#64748b', marginBottom: 24 }}>
-                Explore node types, edit their data, and view the manifest
-            </p>
+            {/* Global CSS: hide handles on preview widgets */}
+            <style>{`.hide-handles .react-flow__handle { display: none !important; }`}</style>
 
-            <div style={S.layout}>
-                {/* ── Left: Selector + Preview ── */}
-                <div style={S.left}>
-                    {/* Widget type selector */}
-                    <div style={S.card}>
-                        <div style={S.cardHeader}>Widget Type</div>
-                        <div style={S.cardBody}>
+            {/* ── Column 1: Preview ── */}
+            <div style={S.col1}>
+                {/* Normal preview */}
+                <div style={S.card}>
+                    <div style={S.cardHeader}>Preview</div>
+                    <div style={{
+                        ...S.cardBody,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        minHeight: 140, background: '#0a0a14',
+                    }}>
+                        <div className="hide-handles" style={{
+                            width: previewW, height: previewH,
+                            position: 'relative',
+                        }}>
+                            {PreviewComponent ? (
+                                <PreviewComponent data={previewData} />
+                            ) : (
+                                <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Debug preview */}
+                <div style={S.card}>
+                    <div style={{
+                        ...S.cardHeader,
+                        display: 'flex', alignItems: 'center', gap: 6,
+                    }}>
+                        <span style={{ color: '#10b981' }}>⬤</span>
+                        Debug Preview
+                    </div>
+                    <div style={{
+                        ...S.cardBody,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        minHeight: 140, background: '#0a0a14',
+                    }}>
+                        <div className="hide-handles" style={{
+                            width: previewW, height: previewH,
+                            position: 'relative',
+                        }}>
+                            {PreviewComponent ? (
+                                <PreviewComponent data={debugPreviewData} />
+                            ) : (
+                                <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Widget info */}
+                <div style={S.card}>
+                    <div style={S.cardHeader}>Info</div>
+                    <div style={{ ...S.cardBody, fontSize: 10, color: '#94a3b8', lineHeight: 1.6 }}>
+                        <div><strong style={{ color: '#e2e8f0' }}>Type:</strong> {widgetDef.type}</div>
+                        <div><strong style={{ color: '#e2e8f0' }}>Category:</strong> {widgetDef.category}</div>
+                        <div><strong style={{ color: '#e2e8f0' }}>Size:</strong> {previewW}×{previewH} px</div>
+                        <div style={{ marginTop: 4 }}>{widgetDef.description}</div>
+                        {widgetDef.subTypes && widgetDef.subTypes.length > 0 && (
+                            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8 }}>
+                                {widgetDef.subTypes.map(st => (
+                                    <span key={st.value} style={{
+                                        padding: '2px 8px', borderRadius: 4,
+                                        background: `${st.color || '#8b5cf6'}20`,
+                                        border: `1px solid ${st.color || '#8b5cf6'}33`,
+                                        fontSize: 9, color: st.color || '#8b5cf6',
+                                        fontWeight: 500,
+                                    }}>
+                                        {st.label}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Column 2: Configurator ── */}
+            <div style={S.col2}>
+                {/* Widget type + template selectors */}
+                <div style={S.card}>
+                    <div style={{
+                        ...S.cardHeader,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <WidgetIcon type={widgetDef.icon} size={14} />
+                            <span>{widgetDef.label}</span>
+                        </div>
+                        <span style={{
+                            fontSize: 8, color: '#475569',
+                            fontFamily: "'JetBrains Mono', monospace",
+                        }}>
+                            {widgetDef.type}
+                        </span>
+                    </div>
+                    <div style={{ ...S.cardBody, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {/* Type selector */}
+                        <div>
+                            <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Widget Type</div>
                             <select
                                 data-testid="widget-type-select"
                                 style={S.select}
@@ -312,220 +465,196 @@ export function NodeConfiguratorPage() {
                                 ))}
                             </select>
                         </div>
-                    </div>
 
-                    {/* Template selector */}
-                    {widgetDef.templates.length > 1 && (
-                        <div style={S.card}>
-                            <div style={S.cardHeader}>Template</div>
-                            <div style={{ ...S.cardBody, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {widgetDef.templates.map((tpl, i) => (
-                                    <button
-                                        key={i}
-                                        data-testid={`template-${i}`}
-                                        onClick={() => handleTemplateChange(i)}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: 10,
-                                            padding: '8px 12px', borderRadius: 8, border: 'none',
-                                            background: i === templateIdx
-                                                ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.02)',
-                                            cursor: 'pointer', textAlign: 'left',
-                                            fontFamily: 'Inter, sans-serif',
-                                        }}
-                                    >
-                                        <WidgetIcon type={widgetDef.icon} size={16} />
-                                        <div>
-                                            <div style={{
-                                                fontSize: 11, fontWeight: 600,
-                                                color: i === templateIdx ? '#c084fc' : '#e2e8f0',
-                                            }}>
-                                                {tpl.name}
+                        {/* Template selector */}
+                        {widgetDef.templates.length > 1 && (
+                            <div>
+                                <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Template</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {widgetDef.templates.map((tpl, i) => (
+                                        <button
+                                            key={i}
+                                            data-testid={`template-${i}`}
+                                            onClick={() => handleTemplateChange(i)}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: 10,
+                                                padding: '8px 12px', borderRadius: 8, border: 'none',
+                                                background: i === templateIdx
+                                                    ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.02)',
+                                                cursor: 'pointer', textAlign: 'left',
+                                                fontFamily: 'Inter, sans-serif',
+                                            }}
+                                        >
+                                            <WidgetIcon type={widgetDef.icon} size={14} />
+                                            <div>
+                                                <div style={{
+                                                    fontSize: 11, fontWeight: 600,
+                                                    color: i === templateIdx ? '#c084fc' : '#e2e8f0',
+                                                }}>
+                                                    {tpl.name}
+                                                </div>
+                                                <div style={{ fontSize: 9, color: '#64748b' }}>
+                                                    {tpl.description}
+                                                </div>
                                             </div>
-                                            <div style={{ fontSize: 9, color: '#64748b' }}>
-                                                {tpl.description}
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Node preview card */}
-                    <div style={S.card}>
-                        <div style={S.cardHeader}>Node Preview</div>
-                        <div style={{
-                            ...S.cardBody,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            minHeight: 120,
-                        }}>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                padding: '16px 20px',
-                                background: 'rgba(15,15,26,0.8)',
-                                border: `1.5px solid ${widgetDef.color}44`,
-                                borderRadius: 12,
-                                boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px ${widgetDef.color}11`,
-                                minWidth: 180,
-                            }}>
-                                <div style={{
-                                    width: 36, height: 36, borderRadius: 8,
-                                    background: `${widgetDef.color}15`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                    <WidgetIcon type={widgetDef.icon} size={18} />
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>
-                                        {String(nodeData.label || widgetDef.label)}
-                                    </div>
-                                    <div style={{ fontSize: 9, color: '#64748b', marginTop: 2 }}>
-                                        {widgetDef.type}
-                                        {nodeData.subType && ` · ${String(nodeData.subType)}`}
-                                    </div>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Widget info */}
-                    <div style={S.card}>
-                        <div style={S.cardHeader}>Info</div>
-                        <div style={{ ...S.cardBody, fontSize: 10, color: '#94a3b8', lineHeight: 1.6 }}>
-                            <div><strong style={{ color: '#e2e8f0' }}>Category:</strong> {widgetDef.category}</div>
-                            <div><strong style={{ color: '#e2e8f0' }}>Tags:</strong> {widgetDef.tags.join(', ')}</div>
-                            <div style={{ marginTop: 4 }}>{widgetDef.description}</div>
-                            {widgetDef.subTypes && widgetDef.subTypes.length > 0 && (
-                                <div style={{ marginTop: 8 }}>
-                                    <strong style={{ color: '#e2e8f0' }}>Sub-types:</strong>
-                                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
-                                        {widgetDef.subTypes.map(st => (
-                                            <span key={st.value} style={{
-                                                padding: '2px 8px', borderRadius: 4,
-                                                background: `${st.color || '#8b5cf6'}20`,
-                                                border: `1px solid ${st.color || '#8b5cf6'}33`,
-                                                fontSize: 9, color: st.color || '#8b5cf6',
-                                                fontWeight: 500,
-                                            }}>
-                                                {st.label}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
                 </div>
 
-                {/* ── Right: Settings Panel ── */}
-                <div style={S.right}>
-                    <div style={S.card}>
-                        {/* Header with mode switcher */}
+                {/* Settings panel with mode switcher */}
+                <div style={S.card}>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '10px 14px',
+                        borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    }}>
                         <div style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            padding: '10px 14px',
-                            borderBottom: '1px solid rgba(255,255,255,0.04)',
+                            fontSize: 10, fontWeight: 700,
+                            color: '#64748b', textTransform: 'uppercase',
+                            letterSpacing: 0.5,
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <WidgetIcon type={widgetDef.icon} size={16} />
-                                <span style={{ fontWeight: 600, fontSize: 13 }}>
-                                    {String(nodeData.label || widgetDef.label)}
-                                </span>
-                                <span style={{ fontSize: 10, color: '#475569' }}>
-                                    {widgetDef.type}
-                                </span>
-                            </div>
-                            <div style={S.switcherWrap}>
-                                {(['visual', 'raw', 'manifest'] as Mode[]).map(m => (
-                                    <button
-                                        key={m}
-                                        style={S.switchBtn(mode === m)}
-                                        onClick={() => handleModeSwitch(m)}
-                                        data-testid={`mode-${m}`}
-                                    >
-                                        {m.charAt(0).toUpperCase() + m.slice(1)}
-                                    </button>
-                                ))}
-                            </div>
+                            Configuration
                         </div>
-
-                        {/* Body */}
-                        <div style={S.cardBody}>
-                            {mode === 'visual' && (
-                                <VisualEditor
-                                    data={nodeData}
-                                    widgetDef={widgetDef}
-                                    onChange={updateField}
-                                />
-                            )}
-
-                            {mode === 'raw' && (
-                                <div>
-                                    <CodeEditor
-                                        value={rawJson}
-                                        onChange={handleRawChange}
-                                        language="json"
-                                        minHeight={320}
-                                        maxHeight={500}
-                                        testId="raw-editor"
-                                    />
-                                    {parseError && (
-                                        <div style={{
-                                            color: '#ef4444', fontSize: 10, marginTop: 6,
-                                            padding: '6px 10px',
-                                            background: 'rgba(239,68,68,0.08)',
-                                            borderRadius: 6,
-                                            border: '1px solid rgba(239,68,68,0.2)',
-                                            fontFamily: "'JetBrains Mono', monospace",
-                                        }}>
-                                            ⚠ {parseError}
-                                        </div>
-                                    )}
-                                    <button
-                                        onClick={handleRawApply}
-                                        disabled={!!parseError}
-                                        data-testid="raw-apply"
-                                        style={{
-                                            marginTop: 8, padding: '6px 16px',
-                                            borderRadius: 6, border: 'none',
-                                            background: parseError ? '#333' : 'rgba(139,92,246,0.7)',
-                                            color: parseError ? '#666' : '#fff',
-                                            cursor: parseError ? 'not-allowed' : 'pointer',
-                                            fontSize: 12, fontWeight: 500,
-                                            fontFamily: 'Inter, sans-serif',
-                                        }}
-                                    >
-                                        Apply
-                                    </button>
-                                </div>
-                            )}
-
-                            {mode === 'manifest' && (
-                                <div>
-                                    <div style={{
-                                        fontSize: 10, color: '#64748b', marginBottom: 8,
-                                    }}>
-                                        Full manifest with JSON schema, metadata, templates, and dimensions.
-                                    </div>
-                                    <CodeEditor
-                                        value={JSON.stringify(manifest, null, 2)}
-                                        language="json"
-                                        readOnly
-                                        minHeight={320}
-                                        maxHeight={600}
-                                        testId="manifest-editor"
-                                    />
-                                </div>
-                            )}
+                        <div style={S.switcherWrap}>
+                            {(['visual', 'raw', 'manifest'] as Mode[]).map(m => (
+                                <button
+                                    key={m}
+                                    style={S.switchBtn(mode === m)}
+                                    onClick={() => handleModeSwitch(m)}
+                                    data-testid={`mode-${m}`}
+                                >
+                                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                                </button>
+                            ))}
                         </div>
                     </div>
+
+                    <div style={S.cardBody}>
+                        {mode === 'visual' && (
+                            <VisualEditor
+                                data={nodeData}
+                                widgetDef={widgetDef}
+                                onChange={updateField}
+                            />
+                        )}
+
+                        {mode === 'raw' && (
+                            <div>
+                                <CodeEditor
+                                    value={rawJson}
+                                    onChange={handleRawChange}
+                                    language="json"
+                                    minHeight={320}
+                                    maxHeight={500}
+                                    testId="raw-editor"
+                                />
+                                {parseError && (
+                                    <div style={{
+                                        color: '#ef4444', fontSize: 10, marginTop: 6,
+                                        padding: '6px 10px',
+                                        background: 'rgba(239,68,68,0.08)',
+                                        borderRadius: 6,
+                                        border: '1px solid rgba(239,68,68,0.2)',
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                    }}>
+                                        ⚠ {parseError}
+                                    </div>
+                                )}
+                                <button
+                                    onClick={handleRawApply}
+                                    disabled={!!parseError}
+                                    data-testid="raw-apply"
+                                    style={{
+                                        marginTop: 8, padding: '6px 16px',
+                                        borderRadius: 6, border: 'none',
+                                        background: parseError ? '#333' : 'rgba(139,92,246,0.7)',
+                                        color: parseError ? '#666' : '#fff',
+                                        cursor: parseError ? 'not-allowed' : 'pointer',
+                                        fontSize: 12, fontWeight: 500,
+                                        fontFamily: 'Inter, sans-serif',
+                                    }}
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        )}
+
+                        {mode === 'manifest' && (
+                            <div>
+                                <div style={{
+                                    fontSize: 10, color: '#64748b', marginBottom: 8,
+                                }}>
+                                    Full manifest with JSON schema, metadata, templates, and dimensions.
+                                </div>
+                                <CodeEditor
+                                    value={JSON.stringify(manifest, null, 2)}
+                                    language="json"
+                                    readOnly
+                                    minHeight={320}
+                                    maxHeight={600}
+                                    testId="manifest-editor"
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Column 3: WidgetPicker ── */}
+            <div style={S.col3}>
+                <WidgetPicker
+                    rectSize={{ width: 200, height: 120 }}
+                    onSelect={handlePickerSelect}
+                    onCancel={() => { }}
+                    embedded
+                />
+            </div>
+        </div>
+    )
+}
+
+// ── Fallback preview (when no component registered) ─────────────────────────────
+
+function FallbackPreview({ nodeData, widgetDef }: {
+    nodeData: Record<string, any>
+    widgetDef: WidgetDefinition
+}) {
+    return (
+        <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '16px 20px',
+            background: 'rgba(15,15,26,0.8)',
+            border: `1.5px solid ${widgetDef.color}44`,
+            borderRadius: 12,
+            boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px ${widgetDef.color}11`,
+            width: '100%', height: '100%', boxSizing: 'border-box',
+        }}>
+            <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: `${widgetDef.color}15`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+            }}>
+                <WidgetIcon type={widgetDef.icon} size={18} />
+            </div>
+            <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>
+                    {String(nodeData.label || widgetDef.label)}
+                </div>
+                <div style={{ fontSize: 9, color: '#64748b', marginTop: 2 }}>
+                    {widgetDef.type}
+                    {nodeData.subType && ` · ${String(nodeData.subType)}`}
                 </div>
             </div>
         </div>
     )
 }
 
-// ── Visual Editor ───────────────────────────────────────────────────────────────
+// ── Visual Editor (grouped by node-types.md schema) ─────────────────────────────
 
 function VisualEditor({ data, widgetDef, onChange }: {
     data: Record<string, any>
@@ -541,17 +670,43 @@ function VisualEditor({ data, widgetDef, onChange }: {
         )
     }
 
+    // Group fields by category
+    const groups: { identity: [string, any][]; state: [string, any][]; config: [string, any][] } = {
+        identity: [], state: [], config: [],
+    }
+    for (const entry of entries) {
+        const cat = categorizeField(entry[0])
+        if (cat !== 'internal') {
+            groups[cat].push(entry)
+        }
+    }
+
     return (
         <>
-            {entries.map(([key, value]) => (
-                <VisualField
-                    key={key}
-                    fieldKey={key}
-                    value={value}
-                    widgetDef={widgetDef}
-                    onChange={onChange}
-                />
-            ))}
+            {groups.identity.length > 0 && (
+                <>
+                    <div style={S.sectionHeader}>Identity</div>
+                    {groups.identity.map(([key, value]) => (
+                        <VisualField key={key} fieldKey={key} value={value} widgetDef={widgetDef} onChange={onChange} />
+                    ))}
+                </>
+            )}
+            {groups.state.length > 0 && (
+                <>
+                    <div style={S.sectionHeader}>State</div>
+                    {groups.state.map(([key, value]) => (
+                        <VisualField key={key} fieldKey={key} value={value} widgetDef={widgetDef} onChange={onChange} />
+                    ))}
+                </>
+            )}
+            {groups.config.length > 0 && (
+                <>
+                    <div style={S.sectionHeader}>Config</div>
+                    {groups.config.map(([key, value]) => (
+                        <VisualField key={key} fieldKey={key} value={value} widgetDef={widgetDef} onChange={onChange} />
+                    ))}
+                </>
+            )}
         </>
     )
 }
@@ -574,7 +729,6 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     const isCode = fieldKey === 'code'
     const codeLanguage: CodeLanguage = useMemo(() => {
         if (!isCode) return 'text'
-        // Check widget subType for language detection
         const lang = widgetDef.templates[0]?.defaultData?.language
             || widgetDef.templates[0]?.defaultData?.subType
         if (lang === 'ts') return 'typescript'
@@ -584,7 +738,6 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
         return 'javascript'
     }, [isCode, widgetDef])
 
-    // Required field check
     const isRequired = fieldKey === 'label'
 
     const validate = useCallback((val: any) => {
@@ -664,7 +817,7 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
         )
     }
 
-    // Multi-line string → textarea (content, reviewBody, etc.)
+    // Multi-line string → textarea
     if (t === 'string' && (String(value).includes('\n') || fieldKey === 'content' || fieldKey === 'reviewBody')) {
         return (
             <div style={S.fieldRow}>

@@ -15,7 +15,8 @@
         "currentTask": "Running tests",
         "thought": "Assert no errors when project starts",
         "progress": 55,
-        "execTime": "1.3s",
+        "avgExecTime": "1.3s",
+        "execTimes": ["1.3s", "1.2s", "1.4s"],
         "callsCount": 3,
     },
 
