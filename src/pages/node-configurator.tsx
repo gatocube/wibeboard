@@ -616,6 +616,7 @@ export function NodeConfiguratorPage() {
                     onSelect={handlePickerSelect}
                     onCancel={() => { }}
                     embedded
+                    compact
                 />
             </div>
         </div>

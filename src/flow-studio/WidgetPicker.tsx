@@ -61,6 +61,8 @@ interface WidgetPickerProps {
     onCancel: () => void
     onHoverWidget?: (widget: WidgetDefinition | null) => void
     embedded?: boolean
+    /** Compact tile view — renders all widgets as icon tiles instead of a list */
+    compact?: boolean
 }
 
 export function WidgetPicker({
@@ -70,6 +72,7 @@ export function WidgetPicker({
     onCancel,
     onHoverWidget,
     embedded,
+    compact,
 }: WidgetPickerProps) {
     const [search, setSearch] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<WidgetCategory | string | null>(null)
@@ -118,7 +121,7 @@ export function WidgetPicker({
     }
 
     const handleWidgetClick = (widget: WidgetDefinition) => {
-        if (widget.templates.length === 1) {
+        if (widget.templates.length === 1 || compact) {
             handleSelect(widget, widget.templates[0])
         } else {
             setExpandedWidget(expandedWidget === widget.type ? null : widget.type)
@@ -245,8 +248,8 @@ export function WidgetPicker({
                     </div>
                 )}
 
-                {/* ── 2. Category tiles ── */}
-                {!isSearching && (
+                {/* ── 2. Category tiles (hidden in compact mode) ── */}
+                {!isSearching && !compact && (
                     <div style={{
                         padding: '4px 12px 8px',
                         borderTop: recentWidgets.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
@@ -302,7 +305,7 @@ export function WidgetPicker({
                     </div>
                 )}
 
-                {/* ── 3. Widget list ── */}
+                {/* ── 3. Widget list / compact tile grid ── */}
                 <div style={{
                     borderTop: '1px solid rgba(255,255,255,0.04)',
                     paddingTop: 4,
@@ -313,7 +316,7 @@ export function WidgetPicker({
                             textTransform: 'uppercase', letterSpacing: '0.5px',
                             padding: '4px 12px 2px',
                         }}>
-                            All widgets
+                            {compact ? 'Widgets' : 'All widgets'}
                         </div>
                     )}
                     {selectedCategory && (
@@ -337,146 +340,202 @@ export function WidgetPicker({
                         </div>
                     )}
 
-                    <AnimatePresence>
-                        {(() => {
-                            // Group by category when showing "All widgets" (no filter, no search)
-                            const showCategoryHeaders = !isSearching && !selectedCategory
-                            let lastCategory = ''
-
-                            return filtered.map(widget => {
-                                const needsHeader = showCategoryHeaders && widget.category !== lastCategory
-                                lastCategory = widget.category
-
-                                return (
-                                    <motion.div
-                                        key={widget.type}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        layout
-                                    >
-                                        {/* Category header */}
-                                        {needsHeader && (
-                                            <div style={{
-                                                padding: '8px 12px 3px',
-                                                fontSize: 8, fontWeight: 700,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.5px',
-                                                color: CATEGORY_COLORS[widget.category] || '#64748b',
-                                                borderTop: filtered.indexOf(widget) > 0
-                                                    ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                                            }}>
-                                                {widget.category}
-                                            </div>
-                                        )}
-
-                                        {/* Widget row */}
-                                        <div
-                                            data-testid={`widget-${widget.type}`}
-                                            draggable
-                                            onDragStart={e => {
-                                                e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                                    type: widget.type, template: widget.templates[0],
-                                                }))
-                                                e.dataTransfer.effectAllowed = 'move'
-                                            }}
-                                            style={{
-                                                padding: '6px 12px',
-                                                cursor: 'grab',
-                                                display: 'flex', alignItems: 'center', gap: 8,
-                                                transition: 'background 0.1s',
-                                            }}
-                                            onMouseEnter={() => {
-                                                onHoverWidget?.(widget)
-                                                if (widget.templates.length <= 1) setExpandedWidget(null)
-                                            }}
-                                            onMouseLeave={() => onHoverWidget?.(null)}
-                                            onClick={() => handleWidgetClick(widget)}
-                                            onMouseOver={e => {
-                                                (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'
-                                            }}
-                                            onMouseOut={e => {
-                                                (e.currentTarget as HTMLElement).style.background = 'transparent'
-                                            }}
-                                        >
-                                            {/* Icon button */}
-                                            <div style={{
-                                                width: 28, height: 28,
-                                                borderRadius: 8,
-                                                background: `${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}15`,
-                                                border: `1.5px solid ${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}33`,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                flexShrink: 0,
-                                            }}>
-                                                <WidgetIcon type={widget.type} size={14} />
-                                            </div>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
-                                                    {widget.label}
-                                                </div>
-                                                <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.3 }}>
-                                                    {widget.description}
-                                                </div>
-                                            </div>
-                                            <span style={{
-                                                fontSize: 7, padding: '1px 4px', borderRadius: 3,
-                                                background: `${CATEGORY_COLORS[widget.category] || '#475569'}22`,
-                                                color: CATEGORY_COLORS[widget.category] || '#475569',
-                                                fontWeight: 600,
-                                            }}>
-                                                {widget.category}
-                                            </span>
-                                        </div>
-
-                                        {/* Expanded templates */}
-                                        <AnimatePresence>
-                                            {expandedWidget === widget.type && widget.templates.length > 1 && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    style={{ overflow: 'hidden', paddingLeft: 36 }}
-                                                >
-                                                    {widget.templates.map((tmpl, i) => (
-                                                        <div
-                                                            key={i}
-                                                            data-testid={`template-${widget.type}-${i}`}
-                                                            style={{
-                                                                padding: '4px 12px', cursor: 'pointer',
-                                                                fontSize: 9, color: '#94a3b8',
-                                                                borderLeft: `2px solid ${widget.color}33`,
-                                                                transition: 'all 0.1s',
-                                                            }}
-                                                            onClick={e => {
-                                                                e.stopPropagation()
-                                                                handleSelect(widget, tmpl)
-                                                            }}
-                                                            onMouseOver={e => {
-                                                                (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.06)'
-                                                                    ; (e.currentTarget as HTMLElement).style.color = '#e2e8f0'
-                                                            }}
-                                                            onMouseOut={e => {
-                                                                (e.currentTarget as HTMLElement).style.background = 'transparent'
-                                                                    ; (e.currentTarget as HTMLElement).style.color = '#94a3b8'
-                                                            }}
-                                                        >
-                                                            <div style={{ fontWeight: 600 }}>{tmpl.name}</div>
-                                                            <div style={{ fontSize: 8, color: '#64748b' }}>{tmpl.description}</div>
-                                                        </div>
-                                                    ))}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
-                                )
-                            })
-                        })()}
-                    </AnimatePresence>
-
-                    {filtered.length === 0 && (
-                        <div style={{ padding: '16px 12px', textAlign: 'center', fontSize: 9, color: '#475569' }}>
-                            {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
+                    {compact ? (
+                        /* ── Compact tile grid ── */
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
+                            {filtered.map(widget => (
+                                <div
+                                    key={widget.type}
+                                    data-testid={`widget-${widget.type}`}
+                                    title={`${widget.label} — ${widget.description}`}
+                                    draggable
+                                    onDragStart={e => {
+                                        e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
+                                            type: widget.type, template: widget.templates[0],
+                                        }))
+                                        e.dataTransfer.effectAllowed = 'move'
+                                    }}
+                                    onClick={() => handleWidgetClick(widget)}
+                                    onMouseEnter={() => onHoverWidget?.(widget)}
+                                    onMouseLeave={() => onHoverWidget?.(null)}
+                                    style={{
+                                        width: 48, height: 48, borderRadius: 8,
+                                        background: `${widget.color}15`,
+                                        border: `1px solid ${widget.color}33`,
+                                        display: 'flex', flexDirection: 'column',
+                                        alignItems: 'center', justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.15s',
+                                        gap: 2,
+                                    }}
+                                    onMouseOver={e => {
+                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}25`
+                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}55`
+                                            ; (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'
+                                    }}
+                                    onMouseOut={e => {
+                                        (e.currentTarget as HTMLElement).style.background = `${widget.color}15`
+                                            ; (e.currentTarget as HTMLElement).style.borderColor = `${widget.color}33`
+                                            ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                                    }}
+                                >
+                                    <WidgetIcon type={widget.type} size={16} />
+                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1 }}>
+                                        {widget.label.length > 6 ? widget.label.slice(0, 6) : widget.label}
+                                    </span>
+                                </div>
+                            ))}
+                            {filtered.length === 0 && (
+                                <div style={{ padding: '12px 0', fontSize: 9, color: '#475569', width: '100%', textAlign: 'center' }}>
+                                    {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
+                                </div>
+                            )}
                         </div>
+                    ) : (
+                        /* ── Standard list view ── */
+                        <>
+                            <AnimatePresence>
+                                {(() => {
+                                    // Group by category when showing "All widgets" (no filter, no search)
+                                    const showCategoryHeaders = !isSearching && !selectedCategory
+                                    let lastCategory = ''
+
+                                    return filtered.map(widget => {
+                                        const needsHeader = showCategoryHeaders && widget.category !== lastCategory
+                                        lastCategory = widget.category
+
+                                        return (
+                                            <motion.div
+                                                key={widget.type}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                layout
+                                            >
+                                                {/* Category header */}
+                                                {needsHeader && (
+                                                    <div style={{
+                                                        padding: '8px 12px 3px',
+                                                        fontSize: 8, fontWeight: 700,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.5px',
+                                                        color: CATEGORY_COLORS[widget.category] || '#64748b',
+                                                        borderTop: filtered.indexOf(widget) > 0
+                                                            ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                                    }}>
+                                                        {widget.category}
+                                                    </div>
+                                                )}
+
+                                                {/* Widget row */}
+                                                <div
+                                                    data-testid={`widget-${widget.type}`}
+                                                    draggable
+                                                    onDragStart={e => {
+                                                        e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
+                                                            type: widget.type, template: widget.templates[0],
+                                                        }))
+                                                        e.dataTransfer.effectAllowed = 'move'
+                                                    }}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        cursor: 'grab',
+                                                        display: 'flex', alignItems: 'center', gap: 8,
+                                                        transition: 'background 0.1s',
+                                                    }}
+                                                    onMouseEnter={() => {
+                                                        onHoverWidget?.(widget)
+                                                        if (widget.templates.length <= 1) setExpandedWidget(null)
+                                                    }}
+                                                    onMouseLeave={() => onHoverWidget?.(null)}
+                                                    onClick={() => handleWidgetClick(widget)}
+                                                    onMouseOver={e => {
+                                                        (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'
+                                                    }}
+                                                    onMouseOut={e => {
+                                                        (e.currentTarget as HTMLElement).style.background = 'transparent'
+                                                    }}
+                                                >
+                                                    {/* Icon button */}
+                                                    <div style={{
+                                                        width: 28, height: 28,
+                                                        borderRadius: 8,
+                                                        background: `${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}15`,
+                                                        border: `1.5px solid ${widget.color || CATEGORY_COLORS[widget.category] || '#475569'}33`,
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                    }}>
+                                                        <WidgetIcon type={widget.type} size={14} />
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: 10, fontWeight: 600, color: '#e2e8f0' }}>
+                                                            {widget.label}
+                                                        </div>
+                                                        <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.3 }}>
+                                                            {widget.description}
+                                                        </div>
+                                                    </div>
+                                                    <span style={{
+                                                        fontSize: 7, padding: '1px 4px', borderRadius: 3,
+                                                        background: `${CATEGORY_COLORS[widget.category] || '#475569'}22`,
+                                                        color: CATEGORY_COLORS[widget.category] || '#475569',
+                                                        fontWeight: 600,
+                                                    }}>
+                                                        {widget.category}
+                                                    </span>
+                                                </div>
+
+                                                {/* Expanded templates */}
+                                                <AnimatePresence>
+                                                    {expandedWidget === widget.type && widget.templates.length > 1 && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: 'auto', opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            style={{ overflow: 'hidden', paddingLeft: 36 }}
+                                                        >
+                                                            {widget.templates.map((tmpl, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    data-testid={`template-${widget.type}-${i}`}
+                                                                    style={{
+                                                                        padding: '4px 12px', cursor: 'pointer',
+                                                                        fontSize: 9, color: '#94a3b8',
+                                                                        borderLeft: `2px solid ${widget.color}33`,
+                                                                        transition: 'all 0.1s',
+                                                                    }}
+                                                                    onClick={e => {
+                                                                        e.stopPropagation()
+                                                                        handleSelect(widget, tmpl)
+                                                                    }}
+                                                                    onMouseOver={e => {
+                                                                        (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.06)'
+                                                                            ; (e.currentTarget as HTMLElement).style.color = '#e2e8f0'
+                                                                    }}
+                                                                    onMouseOut={e => {
+                                                                        (e.currentTarget as HTMLElement).style.background = 'transparent'
+                                                                            ; (e.currentTarget as HTMLElement).style.color = '#94a3b8'
+                                                                    }}
+                                                                >
+                                                                    <div style={{ fontWeight: 600 }}>{tmpl.name}</div>
+                                                                    <div style={{ fontSize: 8, color: '#64748b' }}>{tmpl.description}</div>
+                                                                </div>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </motion.div>
+                                        )
+                                    })
+                                })()}
+                            </AnimatePresence>
+
+                            {filtered.length === 0 && (
+                                <div style={{ padding: '16px 12px', textAlign: 'center', fontSize: 9, color: '#475569' }}>
+                                    {search ? `No widgets match "${search}"` : 'No widgets in this category yet'}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
