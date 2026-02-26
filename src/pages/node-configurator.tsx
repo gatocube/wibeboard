@@ -488,7 +488,7 @@ export function NodeConfiguratorPage() {
                                         const gradientBorder = hasBorderColors
                                             ? (() => {
                                                 const c = tpl.ui!.borderColors!
-                                                const stops = c.map((col, idx) => `${col} ${Math.round((idx / (c.length - 1)) * 100)}%`)
+                                                const stops = c.map((col, idx) => `${col}88 ${Math.round((idx / (c.length - 1)) * 100)}%`)
                                                 return `linear-gradient(135deg, ${stops.join(', ')})`
                                             })()
                                             : undefined

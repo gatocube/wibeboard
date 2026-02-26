@@ -357,8 +357,8 @@ export function WidgetPicker({
                                     const smoothGradient = hasBorderColors
                                         ? (() => {
                                             const c = tmpl.ui!.borderColors!
-                                            const stops = c.map((col, idx) => `${col} ${Math.round((idx / c.length) * 100)}%`)
-                                            stops.push(`${c[0]} 100%`)
+                                            const stops = c.map((col, idx) => `${col}88 ${Math.round((idx / c.length) * 100)}%`)
+                                            stops.push(`${c[0]}88 100%`)
                                             return `conic-gradient(${stops.join(', ')})`
                                         })()
                                         : undefined
