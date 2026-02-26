@@ -79,7 +79,7 @@ const api = new FlowStudioApi()
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
-        const tpl = presetRegistry.getDefault(def?.type ?? '')
+        const tpl = presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
         return {
             nodeType: 'user',
             data: {
@@ -92,7 +92,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     if (widgetType === 'subflow') {
         const def = widgetRegistry.get('subflow')
-        const tpl = presetRegistry.getDefault(def?.type ?? '')
+        const tpl = presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
         return {
             nodeType: 'subflow',
             data: {
@@ -107,7 +107,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         const [prefix, variant] = widgetType.split(':')
         const def = widgetRegistry.get('job')
         const subType = prefix === 'ai' ? 'ai' : variant
-        const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === subType) || presetRegistry.getDefault(def?.type ?? '')
+        const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === subType) || presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
         const label = tpl?.defaultData.label || `${variant} Script`
         return {
             nodeType: 'job',
@@ -125,7 +125,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     // Fallback: treat as job with default JS script
     const def = widgetRegistry.get('job')
-    const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === 'js') || presetRegistry.getDefault(def?.type ?? '')
+    const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === 'js') || presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
     const label = tpl?.defaultData.label || 'Script'
     return {
         nodeType: 'job',

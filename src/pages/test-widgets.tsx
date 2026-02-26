@@ -231,7 +231,7 @@ export function TestWidgetsPage() {
 function WidgetGalleryInner() {
     const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('job') ?? null)
     const [selectedTemplate, setSelectedTemplate] = useState<PresetDefinition | null>(
-        presetRegistry.getDefault('job') ?? null
+        presetRegistry.getDefault('job', widgetRegistry.get('job')?.defaultPreset) ?? null
     )
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)

@@ -35,6 +35,8 @@ export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Informer' | '
 export interface WidgetDefinition extends RegistryItem {
     category: WidgetCategory
     ui: WidgetUI
+    /** Preset ID used when creating a node with no explicit preset */
+    defaultPreset: string
     disabled?: boolean
     /** Available sub-types for this widget */
     subTypes?: { value: string; label: string; color?: string }[]
@@ -45,6 +47,7 @@ export interface WidgetDefinition extends RegistryItem {
 const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     {
         type: 'job',
+        defaultPreset: 'job-js',
         label: 'Job',
         category: 'Job',
         tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
@@ -65,6 +68,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── SubFlow ──
     {
         type: 'subflow',
+        defaultPreset: 'subflow-default',
         label: 'SubFlow',
         category: 'SubFlow',
         tags: ['subflow', 'scope', 'container', 'nested', 'group', 'boundary'],
@@ -78,6 +82,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Layout ──
     {
         type: 'group',
+        defaultPreset: 'group-pipeline',
         label: 'Group',
         category: 'Layout',
         tags: ['group', 'container', 'pipeline', 'section'],
@@ -91,6 +96,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── User (human interaction) ──
     {
         type: 'user',
+        defaultPreset: 'user-code-reviewer',
         label: 'User',
         category: 'Job',
         tags: ['user', 'human', 'review', 'approval', 'gate', 'interaction'],
@@ -104,6 +110,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Informer ──
     {
         type: 'informer',
+        defaultPreset: 'informer-sticker',
         label: 'Informer',
         category: 'Informer',
         tags: ['informer', 'note', 'sticker', 'annotation', 'comment', 'post-it', 'label', 'group', 'section', 'web', 'iframe'],
@@ -122,6 +129,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Expectation ──
     {
         type: 'expectation',
+        defaultPreset: 'expectation-artifact',
         label: 'Expectation',
         category: 'Expectation',
         tags: ['expectation', 'assert', 'verify', 'check', 'artifact', 'tool', 'test'],
@@ -139,6 +147,7 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Starting (flow entry point) ──
     {
         type: 'starting',
+        defaultPreset: 'starting-default',
         label: 'Starting',
         category: 'Starting',
         tags: ['start', 'begin', 'entry', 'trigger', 'play'],

@@ -216,8 +216,14 @@ export class PresetRegistry extends Registry<PresetDefinition> {
         return this.getAll().filter(p => p.widgetType === widgetType && p.subType === subType)
     }
 
-    /** Get the first (default) preset for a widget type */
-    getDefault(widgetType: string): PresetDefinition | undefined {
+    /** Get the default preset for a widget type.
+     *  If defaultPresetId is provided (from widget.defaultPreset), returns that specific preset.
+     *  Otherwise returns the first preset for the widget type. */
+    getDefault(widgetType: string, defaultPresetId?: string): PresetDefinition | undefined {
+        if (defaultPresetId) {
+            const preset = this.get(defaultPresetId)
+            if (preset) return preset
+        }
         return this.getAll().find(p => p.widgetType === widgetType)
     }
 }
