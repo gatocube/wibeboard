@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
-import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/widgets/widget-registry'
+import { widgetRegistry, type WidgetDefinition, type WidgetTemplate } from '@/engine/widget-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { CodeEditor } from '@/kit'
@@ -27,7 +27,8 @@ import {
 
 // ── Node component map ──────────────────────────────────────────────────────────
 
-const NODE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- widget components expect NodeProps but we render standalone
+const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     job: JobNode,
     group: GroupNode,
     note: NoteNode,
@@ -245,7 +246,6 @@ function categorizeField(key: string): 'identity' | 'state' | 'config' | 'intern
 
 function buildPreviewData(
     nodeData: Record<string, any>,
-    widgetDef: WidgetDefinition,
     width: number,
     height: number,
     debugMode: boolean,
@@ -337,12 +337,12 @@ export function NodeConfiguratorPage() {
     const previewW = widgetDef.defaultWidth || 200
     const previewH = widgetDef.defaultHeight || 120
     const previewData = useMemo(
-        () => buildPreviewData(nodeData, widgetDef, previewW, previewH, false),
-        [nodeData, widgetDef, previewW, previewH],
+        () => buildPreviewData(nodeData, previewW, previewH, false),
+        [nodeData, previewW, previewH],
     )
     const debugPreviewData = useMemo(
-        () => buildPreviewData(nodeData, widgetDef, previewW, previewH, true),
-        [nodeData, widgetDef, previewW, previewH],
+        () => buildPreviewData(nodeData, previewW, previewH, true),
+        [nodeData, previewW, previewH],
     )
 
     const PreviewComponent = NODE_COMPONENTS[widgetDef.type]
