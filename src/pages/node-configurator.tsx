@@ -486,7 +486,11 @@ export function NodeConfiguratorPage() {
                                         const presetIcon = tpl.ui?.icons?.default || widgetDef.ui.icons.default
                                         const hasBorderColors = tpl.ui?.borderColors && tpl.ui.borderColors.length > 1
                                         const gradientBorder = hasBorderColors
-                                            ? `linear-gradient(135deg, ${tpl.ui!.borderColors!.join(', ')})`
+                                            ? (() => {
+                                                const c = tpl.ui!.borderColors!
+                                                const stops = c.map((col, idx) => `${col} ${Math.round((idx / (c.length - 1)) * 100)}%`)
+                                                return `linear-gradient(135deg, ${stops.join(', ')})`
+                                            })()
                                             : undefined
                                         return (
                                             <button

@@ -353,6 +353,15 @@ export function WidgetPicker({
                                     const presetIcon = tmpl.ui?.icons?.default || widget.ui.icons.default
                                     const hasBorderColors = tmpl.ui?.borderColors && tmpl.ui.borderColors.length > 1
                                     const tileColor = tmpl.ui?.color || widget.ui.color
+                                    // Build smooth gradient: evenly spaced stops + repeat first color at 100%
+                                    const smoothGradient = hasBorderColors
+                                        ? (() => {
+                                            const c = tmpl.ui!.borderColors!
+                                            const stops = c.map((col, idx) => `${col} ${Math.round((idx / c.length) * 100)}%`)
+                                            stops.push(`${c[0]} 100%`)
+                                            return `conic-gradient(${stops.join(', ')})`
+                                        })()
+                                        : undefined
                                     return (
                                         <div
                                             key={`${widget.type}-${i}`}
@@ -371,7 +380,7 @@ export function WidgetPicker({
                                             style={{
                                                 width: 48, height: 48, borderRadius: 8,
                                                 background: hasBorderColors
-                                                    ? `conic-gradient(${tmpl.ui!.borderColors!.join(', ')})`
+                                                    ? smoothGradient
                                                     : `${tileColor}15`,
                                                 border: hasBorderColors ? 'none' : `1px solid ${tileColor}33`,
                                                 padding: hasBorderColors ? 1 : 0,
