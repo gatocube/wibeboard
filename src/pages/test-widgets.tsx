@@ -312,178 +312,8 @@ function WidgetGalleryInner() {
                 )}
             </div>
 
-            {/* Right: Preview area */}
+            {/* Center: Preview area */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                {/* Top: State controls */}
-                <div style={{
-                    padding: '8px 16px',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    display: 'flex', alignItems: 'center', gap: 16,
-                    flexShrink: 0,
-                    background: 'rgba(15,15,26,0.95)',
-                }}>
-                    {/* Selected widget info */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 'auto' }}>
-                        {selectedWidget && (
-                            <>
-                                <span style={{ fontSize: 18 }}>{selectedWidget.icon}</span>
-                                <div>
-                                    <div style={{ fontSize: 12, fontWeight: 700, color: selectedWidget.color, fontFamily: 'Inter' }}>
-                                        {selectedWidget.label}
-                                    </div>
-                                    <div style={{ fontSize: 9, color: '#64748b', fontFamily: 'Inter' }}>
-                                        {selectedTemplate?.name} · {selectedWidget.type}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* SubType selector */}
-                    {selectedWidget?.subTypes && selectedWidget.subTypes.length > 1 && (
-                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                            <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>SubType</span>
-                            {selectedWidget.subTypes.map(st => (
-                                <button
-                                    key={st.value}
-                                    data-testid={`subtype-${st.value}`}
-                                    onClick={() => setActiveSubType(st.value)}
-                                    style={{
-                                        padding: '3px 8px', borderRadius: 4,
-                                        border: 'none', cursor: 'pointer',
-                                        background: activeSubType === st.value ? `${st.color || '#8b5cf6'}33` : 'rgba(255,255,255,0.04)',
-                                        color: activeSubType === st.value ? (st.color || '#8b5cf6') : '#64748b',
-                                        fontSize: 9, fontWeight: 600,
-                                        fontFamily: "'JetBrains Mono', monospace",
-                                        textTransform: 'uppercase',
-                                    }}
-                                >
-                                    {st.label}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Status buttons */}
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                        <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>Status</span>
-                        {STATUSES.map(s => (
-                            <button
-                                key={s}
-                                data-testid={`status-${s}`}
-                                onClick={() => {
-                                    setStatus(s)
-                                    setProgress(s === 'done' ? 100 : s === 'running' ? 55 : s === 'waking' ? 10 : 0)
-                                }}
-                                style={{
-                                    padding: '3px 8px', borderRadius: 4,
-                                    border: 'none', cursor: 'pointer',
-                                    background: status === s ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
-                                    color: status === s ? '#8b5cf6' : '#64748b',
-                                    fontSize: 9, fontWeight: 600,
-                                    fontFamily: "'JetBrains Mono', monospace",
-                                    textTransform: 'uppercase',
-                                }}
-                            >
-                                {s}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Knock buttons */}
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                        <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>Knock</span>
-                        {KNOCK_OPTIONS.map(k => (
-                            <button
-                                key={k.label}
-                                data-testid={`knock-${k.value || 'none'}`}
-                                onClick={() => {
-                                    setKnockSide(k.value)
-                                    setCommSide(null)
-                                    if (k.value) setStatus('waking')
-                                }}
-                                style={{
-                                    padding: '3px 8px', borderRadius: 4,
-                                    border: 'none', cursor: 'pointer',
-                                    background: knockSide === k.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
-                                    color: knockSide === k.value ? '#8b5cf6' : '#64748b',
-                                    fontSize: 9, fontWeight: 600,
-                                    fontFamily: "'JetBrains Mono', monospace",
-                                }}
-                            >
-                                {k.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Communicate buttons */}
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                        <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600, marginRight: 4 }}>Comm</span>
-                        {COMM_OPTIONS.map(c => (
-                            <button
-                                key={c.label}
-                                data-testid={`comm-${c.value || 'none'}`}
-                                onClick={() => {
-                                    setCommSide(c.value)
-                                    setKnockSide(null)
-                                    if (c.value && status === 'idle') setStatus('running')
-                                }}
-                                style={{
-                                    padding: '3px 8px', borderRadius: 4,
-                                    border: 'none', cursor: 'pointer',
-                                    background: commSide === c.value ? 'rgba(6,182,212,0.2)' : 'rgba(255,255,255,0.04)',
-                                    color: commSide === c.value ? '#06b6d4' : '#64748b',
-                                    fontSize: 9, fontWeight: 600,
-                                    fontFamily: "'JetBrains Mono', monospace",
-                                }}
-                            >
-                                {c.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Progress slider */}
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <span style={{ fontSize: 9, color: '#475569', fontFamily: 'Inter', fontWeight: 600 }}>Progress</span>
-                        <input
-                            type="range"
-                            min={0} max={100} value={progress}
-                            onChange={e => setProgress(Number(e.target.value))}
-                            style={{ width: 80, accentColor: '#8b5cf6' }}
-                        />
-                        <span style={{ fontSize: 9, color: '#64748b', fontFamily: "'JetBrains Mono', monospace", minWidth: 28 }}>
-                            {progress}%
-                        </span>
-                    </div>
-
-                    {/* Separator */}
-                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.06)' }} />
-
-                    {/* Toggle switches */}
-                    {[{ label: 'Connections', value: showConnections, set: setShowConnections },
-                    { label: 'Animations', value: showAnimations, set: setShowAnimations },
-                    { label: 'Thinking', value: showThinking, set: setShowThinking },
-                    { label: 'Raw', value: showRaw, set: setShowRaw },
-                    { label: '🐛 Debug', value: debugMode, set: setDebugMode },
-                    ].map(toggle => (
-                        <button
-                            key={toggle.label}
-                            onClick={() => toggle.set(!toggle.value)}
-                            style={{
-                                padding: '3px 8px', borderRadius: 4,
-                                border: 'none', cursor: 'pointer',
-                                background: toggle.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
-                                color: toggle.value ? '#8b5cf6' : '#64748b',
-                                fontSize: 9, fontWeight: 600,
-                                fontFamily: "'JetBrains Mono', monospace",
-                                display: 'flex', alignItems: 'center', gap: 4,
-                            }}
-                        >
-                            <span style={{ fontSize: 8 }}>{toggle.value ? '☑' : '☐'}</span>
-                            {toggle.label}
-                        </button>
-                    ))}
-                </div>
 
                 {/* Theme panes */}
                 {selectedWidget && selectedTemplate ? (
@@ -789,6 +619,193 @@ function WidgetGalleryInner() {
                         Select a widget from the left panel
                     </div>
                 )}
+            </div>
+
+            {/* Right: Settings sidebar */}
+            <div style={{
+                width: 180, flexShrink: 0,
+                borderLeft: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(15,15,26,0.95)',
+                display: 'flex', flexDirection: 'column',
+                overflow: 'auto',
+                padding: '12px 10px',
+                gap: 12,
+            }}>
+                {/* Selected widget info */}
+                {selectedWidget && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                        <span style={{ fontSize: 18 }}>{selectedWidget.icon}</span>
+                        <div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: selectedWidget.color, fontFamily: 'Inter' }}>
+                                {selectedWidget.label}
+                            </div>
+                            <div style={{ fontSize: 8, color: '#64748b', fontFamily: 'Inter' }}>
+                                {selectedTemplate?.name} · {selectedWidget.type}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* SubType selector */}
+                {selectedWidget?.subTypes && selectedWidget.subTypes.length > 1 && (
+                    <div>
+                        <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>SubType</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                            {selectedWidget.subTypes.map(st => (
+                                <button
+                                    key={st.value}
+                                    data-testid={`subtype-${st.value}`}
+                                    onClick={() => setActiveSubType(st.value)}
+                                    style={{
+                                        padding: '3px 6px', borderRadius: 4,
+                                        border: 'none', cursor: 'pointer',
+                                        background: activeSubType === st.value ? `${st.color || '#8b5cf6'}33` : 'rgba(255,255,255,0.04)',
+                                        color: activeSubType === st.value ? (st.color || '#8b5cf6') : '#64748b',
+                                        fontSize: 8, fontWeight: 600,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        textTransform: 'uppercase' as const,
+                                    }}
+                                >
+                                    {st.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Status */}
+                <div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>Status</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        {STATUSES.map(s => (
+                            <button
+                                key={s}
+                                data-testid={`status-${s}`}
+                                onClick={() => {
+                                    setStatus(s)
+                                    setProgress(s === 'done' ? 100 : s === 'running' ? 55 : s === 'waking' ? 10 : 0)
+                                }}
+                                style={{
+                                    padding: '3px 6px', borderRadius: 4,
+                                    border: 'none', cursor: 'pointer',
+                                    background: status === s ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
+                                    color: status === s ? '#8b5cf6' : '#64748b',
+                                    fontSize: 8, fontWeight: 600,
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                    textTransform: 'uppercase' as const,
+                                }}
+                            >
+                                {s}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Knock */}
+                <div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>Knock</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        {KNOCK_OPTIONS.map(k => (
+                            <button
+                                key={k.label}
+                                data-testid={`knock-${k.value || 'none'}`}
+                                onClick={() => {
+                                    setKnockSide(k.value)
+                                    setCommSide(null)
+                                    if (k.value) setStatus('waking')
+                                }}
+                                style={{
+                                    padding: '3px 6px', borderRadius: 4,
+                                    border: 'none', cursor: 'pointer',
+                                    background: knockSide === k.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
+                                    color: knockSide === k.value ? '#8b5cf6' : '#64748b',
+                                    fontSize: 8, fontWeight: 600,
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                }}
+                            >
+                                {k.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Comm */}
+                <div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>Comm</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        {COMM_OPTIONS.map(c => (
+                            <button
+                                key={c.label}
+                                data-testid={`comm-${c.value || 'none'}`}
+                                onClick={() => {
+                                    setCommSide(c.value)
+                                    setKnockSide(null)
+                                    if (c.value && status === 'idle') setStatus('running')
+                                }}
+                                style={{
+                                    padding: '3px 6px', borderRadius: 4,
+                                    border: 'none', cursor: 'pointer',
+                                    background: commSide === c.value ? 'rgba(6,182,212,0.2)' : 'rgba(255,255,255,0.04)',
+                                    color: commSide === c.value ? '#06b6d4' : '#64748b',
+                                    fontSize: 8, fontWeight: 600,
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                }}
+                            >
+                                {c.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Progress */}
+                <div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>Progress</div>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <input
+                            type="range"
+                            min={0} max={100} value={progress}
+                            onChange={e => setProgress(Number(e.target.value))}
+                            style={{ flex: 1, accentColor: '#8b5cf6' }}
+                        />
+                        <span style={{ fontSize: 8, color: '#64748b', fontFamily: "'JetBrains Mono', monospace", minWidth: 24 }}>
+                            {progress}%
+                        </span>
+                    </div>
+                </div>
+
+                {/* Separator */}
+                <div style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+
+                {/* Toggles */}
+                <div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>Display</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {[{ label: 'Connections', value: showConnections, set: setShowConnections },
+                        { label: 'Animations', value: showAnimations, set: setShowAnimations },
+                        { label: 'Thinking', value: showThinking, set: setShowThinking },
+                        { label: 'Raw', value: showRaw, set: setShowRaw },
+                        { label: '🐛 Debug', value: debugMode, set: setDebugMode },
+                        ].map(toggle => (
+                            <button
+                                key={toggle.label}
+                                onClick={() => toggle.set(!toggle.value)}
+                                style={{
+                                    padding: '4px 6px', borderRadius: 4,
+                                    border: 'none', cursor: 'pointer',
+                                    background: toggle.value ? 'rgba(139,92,246,0.15)' : 'transparent',
+                                    color: toggle.value ? '#a78bfa' : '#64748b',
+                                    fontSize: 9, fontWeight: 500,
+                                    fontFamily: "'JetBrains Mono', monospace",
+                                    display: 'flex', alignItems: 'center', gap: 6,
+                                    textAlign: 'left',
+                                }}
+                            >
+                                <span style={{ fontSize: 9, width: 12 }}>{toggle.value ? '☑' : '☐'}</span>
+                                {toggle.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     )
