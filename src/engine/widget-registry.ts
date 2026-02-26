@@ -1,15 +1,17 @@
 /**
  * Widget Registry — available node types for the builder.
  *
- * Each widget has: type, label, ui, category, description, templates.
- * Templates define default data for creating new nodes.
+ * Each widget has: type, label, ui, category, description, presets.
+ * Presets define default data for creating new nodes.
  *
  * The `subTypes` array lists the available sub-type specializations.
- * For widgets with subTypes, templates carry `subType` in defaultData.
+ * For widgets with subTypes, presets carry `subType` in defaultData.
  *
  * ALL sizes are stored in **grid units** (gu).
  * Use GRID_CELL to convert: pixels = gu * GRID_CELL.
  */
+
+import { Registry, type RegistryItem } from './registry'
 
 export const GRID_CELL = 20       // px per grid unit
 export const MIN_NODE_SIZE = 3    // minimum node dimension: 3×3 gu (60×60 px)
@@ -46,12 +48,8 @@ export interface WidgetPreset {
 
 export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Informer' | 'Expectation' | 'Starting' | 'SubFlow'
 
-export interface WidgetDefinition {
-    type: string
-    label: string
+export interface WidgetDefinition extends RegistryItem {
     category: WidgetCategory
-    tags: string[]
-    description: string
     ui: WidgetUI
     presets: WidgetPreset[]
     disabled?: boolean
@@ -61,7 +59,7 @@ export interface WidgetDefinition {
 
 // ── Widget Definitions ─────────────────────────────────────────────────────────
 
-const WIDGETS: WidgetDefinition[] = [
+const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     {
         type: 'job',
         label: 'Job',
@@ -321,33 +319,31 @@ const WIDGETS: WidgetDefinition[] = [
 
 // ── Registry API ───────────────────────────────────────────────────────────────
 
-class WidgetRegistry {
-    private widgets = WIDGETS
+class WidgetRegistry extends Registry<WidgetDefinition> {
     private usedTypes = new Set<string>()
 
-    getAll(): WidgetDefinition[] {
-        return this.widgets
+    constructor(widgets: Omit<WidgetDefinition, 'id'>[]) {
+        // Auto-set id = type for each widget
+        const withIds = widgets.map(w => ({ ...w, id: w.type }) as WidgetDefinition)
+        super(withIds.map(w => [w.type, w]))
     }
 
-    get(type: string): WidgetDefinition | undefined {
-        return this.widgets.find(w => w.type === type)
-    }
-
+    /** Alias for get() */
     getByType(type: string): WidgetDefinition | undefined {
         return this.get(type)
     }
 
     getCategories(): WidgetCategory[] {
-        return [...new Set(this.widgets.map(w => w.category))]
+        return [...new Set(this.getAll().map(w => w.category))]
     }
 
     getByCategory(category: WidgetCategory): WidgetDefinition[] {
-        return this.widgets.filter(w => w.category === category)
+        return this.getAll().filter(w => w.category === category)
     }
 
     search(query: string): WidgetDefinition[] {
         const q = query.toLowerCase()
-        return this.widgets.filter(w =>
+        return this.getAll().filter(w =>
             w.label.toLowerCase().includes(q) ||
             w.description.toLowerCase().includes(q) ||
             w.tags.some(t => t.includes(q))
@@ -359,7 +355,7 @@ class WidgetRegistry {
     }
 
     getRecent(): WidgetDefinition[] {
-        return this.widgets.filter(w => this.usedTypes.has(w.type))
+        return this.getAll().filter(w => this.usedTypes.has(w.type))
     }
 
     // ── Pixel helpers (convert grid units → px) ──
@@ -386,4 +382,4 @@ class WidgetRegistry {
     }
 }
 
-export const widgetRegistry = new WidgetRegistry()
+export const widgetRegistry = new WidgetRegistry(WIDGETS)

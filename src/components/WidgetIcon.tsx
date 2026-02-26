@@ -28,9 +28,11 @@ import {
 
 // ── Icon mapping ────────────────────────────────────────────────────────────────
 
+import { IconRegistry, type IconDefinition } from '@/engine/icon-registry'
+
 export type WidgetIconName =
     | 'agent' | 'script-js' | 'script-ts' | 'script-sh' | 'script-py'
-    | 'group' | 'expectation' | 'note' | 'subflow'
+    | 'group' | 'expectation' | 'informer' | 'subflow'
 
 const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'agent': Sparkles, 'script-js': Terminal, 'script-ts': Terminal,
@@ -60,6 +62,8 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'file-code': FileCode, 'file-type': FileType, 'sparkles': Sparkles,
     // Widget type aliases (so widget.type lookups also work)
     'job': Briefcase, 'expectation': ClipboardCheck,
+    'sticky-note': StickyNote, 'check-circle-2': CheckCircle2,
+    'user': UserCircle, 'package': Package, 'globe': Globe,
 }
 
 export const WIDGET_ICON_COLORS: Record<string, string> = {
@@ -87,11 +91,26 @@ export const WIDGET_ICON_COLORS: Record<string, string> = {
     'volume': '#3b82f6', 'sleep': '#64748b', 'timer': '#8b5cf6', 'clock': '#f59e0b',
     'starting': '#22c55e',
     'subflow': '#6366f1',
+    'sticky-note': '#fbbf24', 'check-circle-2': '#10b981',
+    'user': '#f59e0b', 'package': '#6366f1', 'globe': '#06b6d4',
 }
+
+// ── Build IconRegistry instance from existing maps ──────────────────────────────
+
+const iconEntries: Omit<IconDefinition, 'id'>[] = Object.keys(ICON_MAP).map(key => ({
+    type: key,
+    label: key,
+    description: `Icon: ${key}`,
+    tags: [key],
+    component: ICON_MAP[key],
+    color: WIDGET_ICON_COLORS[key] ?? '#8b5cf6',
+}))
+
+export const iconRegistry = new IconRegistry(iconEntries)
 
 export const CATEGORY_ICONS: Record<string, React.ComponentType<LucideProps>> = {
     'AI': Sparkles, 'Script': Terminal, 'Expectation': CheckCircle2,
-    'Note': StickyNote, 'Layout': Package, 'Integration': Globe,
+    'Informer': StickyNote, 'Layout': Package, 'Integration': Globe,
     'SubFlow': Workflow,
     'Workflow': Workflow, 'Dev': Code2, 'Starting': Play,
 }
@@ -123,8 +142,8 @@ export function WidgetIcon({ type, size = 16, color, className, style }: WidgetI
             return <C size={size} color={color || pi.color} />
         }
     }
-    const Icon = ICON_MAP[type] || Package
-    return <Icon size={size} color={color || WIDGET_ICON_COLORS[type] || '#8b5cf6'} className={className} style={style} />
+    const Icon = iconRegistry.getComponent(type, Package)
+    return <Icon size={size} color={color || iconRegistry.getColor(type)} className={className} style={style} />
 }
 
 // ── Animated Icons ──────────────────────────────────────────────────────────────
