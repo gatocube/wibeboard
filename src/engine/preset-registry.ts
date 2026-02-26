@@ -222,19 +222,19 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'expectation-artifact', widgetType: 'expectation', subType: 'artifact',
         label: 'Artifact', description: 'Expects agent to generate an artifact',
         tags: ['expectation', 'artifact', 'assert'],
-        defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', status: 'pending' },
+        defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', status: 'idle', color: '#ec4899' },
     },
     {
         type: 'expectation-tool-call', widgetType: 'expectation', subType: 'tool-call',
         label: 'Tool Call', description: 'Expects agent to call a specific tool',
         tags: ['expectation', 'tool', 'call', 'assert'],
-        defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', status: 'pending' },
+        defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', status: 'idle', color: '#06b6d4' },
     },
     {
         type: 'expectation-pr', widgetType: 'expectation', subType: 'tool-call',
         label: 'Pull Request', description: 'Expects agent to create a pull request',
         tags: ['expectation', 'pr', 'pull-request'],
-        defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+        defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'idle', color: '#8b5cf6' },
     },
 
     // ── Starting preset ──

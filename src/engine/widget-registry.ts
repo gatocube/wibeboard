@@ -142,8 +142,9 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
             defaultSize: { w: 8, h: 4 },
         },
         subTypes: [
-            { value: 'artifact', label: 'Artifact', color: '#10b981' },
+            { value: 'artifact', label: 'Artifact', color: '#ec4899' },
             { value: 'tool-call', label: 'Tool Call', color: '#06b6d4' },
+            { value: 'job', label: 'Job', color: '#8b5cf6' },
         ],
     },
     // ── Starting (flow entry point) ──
