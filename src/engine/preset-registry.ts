@@ -7,7 +7,7 @@
  * Extends Registry<PresetDefinition> for standard get/getAll/search/has/keys.
  */
 
-import { Registry, type RegistryItem } from './registry'
+import { Registry, type RegistryItem } from './core'
 import type { WidgetUI } from './widget-registry'
 
 // ── Types ───────────────────────────────────────────────────────────────────────

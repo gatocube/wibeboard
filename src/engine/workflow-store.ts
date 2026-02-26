@@ -14,6 +14,7 @@
  */
 
 import * as Automerge from '@automerge/automerge'
+import { generateId, now } from './core'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -113,10 +114,7 @@ function idbGetAll<T>(db: IDBDatabase, store: string): Promise<T[]> {
 
 // ── Store ──────────────────────────────────────────────────────────────────
 
-let _idCounter = 0
-function generateId(): string {
-    return `wf-${Date.now()}-${++_idCounter}`
-}
+// ID generation moved to engine/core/utils.ts
 
 export class WorkflowStore {
     private db: IDBDatabase | null = null
@@ -138,14 +136,14 @@ export class WorkflowStore {
 
     /** Create a new empty workflow */
     async create(name: string): Promise<WorkflowDoc> {
-        const now = Date.now()
+        const ts = now()
         const doc: WorkflowDoc = {
-            id: generateId(),
+            id: generateId('wf'),
             name,
             nodes: [],
             edges: [],
-            createdAt: now,
-            updatedAt: now,
+            createdAt: ts,
+            updatedAt: ts,
         }
         await this.saveDoc(doc)
         return doc
@@ -162,7 +160,7 @@ export class WorkflowStore {
 
     /** Save a workflow (full doc with nodes/edges) */
     async save(doc: WorkflowDoc): Promise<void> {
-        const updated = { ...doc, updatedAt: Date.now() }
+        const updated = { ...doc, updatedAt: now() }
         await this.saveDoc(updated)
     }
 

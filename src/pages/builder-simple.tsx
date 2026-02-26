@@ -23,6 +23,7 @@ import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { widgetRegistry } from '@/engine/widget-registry'
 import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
+import { generateId } from '@/engine/core'
 import { AgentMessenger } from '@/engine/AgentMessenger'
 import { runScriptInBrowser } from '@/engine/script-runner'
 import { EventsPanel, type FlowEvent } from '@/flow-studio/EventsPanel'
@@ -51,7 +52,7 @@ interface Workflow {
 
 function createWorkflow(name: string): Workflow {
     return {
-        id: `wf-${Date.now()}`,
+        id: generateId('wf'),
         name,
         nodes: [api.createStartNode()],
         edges: [],
@@ -310,7 +311,7 @@ function BuilderSimpleInner() {
     // ── Add After handler ──
     const handleAddAfter = useCallback((sourceNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
-        const newNodeId = `node-${Date.now()}`
+        const newNodeId = generateId('node')
         const sourceNode = nodesRef.current.find(n => n.id === sourceNodeId)
         const position = sourceNode
             ? api.positionAfter(sourceNode, nodeType, data)
@@ -349,7 +350,7 @@ function BuilderSimpleInner() {
     // ── Add Before handler ──
     const handleAddBefore = useCallback((targetNodeId: string, widgetType: string) => {
         const { nodeType, data } = resolveWidgetType(widgetType)
-        const newNodeId = `node-${Date.now()}`
+        const newNodeId = generateId('node')
 
         mutateState((prevNodes, prevEdges) => {
             const targetNode = prevNodes.find(n => n.id === targetNodeId)
@@ -413,7 +414,7 @@ function BuilderSimpleInner() {
         // Listen for messages sent during execution
         const unsub = messenger.onMessage((msg) => {
             setEvents(prev => [...prev, {
-                id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                id: generateId('evt'),
                 timestamp: msg.timestamp,
                 nodeId,
                 nodeName,

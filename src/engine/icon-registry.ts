@@ -6,7 +6,7 @@
  */
 
 import type { ComponentType } from 'react'
-import { Registry, type RegistryItem } from './registry'
+import { Registry, type RegistryItem } from './core'
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 

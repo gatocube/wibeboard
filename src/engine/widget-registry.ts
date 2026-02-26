@@ -8,7 +8,7 @@
  * Use GRID_CELL to convert: pixels = gu * GRID_CELL.
  */
 
-import { Registry, type RegistryItem } from './registry'
+import { Registry, type RegistryItem } from './core'
 
 export const GRID_CELL = 20       // px per grid unit
 export const MIN_NODE_SIZE = 3    // minimum node dimension: 3×3 gu (60×60 px)

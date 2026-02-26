@@ -20,6 +20,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry } from '@/engine/widget-registry'
 import { type PresetDefinition } from '@/engine/preset-registry'
+import { generateId } from '@/engine/core'
 
 import type { FlowStudioProps, ThemeKey, NodeSize } from './types'
 import { useFlowStudioStore } from './FlowStudioStore'
@@ -222,7 +223,7 @@ export const FlowStudio = observer(function FlowStudio({
         const safePos = findNonOverlappingPosition(nodes, defaultW, defaultH, position)
 
         const rect = { x: safePos.x, y: safePos.y, width: defaultW, height: defaultH }
-        const nodeId = `node-${Date.now()}`
+        const nodeId = generateId('node')
 
         onNodeCreatedRef.current?.(nodeId, widgetType, template, rect, sourceNodeId)
         widgetRegistry.markUsed(widgetType)

@@ -11,6 +11,7 @@ import { JobNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import type { PresetDefinition } from '@/engine/preset-registry'
+import { generateId, now } from '@/engine/core'
 import { TimelineDots } from '@/components/TimelineDots'
 import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
 
@@ -108,7 +109,7 @@ function BuilderInner() {
             await store.save({
                 id: activeWorkflowId, name: workflowName,
                 nodes: plainNodes as any, edges: plainEdges as any,
-                createdAt: Date.now(), updatedAt: Date.now(),
+                createdAt: now(), updatedAt: now(),
             })
             setDirty(false)
             // Refresh list to update node counts
@@ -344,7 +345,7 @@ function BuilderInner() {
                     : targetNode.position.x - 200
                 const newY = targetNode.position.y
 
-                const newNodeId = `node-${Date.now()}`
+                const newNodeId = generateId('node')
                 setNodes(nds => [...nds, {
                     id: newNodeId,
                     type: 'placeholder',
