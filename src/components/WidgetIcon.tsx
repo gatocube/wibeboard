@@ -35,7 +35,7 @@ export type WidgetIconName =
 const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'agent': Sparkles, 'script-js': Terminal, 'script-ts': Terminal,
     'script-sh': Terminal, 'script-py': Terminal, 'group': Package,
-    'expectation': CheckCircle2, 'note': StickyNote,
+    'note': StickyNote,
     'note-sticker': StickyNote, 'note-group': Package, 'note-label': StickyNote,
     'bot': Bot, 'api': Globe, 'webhook': Zap, 'workflow': Workflow,
     'function': Braces, 'code': Code2, 'file': FileCode2, 'doc': FileText,
@@ -58,6 +58,8 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
     'briefcase': Briefcase, 'clipboard-check': ClipboardCheck,
     'user-circle': UserCircle, 'brain': Brain, 'wrench': Wrench,
     'file-code': FileCode, 'file-type': FileType, 'sparkles': Sparkles,
+    // Widget type aliases (so widget.type lookups also work)
+    'job': Briefcase, 'expectation': ClipboardCheck,
 }
 
 export const WIDGET_ICON_COLORS: Record<string, string> = {
@@ -121,7 +123,7 @@ export function WidgetIcon({ type, size = 16, color, className, style }: WidgetI
             return <C size={size} color={color || pi.color} />
         }
     }
-    const Icon = ICON_MAP[type] || Cpu
+    const Icon = ICON_MAP[type] || Package
     return <Icon size={size} color={color || WIDGET_ICON_COLORS[type] || '#8b5cf6'} className={className} style={style} />
 }
 
