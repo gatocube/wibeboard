@@ -67,6 +67,10 @@ function AgentVariant({ data }: { data: any }) {
     const isActive = isWaking || isRunning || !!(data.knockSide)
     const secondaryColor = isActive ? '#06b6d4' : '#06b6d488'
     const tertiaryColor = isActive ? '#f59e0b' : '#f59e0b66'
+    // Use borderColors from preset if available, otherwise fall back to hardcoded 3-color
+    const borderGradient = data.borderColors && data.borderColors.length > 1
+        ? `linear-gradient(135deg, ${data.borderColors.map((c: string) => isActive ? c : `${c}88`).join(', ')})`
+        : `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`
     const knockOut = data.knockSide === 'out'
     const hasKnock = !!(data.knockSide)
     const kColor = data.knockColor || '#f97316'
@@ -85,7 +89,7 @@ function AgentVariant({ data }: { data: any }) {
                         width: w, height: h,
                         padding: 1,
                         borderRadius: 12,
-                        background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
+                        background: borderGradient,
                         boxShadow: isActive
                             ? `0 0 12px ${color}44, 0 0 24px ${color}22`
                             : `0 2px 8px rgba(0,0,0,0.3)`,
@@ -140,7 +144,7 @@ function AgentVariant({ data }: { data: any }) {
                     width: w, height: h,
                     padding: 1.5,
                     borderRadius: 14,
-                    background: `linear-gradient(135deg, ${color}, ${secondaryColor}, ${tertiaryColor})`,
+                    background: borderGradient,
                     boxShadow: isActive
                         ? `0 0 20px ${color}33, 0 0 40px ${color}15`
                         : `0 4px 16px rgba(0,0,0,0.3)`,

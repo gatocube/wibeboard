@@ -353,13 +353,12 @@ export function WidgetPicker({
                                     const presetIcon = tmpl.ui?.icons?.default || widget.ui.icons.default
                                     const hasBorderColors = tmpl.ui?.borderColors && tmpl.ui.borderColors.length > 1
                                     const tileColor = tmpl.ui?.color || widget.ui.color
-                                    // Build smooth gradient: evenly spaced stops + repeat first color at 100%
+                                    // Build smooth gradient matching JobNode's linear-gradient(135deg)
                                     const smoothGradient = hasBorderColors
                                         ? (() => {
                                             const c = tmpl.ui!.borderColors!
-                                            const stops = c.map((col, idx) => `${col}88 ${Math.round((idx / c.length) * 100)}%`)
-                                            stops.push(`${c[0]}88 100%`)
-                                            return `conic-gradient(${stops.join(', ')})`
+                                            const stops = c.map((col, idx) => `${col}88 ${Math.round((idx / (c.length - 1)) * 100)}%`)
+                                            return `linear-gradient(135deg, ${stops.join(', ')})`
                                         })()
                                         : undefined
                                     return (

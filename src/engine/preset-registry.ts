@@ -35,7 +35,8 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         defaultData: {
             label: 'AI Agent', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
-            color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0,
+            color: '#8b5cf6', borderColors: ['#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b'],
+            status: 'idle', execTime: '—', callsCount: 0,
         },
     },
     {
@@ -46,7 +47,8 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         defaultData: {
             label: 'Planner', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
-            color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0,
+            color: '#8b5cf6', borderColors: ['#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b'],
+            status: 'idle', execTime: '—', callsCount: 0,
         },
     },
     {
@@ -57,7 +59,8 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         defaultData: {
             label: 'Worker', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
-            color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0,
+            color: '#06b6d4', borderColors: ['#06b6d4', '#22c55e', '#f59e0b', '#8b5cf6'],
+            status: 'idle', execTime: '—', callsCount: 0,
         },
     },
     {
@@ -68,7 +71,8 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         defaultData: {
             label: 'Reviewer', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
-            color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0,
+            color: '#f59e0b', borderColors: ['#f59e0b', '#8b5cf6', '#06b6d4', '#22c55e'],
+            status: 'idle', execTime: '—', callsCount: 0,
         },
     },
     {
