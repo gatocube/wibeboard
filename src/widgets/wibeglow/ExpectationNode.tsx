@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, XCircle, Clock, FileText, Wrench } from 'lucide-react'
+import { resolveState } from '@/widgets/resolve-state'
 
 /**
  * ExpectationNode (wibeglow) — assertion node connected on the side of an agent.
@@ -34,7 +35,7 @@ const VARIANT_ICON = {
 export function ExpectationNode({ data }: { data: any }) {
     const w = data.width || 140
     const h = data.height || 60
-    const status: keyof typeof STATUS_CONFIG = data.status || 'pending'
+    const status: keyof typeof STATUS_CONFIG = resolveState(data).status as any || 'pending'
     const variant = data.variant || 'artifact'
     const cfg = STATUS_CONFIG[status]
     const VariantIcon = VARIANT_ICON[variant as keyof typeof VARIANT_ICON] || FileText

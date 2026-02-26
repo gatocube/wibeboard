@@ -6,6 +6,7 @@
  */
 
 import { PreviewCanvas } from '@/components/PreviewCanvas'
+import { resolveState } from '@/widgets/resolve-state'
 
 export function RawNode({ data }: { data: Record<string, any> }) {
     const w = data.width || 220
@@ -42,12 +43,12 @@ export function RawNode({ data }: { data: Record<string, any> }) {
                 }}>
                     {data.label || data.type || 'raw'}
                 </span>
-                {data.status && (
+                {resolveState(data).status && (
                     <span style={{
                         fontSize: 7, color: '#64748b',
                         padding: '1px 4px', borderRadius: 3,
                         background: 'rgba(255,255,255,0.04)',
-                    }}>{data.status}</span>
+                    }}>{resolveState(data).status}</span>
                 )}
             </div>
 

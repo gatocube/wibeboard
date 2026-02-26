@@ -2,6 +2,7 @@ import { Handle, Position, NodeToolbar } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { User, MessageSquare, Check } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
+import { resolveState } from '@/widgets/resolve-state'
 
 /**
  * UserNode (wibeglow) — Human interaction node.
@@ -23,7 +24,7 @@ import { StatusDot } from '@/widgets/StatusDot'
  */
 export function UserNode({ data }: { data: any }) {
     const color = data.color || '#f59e0b'
-    const status = data.status || 'idle'
+    const status = resolveState(data).status || 'idle'
     const w = data.width || 160
     const h = data.height || 100
     const isCompact = w <= 60

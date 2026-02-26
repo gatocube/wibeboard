@@ -72,17 +72,17 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Planner',
                 description: 'Strategic planning agent',
-                defaultData: { label: 'Planner', subType: 'ai', agent: 'Claude 3.5', color: '#8b5cf6', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Planner', subType: 'ai', agent: 'Claude 3.5', color: '#8b5cf6', state: { status: 'idle', execTime: '—', callsCount: 0 } },
             },
             {
                 name: 'Worker',
                 description: 'Task execution agent',
-                defaultData: { label: 'Worker', subType: 'ai', agent: 'Claude 3.5', color: '#06b6d4', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Worker', subType: 'ai', agent: 'Claude 3.5', color: '#06b6d4', state: { status: 'idle', execTime: '—', callsCount: 0 } },
             },
             {
                 name: 'Reviewer',
                 description: 'Code review and validation agent',
-                defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', status: 'idle', execTime: '—', callsCount: 0 },
+                defaultData: { label: 'Reviewer', subType: 'ai', agent: 'Claude 3.5', color: '#f59e0b', state: { status: 'idle', execTime: '—', callsCount: 0 } },
             },
             {
                 name: 'JS Script',
@@ -152,12 +152,12 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Code Reviewer',
                 description: 'Human code review with approve/comment',
-                defaultData: { label: 'Code Review', color: '#f59e0b', status: 'idle', reviewTitle: 'Code Review', reviewBody: 'Review the changes and approve or request modifications.' },
+                defaultData: { label: 'Code Review', color: '#f59e0b', reviewTitle: 'Code Review', reviewBody: 'Review the changes and approve or request modifications.', state: { status: 'idle' } },
             },
             {
                 name: 'Approval Gate',
                 description: 'Manual approval before deployment',
-                defaultData: { label: 'Approval', color: '#22c55e', status: 'idle', reviewTitle: 'Deploy Approval', reviewBody: 'Approve to start deployment.' },
+                defaultData: { label: 'Approval', color: '#22c55e', reviewTitle: 'Deploy Approval', reviewBody: 'Approve to start deployment.', state: { status: 'idle' } },
             },
         ],
     },
@@ -225,17 +225,17 @@ const WIDGETS: WidgetDefinition[] = [
             {
                 name: 'Artifact',
                 description: 'Expects agent to generate an artifact',
-                defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', status: 'pending' },
+                defaultData: { label: 'Creates README.md', subType: 'artifact', target: 'README.md', state: { status: 'pending' } },
             },
             {
                 name: 'Tool Call',
                 description: 'Expects agent to call a specific tool',
-                defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', status: 'pending' },
+                defaultData: { label: 'Calls deploy()', subType: 'tool-call', target: 'deploy()', state: { status: 'pending' } },
             },
             {
                 name: 'Pull Request',
                 description: 'Expects agent to create a pull request',
-                defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', status: 'pending' },
+                defaultData: { label: 'Creates PR', subType: 'tool-call', target: 'create_pull_request()', state: { status: 'pending' } },
             },
         ],
     },

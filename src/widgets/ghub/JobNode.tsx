@@ -4,6 +4,7 @@ import { Check, CheckCircle, Circle, Loader2, Terminal } from 'lucide-react'
 import { StatusDot } from '@/widgets/StatusDot'
 import { BaseNode } from '@/widgets/BaseNode'
 import type { NodeContext } from '@/engine/NodeContext'
+import { resolveState } from '@/widgets/resolve-state'
 
 /**
  * JobNode (ghub) — Unified GitHub-style node for agents and scripts.
@@ -98,7 +99,7 @@ function JobNodeInner({ ctx }: { ctx: NodeContext | undefined }) {
     const subType = data.subType || 'ai'
     const isAI = subType === 'ai'
     const gh = ctx?.ui.themeType === 'day' ? ghLight : ghDark
-    const status = data.status || 'idle'
+    const status = resolveState(data).status || 'idle'
     const w = data.width || (isAI ? 240 : 220)
     const h = data.height || (isAI ? 160 : 120)
     const isCompact = w <= 60
@@ -156,12 +157,13 @@ function JobNodeInner({ ctx }: { ctx: NodeContext | undefined }) {
 
 function AgentVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
     const { data } = ctx
-    const status = data.status || 'idle'
+    const ns = resolveState(data)
+    const status = ns.status || 'idle'
     const w = data.width || 240
     const h = data.height || 160
     const isLarge = w >= 280
     const logs: string[] = data.logs || []
-    const pct = data.progress ?? 0
+    const pct = ns.progress ?? 0
 
     const knockSide = data.knockSide
     const hasKnock = !!knockSide
@@ -306,8 +308,8 @@ function AgentVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
                     <CheckCircle size={10} style={{ color: gh.green }} />
                     {tasks.filter(t => t.done).length}/{tasks.length}
                 </span>
-                <span>{data.execTime || '—'}</span>
-                {data.callsCount > 0 && <span>{data.callsCount} calls</span>}
+                <span>{ns.execTime || '—'}</span>
+                {(ns.callsCount ?? 0) > 0 && <span>{ns.callsCount} calls</span>}
             </div>
         </motion.div>
     )
@@ -317,7 +319,8 @@ function AgentVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
 
 function ScriptVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
     const { data } = ctx
-    const status = data.status || 'idle'
+    const ns2 = resolveState(data)
+    const status = ns2.status || 'idle'
     const w = data.width || 220
     const h = data.height || 120
     const logs: string[] = data.logs || []
@@ -375,7 +378,7 @@ function ScriptVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
             }}>
                 {[
                     { text: 'Set up job', done: status !== 'idle' },
-                    { text: `Run ${data.label || 'script'}`, done: status === 'done' || (status === 'running' && (data.progress || 0) > 50), active: status === 'running' },
+                    { text: `Run ${data.label || 'script'}`, done: status === 'done' || (status === 'running' && (ns2.progress || 0) > 50), active: status === 'running' },
                     { text: 'Post run', done: status === 'done' },
                 ].map((step, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
@@ -396,7 +399,7 @@ function ScriptVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
                         </span>
                         {step.done && (
                             <span style={{ marginLeft: 'auto', fontSize: 9, color: gh.fgSubtle, ...ghMono }}>
-                                {i === 0 ? '1s' : i === 1 ? (data.execTime || '—') : '0s'}
+                                {i === 0 ? '1s' : i === 1 ? (ns2.execTime || '—') : '0s'}
                             </span>
                         )}
                     </div>
@@ -443,8 +446,8 @@ function ScriptVariant({ ctx, gh }: { ctx: NodeContext; gh: typeof ghDark }) {
                 fontSize: 10, color: gh.fgMuted,
                 ...ghMono,
             }}>
-                <span>{data.execTime || '—'}</span>
-                {data.callsCount > 0 && <span>{data.callsCount} calls</span>}
+                <span>{ns2.execTime || '—'}</span>
+                {(ns2.callsCount ?? 0) > 0 && <span>{ns2.callsCount} calls</span>}
             </div>
         </div>
     )

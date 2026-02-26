@@ -24,6 +24,12 @@ export interface PluginDefinition {
     /** Default settings (persisted per-plugin in localStorage). */
     defaultSettings: Record<string, any>
 
+    /** Called when the plugin is enabled. */
+    onEnable?: () => void
+
+    /** Called when the plugin is disabled. */
+    onDisable?: () => void
+
     /** Right side panel (main UI). Multiple plugins → tabs. */
     renderSidePanel?: (settings: Record<string, any>) => ReactNode
 

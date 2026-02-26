@@ -11,11 +11,12 @@ import { UIKitPage } from '@/pages/ui-kit'
 import { ButtonsMenuPage } from '@/pages/buttons-menu'
 import NodeConfiguratorPage from '@/pages/node-configurator'
 import { PluginsPage } from '@/pages/plugins'
+import { PluginPopoutPage } from '@/pages/plugin-popout'
 import { FpsMeter } from '@/components/FpsMeter'
 import { PluginSidePanel, PluginBottomBar } from '@/plugins'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key, Settings, Puzzle } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator' | 'plugins'
+type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator' | 'plugins' | 'plugin-popout'
 
 interface NavItem {
     id: Page
@@ -45,7 +46,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins'].includes(p)) {
+        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -69,7 +70,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins'].includes(p)) {
+            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -78,6 +79,11 @@ export function App() {
         window.addEventListener('popstate', handler)
         return () => window.removeEventListener('popstate', handler)
     }, [])
+
+    // ── Plugin pop-out: standalone, no shell ──
+    if (page === 'plugin-popout') {
+        return <PluginPopoutPage />
+    }
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>

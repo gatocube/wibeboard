@@ -8,6 +8,7 @@ import { StatusDot } from '@/widgets/StatusDot'
 import { ShimmeringText, SplittingText } from '@/components/animate-ui'
 import { BaseNode } from '@/widgets/BaseNode'
 import { WidgetIcon, AnimatedIcon } from '@/components/WidgetIcon'
+import { resolveState } from '@/widgets/resolve-state'
 
 /**
  * JobNode (wibeglow) — Unified modern dark node for agents and scripts.
@@ -54,12 +55,13 @@ export function JobNode({ data }: { data: any }) {
 
 function AgentVariant({ data }: { data: any }) {
     const color = data.color || '#8b5cf6'
-    const status = data.status || 'idle'
+    const st = resolveState(data)
+    const status = st.status || 'idle'
     const w = data.width || 200
     const h = data.height || 120
     const isCompact = w <= 60
     const isLarge = w >= 280
-    const progress = data.progress ?? 0
+    const progress = st.progress ?? 0
     const isWaking = status === 'waking'
     const isRunning = status === 'running'
     const isActive = isWaking || isRunning || !!(data.knockSide)
@@ -118,7 +120,7 @@ function AgentVariant({ data }: { data: any }) {
     // ── Full mode ──
     const logs: string[] = data.logs || []
     const lastLog = logs.length > 0 ? logs[logs.length - 1] : null
-    const thoughtText = data.thought || lastLog
+    const thoughtText = st.thought || lastLog
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
@@ -235,7 +237,7 @@ function AgentVariant({ data }: { data: any }) {
                             fontSize: 9, color: '#64748b',
                             fontFamily: "'JetBrains Mono', monospace",
                             flexShrink: 0,
-                        }}>⚡{data.callsCount ?? 0}</span>
+                        }}>⚡{st.callsCount ?? 0}</span>
                     </div>
 
                     {/* ── Current task row ── */}
@@ -279,7 +281,7 @@ function AgentVariant({ data }: { data: any }) {
                             fontSize: 9, color: '#64748b',
                             fontFamily: "'JetBrains Mono', monospace",
                             flexShrink: 0,
-                        }}>{data.execTime || '—'}</span>
+                        }}>{st.execTime || '—'}</span>
                     </div>
                 </div>
             </motion.div>
@@ -307,7 +309,8 @@ function ScriptVariant({ data }: { data: any }) {
     const h = data.height || 200
     const isConfigured = data.configured
     const logs: string[] = data.logs || []
-    const status = data.status || 'idle'
+    const st2 = resolveState(data)
+    const status = st2.status || 'idle'
 
     const [editingCode, setEditingCode] = useState<string>(data.code || '')
     const [isEditing, setIsEditing] = useState(!isConfigured)
@@ -643,8 +646,8 @@ function ScriptVariant({ data }: { data: any }) {
                                                 : `${lineCount} lines`}
                                 </span>
                                 <span style={{ opacity: 0.5 }}>·</span>
-                                <span>{data.execTime || '—'}</span>
-                                <span>⚡{data.callsCount ?? 0}</span>
+                                <span>{st2.execTime || '—'}</span>
+                                <span>⚡{st2.callsCount ?? 0}</span>
                             </span>
                         </div>
                     </div>
@@ -707,8 +710,8 @@ function ScriptVariant({ data }: { data: any }) {
                                                         : `${lineCount} lines`}
                                         </span>
                                         <span style={{ opacity: 0.5 }}>·</span>
-                                        <span>{data.execTime || '—'}</span>
-                                        <span>⚡{data.callsCount ?? 0}</span>
+                                        <span>{st2.execTime || '—'}</span>
+                                        <span>⚡{st2.callsCount ?? 0}</span>
                                     </span>
                                 </div>
                             </>

@@ -40,6 +40,10 @@ function saveEnabledSet(set: Set<string>) {
 export function registerPlugin(def: PluginDefinition) {
     if (plugins.some(p => p.meta.id === def.meta.id)) return // idempotent
     plugins.push(def)
+    // If already enabled (from localStorage), fire onEnable
+    if (isPluginEnabled(def.meta.id)) {
+        def.onEnable?.()
+    }
 }
 
 export function getPlugins(): PluginDefinition[] {
@@ -59,6 +63,11 @@ export function setPluginEnabled(id: string, enabled: boolean) {
     const set = getEnabledSet()
     if (enabled) set.add(id); else set.delete(id)
     saveEnabledSet(set)
+    // Fire lifecycle hooks
+    const def = plugins.find(p => p.meta.id === id)
+    if (def) {
+        if (enabled) def.onEnable?.(); else def.onDisable?.()
+    }
     notify()
 }
 

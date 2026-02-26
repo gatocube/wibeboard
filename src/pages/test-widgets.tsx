@@ -142,10 +142,13 @@ function buildData(
         ...template.defaultData,
         label: template.defaultData.label || template.name,
         subType,
-        status,
         width,
         height,
         knockSide,
+        state: {
+            ...(template.defaultData.state || {}),
+            status,
+        },
     }
 
     // Job: AI agent
@@ -153,10 +156,13 @@ function buildData(
         base.agent = template.defaultData.agent || 'Claude 3.5'
         base.color = template.defaultData.color || widget.color
         base.task = status !== 'idle' ? 'Processing authentication module...' : undefined
-        base.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
-        base.progress = progress
-        base.execTime = status === 'done' ? '4.2s' : status === 'running' ? '1.3s' : '—'
-        base.callsCount = status === 'done' ? 7 : status === 'running' ? 3 : 0
+        base.state = {
+            ...base.state,
+            thought: status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined,
+            progress,
+            execTime: status === 'done' ? '4.2s' : status === 'running' ? '1.3s' : '—',
+            callsCount: status === 'done' ? 7 : status === 'running' ? 3 : 0,
+        }
         base.totalRuns = status === 'done' ? 42 : status === 'running' ? 41 : 40
         base.logs = status === 'running'
             ? ['⚡ tool_call: search("auth patterns")', '← result: 5 patterns found', '⚡ tool_call: analyze(patterns)']
@@ -174,11 +180,14 @@ function buildData(
         base.configured = true
         base.code = template.defaultData.code || '// empty'
         base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : status === 'running' ? ['> Running...'] : []
-        base.status = status === 'running' ? 'running' : status === 'done' ? 'done' : 'idle'
-        base.execTime = status === 'done' ? '1.8s' : status === 'running' ? '0.6s' : '—'
-        base.callsCount = status === 'done' ? 3 : status === 'running' ? 1 : 0
+        base.state = {
+            ...base.state,
+            status: status === 'running' ? 'running' : status === 'done' ? 'done' : 'idle',
+            execTime: status === 'done' ? '1.8s' : status === 'running' ? '0.6s' : '—',
+            callsCount: status === 'done' ? 3 : status === 'running' ? 1 : 0,
+            progress,
+        }
         base.totalRuns = status === 'done' ? 18 : status === 'running' ? 17 : 16
-        base.progress = progress
     }
 
     // Group-specific
@@ -197,7 +206,10 @@ function buildData(
     if (widget.type === 'expectation') {
         base.subType = subType || 'artifact'
         base.target = template.defaultData.target || ''
-        base.status = status === 'done' ? 'pass' : status === 'running' ? 'pending' : status === 'waking' ? 'fail' : 'pending'
+        base.state = {
+            ...base.state,
+            status: status === 'done' ? 'pass' : status === 'running' ? 'pending' : status === 'waking' ? 'fail' : 'pending',
+        }
     }
 
     return base
@@ -587,7 +599,7 @@ function WidgetGalleryInner() {
                                                 // Add thought/log data when thinking toggle is on
                                                 if (showThinking) {
                                                     if (activeSubType === 'ai') {
-                                                        data.thought = status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined
+                                                        data.state = { ...data.state, thought: status === 'running' ? 'Analyzing auth patterns...' : status === 'done' ? 'Task complete!' : undefined }
                                                     } else if (['js', 'ts', 'sh', 'py'].includes(activeSubType || '')) {
                                                         data.logs = ['$ compiling...', 'Output: hello world', '> Done ✓']
                                                     }

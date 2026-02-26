@@ -107,6 +107,15 @@ interface WidgetIconProps {
 }
 
 export function WidgetIcon({ type, size = 16, color, className, style }: WidgetIconProps) {
+    // Check plugin icons first (type = 'plugin-<name>')
+    if (type.startsWith('plugin-')) {
+        const name = type.slice(7) // strip 'plugin-'
+        const pi = pluginIcons.get(name)
+        if (pi) {
+            const C = pi.component
+            return <C size={size} color={color || pi.color} />
+        }
+    }
     const Icon = ICON_MAP[type] || Cpu
     return <Icon size={size} color={color || WIDGET_ICON_COLORS[type] || '#8b5cf6'} className={className} style={style} />
 }
@@ -434,14 +443,70 @@ export interface IconEntry {
     name: string; type: string
     component: React.ComponentType<LucideProps>
     color: string; category: string
+    /** Set when the icon was registered by a plugin */
+    pluginId?: string
 }
 
 export function getAllIconEntries(): IconEntry[] {
-    return Object.entries(ICON_MAP).map(([type, component]) => ({
+    const builtins: IconEntry[] = Object.entries(ICON_MAP).map(([type, component]) => ({
         name: component.displayName || type,
         type,
         component,
         color: WIDGET_ICON_COLORS[type] || '#8b5cf6',
         category: type.startsWith('script-') ? 'Script' : type.startsWith('note-') ? 'Note' : 'Widget',
     }))
+
+    // Append plugin-registered icons
+    for (const [type, icon] of pluginIcons) {
+        builtins.push({
+            name: type,
+            type: `plugin-${type}`,
+            component: icon.component as any,
+            color: icon.color,
+            category: 'Plugin',
+            pluginId: icon.pluginId,
+        })
+    }
+
+    return builtins
+}
+
+// ── Plugin Icon Registry ────────────────────────────────────────────────────────
+
+export interface PluginIconDef {
+    component: React.ComponentType<{ size?: number; color?: string }>
+    color: string
+    /** Key into builtin ICON_MAP — used as fallback when the plugin is disabled */
+    fallbackBuiltin: string
+    pluginId: string
+}
+
+const pluginIcons = new Map<string, PluginIconDef>()
+const pluginIconListeners = new Set<() => void>()
+
+function notifyIconChange() { pluginIconListeners.forEach(fn => fn()) }
+
+/** Register a plugin-provided icon. */
+export function registerPluginIcon(name: string, icon: PluginIconDef) {
+    pluginIcons.set(name, icon)
+    notifyIconChange()
+}
+
+/** Unregister all icons from a given plugin. */
+export function unregisterPluginIcons(pluginId: string) {
+    for (const [key, icon] of pluginIcons) {
+        if (icon.pluginId === pluginId) pluginIcons.delete(key)
+    }
+    notifyIconChange()
+}
+
+/** Get all registered plugin icons. */
+export function getPluginIcons(): Map<string, PluginIconDef> {
+    return pluginIcons
+}
+
+/** Subscribe to plugin icon changes. Returns unsubscribe function. */
+export function onPluginIconChange(fn: () => void): () => void {
+    pluginIconListeners.add(fn)
+    return () => { pluginIconListeners.delete(fn) }
 }

@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StatusDot } from '@/widgets/StatusDot'
 import { BaseNode } from '@/widgets/BaseNode'
+import { resolveState } from '@/widgets/resolve-state'
 
 /**
  * JobNode (pixel) — Unified retro/terminal-style node for agents and scripts.
@@ -38,7 +39,8 @@ export function JobNode({ data }: { data: any }) {
 
 function JobNodeInner({ data, subType }: { data: any; subType: string }) {
     const isAI = subType === 'ai'
-    const status = data.status || 'idle'
+    const nodeState = resolveState(data)
+    const status = nodeState.status || 'idle'
     const w = data.width || 220
     const h = data.height || 100
     const isCompact = w <= 60
@@ -162,9 +164,9 @@ function AgentVariant({ data, status, w, h, isCompact, logs, pixelFont, knockAni
                 fontSize: 8, color: '#555',
             }}>
                 <div>MDL <span style={{ color: '#888' }}>{(data.agent || '—').toUpperCase()}</span></div>
-                <div>PRC <span style={{ color: st.color }}>{data.progress ?? 0}%</span></div>
-                <div>TIM <span style={{ color: '#888' }}>{data.execTime || '—'}</span></div>
-                <div>CLL <span style={{ color: '#888' }}>⚡{data.callsCount ?? 0}</span></div>
+                <div>PRC <span style={{ color: st.color }}>{resolveState(data).progress ?? 0}%</span></div>
+                <div>TIM <span style={{ color: '#888' }}>{resolveState(data).execTime || '—'}</span></div>
+                <div>CLL <span style={{ color: '#888' }}>⚡{resolveState(data).callsCount ?? 0}</span></div>
             </div>
 
             {/* Logs */}
@@ -327,9 +329,9 @@ function ScriptVariant({ data, status, w, h, isCompact, logs, pixelFont, knockAn
                 }}>
                     <span style={{ color: langColor }}>{lang.toUpperCase()}</span>
                     <span style={{ display: 'flex', gap: 6 }}>
-                        <span>{data.execTime || '—'}</span>
-                        <span>⚡{data.callsCount ?? 0}</span>
-                        <span style={{ color: st.color }}>{data.progress ?? 0}%</span>
+                        <span>{resolveState(data).execTime || '—'}</span>
+                        <span>⚡{resolveState(data).callsCount ?? 0}</span>
+                        <span style={{ color: st.color }}>{resolveState(data).progress ?? 0}%</span>
                     </span>
                 </div>
             )}

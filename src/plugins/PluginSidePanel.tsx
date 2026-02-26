@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PanelRightOpen, PanelRightClose } from 'lucide-react'
+import { PanelRightOpen, PanelRightClose, ExternalLink } from 'lucide-react'
 import { getEnabledPlugins, getPluginSettings, usePluginChange } from './plugin-registry'
 
 export function PluginSidePanel() {
@@ -24,20 +24,48 @@ export function PluginSidePanel() {
                 overflow: 'hidden',
             }}
         >
-            {/* Toggle button */}
-            <button
-                data-testid="plugin-side-panel-toggle"
-                onClick={() => setOpen(o => !o)}
-                style={{
-                    width: '100%', height: 32, border: 'none',
-                    background: 'transparent', color: '#64748b',
-                    cursor: 'pointer', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                }}
-            >
-                {open ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
-            </button>
+            {/* Header: toggle + pop-out */}
+            <div style={{
+                display: 'flex', alignItems: 'center',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+            }}>
+                <button
+                    data-testid="plugin-side-panel-toggle"
+                    onClick={() => setOpen(o => !o)}
+                    style={{
+                        flex: 1, height: 32, border: 'none',
+                        background: 'transparent', color: '#64748b',
+                        cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                    }}
+                >
+                    {open ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
+                </button>
+                {open && (
+                    <button
+                        data-testid="plugin-popout-btn"
+                        title="Open in new window"
+                        onClick={() => {
+                            const active = plugins[activeTab]
+                            if (!active) return
+                            const base = window.location.pathname
+                            window.open(
+                                `${base}?page=plugin-popout&pluginId=${active.meta.id}`,
+                                `plugin-${active.meta.id}`,
+                                'width=400,height=700',
+                            )
+                        }}
+                        style={{
+                            width: 32, height: 32, border: 'none',
+                            background: 'transparent', color: '#64748b',
+                            cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center',
+                        }}
+                    >
+                        <ExternalLink size={12} />
+                    </button>
+                )}
+            </div>
 
             {open && (
                 <>

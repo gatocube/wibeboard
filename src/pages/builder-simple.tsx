@@ -386,7 +386,7 @@ function BuilderSimpleInner() {
         // Update status to running
         mutateState((prevNodes, prevEdges) => ({
             nodes: prevNodes.map(n =>
-                n.id === nodeId ? { ...n, data: { ...n.data, status: 'running', logs: ['> Running...'] } } : n
+                n.id === nodeId ? { ...n, data: { ...n.data, logs: ['> Running...'], state: { ...(n.data.state || {}), status: 'running' } } } : n
             ),
             edges: prevEdges,
         }))
@@ -398,7 +398,7 @@ function BuilderSimpleInner() {
 
             mutateState((prevNodes, prevEdges) => ({
                 nodes: prevNodes.map(n =>
-                    n.id === nodeId ? { ...n, data: { ...n.data, status: result.status, logs: result.logs } } : n
+                    n.id === nodeId ? { ...n, data: { ...n.data, logs: result.logs, state: { ...(n.data.state || {}), status: result.status } } } : n
                 ),
                 edges: prevEdges,
             }))

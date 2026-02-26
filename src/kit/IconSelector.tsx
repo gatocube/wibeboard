@@ -16,11 +16,12 @@
  *  - iPad-friendly 44px touch targets
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Search, X } from 'lucide-react'
 import {
     WidgetIcon, getAllIconEntries, AnimatedIcon,
     STATUS_ICONS, STATUS_COLORS,
+    onPluginIconChange,
     type AnimatedIconName,
 } from '@/components/WidgetIcon'
 import {
@@ -40,6 +41,8 @@ interface UnifiedIcon {
     category: string
     tags: string[]
     animated: boolean
+    /** Set when the icon was registered by a plugin */
+    pluginId?: string
     /** Render function */
     render: (size: number) => React.ReactNode
 }
@@ -87,10 +90,11 @@ function buildAllIcons(): UnifiedIcon[] {
             id: entry.type,
             label: entry.type,
             color: entry.color,
-            iconType: 'lucide',
+            iconType: entry.pluginId ? 'svg' : 'lucide',
             category: getCat(entry.type),
-            tags: ICON_TAGS[entry.type] || [],
+            tags: ICON_TAGS[entry.type] || (entry.pluginId ? ['plugin', entry.type] : []),
             animated: false,
+            pluginId: entry.pluginId,
             render: (size) => <WidgetIcon type={entry.type} size={size} />,
         })
     }
@@ -190,6 +194,7 @@ function buildAllIcons(): UnifiedIcon[] {
 }
 
 function getCat(type: string): string {
+    if (type.startsWith('plugin-')) return 'Plugin'
     if (type.startsWith('script-')) return 'Script'
     if (['agent', 'bot'].includes(type)) return 'AI'
     if (['play', 'starting', 'sleep', 'timer', 'clock'].includes(type)) return 'Status'
@@ -204,6 +209,7 @@ const FILTERS = [
     { key: 'animated', label: '✦ Animated' },
     { key: 'svg', label: 'SVG' },
     { key: 'lucide', label: 'Lucide' },
+    { key: 'Plugin', label: '🔌 Plugin' },
     { key: 'Widget', label: 'Widget' },
     { key: 'Status', label: 'Status' },
     { key: 'Action', label: 'Action' },
@@ -226,7 +232,11 @@ export function IconSelector({ onSelect, selected, height = 400 }: IconSelectorP
     const [query, setQuery] = useState('')
     const [filter, setFilter] = useState('all')
 
-    const allIcons = useMemo(() => buildAllIcons(), [])
+    // Re-build icon list when plugin icons change
+    const [pluginRev, setPluginRev] = useState(0)
+    useEffect(() => onPluginIconChange(() => setPluginRev(n => n + 1)), [])
+
+    const allIcons = useMemo(() => buildAllIcons(), [pluginRev])
 
     const filtered = useMemo(() => {
         const q = query.toLowerCase().trim()
@@ -430,13 +440,29 @@ function IconTile({ icon, isSelected, onSelect }: {
                 }} />
             )}
             {/* SVG badge */}
-            {icon.iconType === 'svg' && !icon.animated && (
+            {icon.iconType === 'svg' && !icon.animated && !icon.pluginId && (
                 <div style={{
                     position: 'absolute', top: 2, right: 2,
                     fontSize: 5, fontWeight: 700, color: '#64748b',
                     letterSpacing: 0.3,
                 }}>
                     SVG
+                </div>
+            )}
+            {/* Plugin badge */}
+            {icon.pluginId && (
+                <div
+                    data-testid={`icon-plugin-badge-${icon.id}`}
+                    style={{
+                        position: 'absolute', top: 1, right: 1,
+                        fontSize: 7, lineHeight: 1, fontWeight: 700,
+                        color: '#c084fc',
+                        background: 'rgba(139,92,246,0.2)',
+                        borderRadius: 3,
+                        padding: '1px 3px',
+                    }}
+                >
+                    P
                 </div>
             )}
             {icon.render(20)}
