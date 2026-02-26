@@ -9,6 +9,8 @@ import { makeAutoObservable, action } from 'mobx'
 import { createContext, useContext } from 'react'
 import type { ThemeKey, ThemeMode, NodeSize } from './types'
 
+export type ControlMode = 'click' | 'hold' | 'swipe'
+
 // ── Store ────────────────────────────────────────────────────────────────────
 
 export class FlowStudioStore {
@@ -18,6 +20,7 @@ export class FlowStudioStore {
     zoomAutosize: boolean = false
     currentSize: NodeSize = 'M'
     showMinimap: boolean = false
+    controlMode: ControlMode = 'click'
 
     // ── Node selection (player buttons / SwipeButtons menu) ──
     selectedNodeId: string | null = null
@@ -30,6 +33,10 @@ export class FlowStudioStore {
             const savedMinimap = localStorage.getItem('flowstudio_show_minimap')
             if (savedMinimap === '1') this.showMinimap = true
             if (savedMinimap === '0') this.showMinimap = false
+            const savedControl = localStorage.getItem('flowstudio_control_mode')
+            if (savedControl === 'click' || savedControl === 'hold' || savedControl === 'swipe') {
+                this.controlMode = savedControl
+            }
         } catch (e) { }
 
         makeAutoObservable(this, {
@@ -38,6 +45,7 @@ export class FlowStudioStore {
             setZoomAutosize: action,
             setCurrentSize: action,
             setShowMinimap: action,
+            setControlMode: action,
             setSelectedNodeId: action,
             toggleSelectedNode: action,
             clearSelectedNode: action,
@@ -66,6 +74,13 @@ export class FlowStudioStore {
         this.showMinimap = show
         try {
             localStorage.setItem('flowstudio_show_minimap', show ? '1' : '0')
+        } catch (e) { }
+    }
+
+    setControlMode(mode: ControlMode) {
+        this.controlMode = mode
+        try {
+            localStorage.setItem('flowstudio_control_mode', mode)
         } catch (e) { }
     }
 

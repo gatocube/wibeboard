@@ -430,3 +430,97 @@ test.describe('Builder Demo Simple — JS execution in browser', () => {
         await breath()
     })
 })
+
+// ── Node dragging ───────────────────────────────────────────────────────────
+
+test.describe('Builder Demo Simple — node dragging', () => {
+
+    test('nodes can be dragged to a new position', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // ── Add a node after start ──
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        expect(await nodeCount(page)).toBe(2)
+        const newNodeId = await getLastNodeId(page)
+
+        // ── Record initial position ──
+        const newNode = page.locator(`.react-flow__node[data-id="${newNodeId}"]`)
+        await expect(newNode).toBeVisible()
+        const beforeBox = await newNode.boundingBox()
+        expect(beforeBox).toBeTruthy()
+
+        // ── Drag the node 120px right and 60px down ──
+        const dx = 120, dy = 60
+        await newNode.hover()
+        await page.mouse.down()
+        await page.mouse.move(beforeBox!.x + beforeBox!.width / 2 + dx, beforeBox!.y + beforeBox!.height / 2 + dy, { steps: 10 })
+        await page.mouse.up()
+        await page.waitForTimeout(400)
+
+        // ── Verify the node moved ──
+        const afterBox = await newNode.boundingBox()
+        expect(afterBox).toBeTruthy()
+
+        if (beforeBox && afterBox) {
+            // The center should have moved at least some of dx/dy
+            const movedX = afterBox.x - beforeBox.x
+            const movedY = afterBox.y - beforeBox.y
+            // Allow tolerance — React Flow may snap to grid or adjust
+            expect(Math.abs(movedX) + Math.abs(movedY)).toBeGreaterThan(20)
+        }
+
+        await breath()
+    })
+})
+
+// ── Control mode settings ───────────────────────────────────────────────────
+
+test.describe('Builder Demo Simple — control mode setting', () => {
+
+    test('control mode switches between click, hold, and swipe', async ({ page }) => {
+        await openPage(page)
+        await breath()
+
+        // ── Open settings ──
+        await page.getByTestId('settings-btn').click()
+        await page.waitForTimeout(300)
+
+        // ── Click mode should be active by default ──
+        const clickBtn = page.getByTestId('control-mode-click')
+        const holdBtn = page.getByTestId('control-mode-hold')
+        const swipeBtn = page.getByTestId('control-mode-swipe')
+
+        await expect(clickBtn).toBeVisible()
+        await expect(holdBtn).toBeVisible()
+        await expect(swipeBtn).toBeVisible()
+
+        // ── Switch to Hold ──
+        await holdBtn.click()
+        await page.waitForTimeout(200)
+
+        // Verify persisted to localStorage
+        const savedHold = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
+        expect(savedHold).toBe('hold')
+
+        // ── Switch to Swipe ──
+        await swipeBtn.click()
+        await page.waitForTimeout(200)
+
+        const savedSwipe = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
+        expect(savedSwipe).toBe('swipe')
+
+        // ── Switch back to Click ──
+        await clickBtn.click()
+        await page.waitForTimeout(200)
+
+        const savedClick = await page.evaluate(() => localStorage.getItem('flowstudio_control_mode'))
+        expect(savedClick).toBe('click')
+
+        await breath()
+    })
+})

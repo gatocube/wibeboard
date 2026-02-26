@@ -5,9 +5,9 @@
 
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Settings, Sun, Moon, ZoomIn } from 'lucide-react'
+import { Settings, Sun, Moon, ZoomIn, MousePointer2, Hand, Pointer } from 'lucide-react'
 import type { ThemeKey } from './types'
-import { useFlowStudioStore } from './FlowStudioStore'
+import { useFlowStudioStore, type ControlMode } from './FlowStudioStore'
 
 export const StudioSettings = observer(function StudioSettings({
     onThemeChange,
@@ -160,6 +160,31 @@ export const StudioSettings = observer(function StudioSettings({
                             </div>
                         </div>
                     </label>
+
+                    <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '6px 0' }} />
+
+                    {/* Control mode */}
+                    <div style={{ padding: '4px 12px', fontSize: 9, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                        Control Mode
+                    </div>
+                    {([['click', 'Click', MousePointer2], ['hold', 'Hold', Hand], ['swipe', 'Swipe', Pointer]] as [ControlMode, string, typeof MousePointer2][]).map(([key, label, Icon]) => (
+                        <button
+                            key={key}
+                            data-testid={`control-mode-${key}`}
+                            onClick={() => store.setControlMode(key)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                                padding: '6px 12px', border: 'none', cursor: 'pointer',
+                                background: store.controlMode === key ? 'rgba(139,92,246,0.1)' : 'transparent',
+                                color: store.controlMode === key ? '#c084fc' : '#94a3b8',
+                                fontSize: 11, fontWeight: store.controlMode === key ? 600 : 400,
+                                fontFamily: 'Inter', textAlign: 'left',
+                            }}
+                        >
+                            <Icon size={12} />
+                            {label}
+                        </button>
+                    ))}
                 </div>
             )}
         </div>

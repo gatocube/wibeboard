@@ -391,6 +391,7 @@ export const FlowStudio = observer(function FlowStudio({
                 <SwipeButtons
                     nodeId={selectedNode.id}
                     currentLabel={String(selectedNode.data?.label || selectedNode.id)}
+                    activationMode={store.controlMode}
                     directions={hideBeforeButton?.(selectedNode.id) ? ['top', 'right', 'bottom', 'bottom-right'] : undefined}
                     onAddBefore={(id, widgetType) => {
                         onAddBefore?.(id, widgetType)
