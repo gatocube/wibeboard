@@ -495,7 +495,7 @@ export function NodeConfiguratorPage() {
                                                 onClick={() => handleTemplateChange(i)}
                                                 style={{
                                                     display: 'flex', alignItems: 'center', gap: 10,
-                                                    padding: hasBorderColors ? '2px' : '8px 12px',
+                                                    padding: hasBorderColors ? '1px' : '8px 12px',
                                                     borderRadius: 8, border: 'none',
                                                     background: hasBorderColors
                                                         ? gradientBorder

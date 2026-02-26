@@ -374,7 +374,7 @@ export function WidgetPicker({
                                                     ? `conic-gradient(${tmpl.ui!.borderColors!.join(', ')})`
                                                     : `${tileColor}15`,
                                                 border: hasBorderColors ? 'none' : `1px solid ${tileColor}33`,
-                                                padding: hasBorderColors ? 2 : 0,
+                                                padding: hasBorderColors ? 1 : 0,
                                                 display: 'flex', flexDirection: 'column',
                                                 alignItems: 'center', justifyContent: 'center',
                                                 cursor: 'pointer',
