@@ -7,7 +7,7 @@
  *  3. Clicking in WidgetPicker auto-populates everything
  *  4. Visual editor fields are editable
  *  5. Mode switching (Visual → Raw → Manifest) works
- *  6. Raw JSON apply updates visual fields
+ *  6. Widget picker tiles follow the expected order
  */
 
 import { test, expect } from '@playwright/test'
@@ -57,10 +57,10 @@ test.describe('Node Configurator', () => {
     test('clicking widget in WidgetPicker auto-populates config', async ({ page }) => {
         await goto(page)
 
-        // Click on first Note template tile in the compact picker sidebar
-        const noteWidget = page.locator('[data-testid="widget-informer-0"]')
-        await expect(noteWidget).toBeVisible({ timeout: 5_000 })
-        await noteWidget.click()
+        // Click on the Sticker preset tile in the compact picker sidebar
+        const stickerTile = page.locator('[data-testid="tile-informer-sticker"]')
+        await expect(stickerTile).toBeVisible({ timeout: 5_000 })
+        await stickerTile.click()
 
         await page.waitForTimeout(300)
 
@@ -106,24 +106,73 @@ test.describe('Node Configurator', () => {
         await expect(page.locator('[data-testid="field-label"]')).toBeVisible({ timeout: 3_000 })
     })
 
-    test('template selector appears for widgets with multiple templates', async ({ page }) => {
+    test('widget picker tiles follow the expected order', async ({ page }) => {
         await goto(page)
 
-        // Job widget (default, has multiple templates)
-        const select = page.locator('[data-testid="widget-type-select"]')
-        await select.selectOption('job')
-        await page.waitForTimeout(300)
+        // Wait for tiles to render
+        await expect(page.locator('[data-testid^="tile-"]').first()).toBeVisible({ timeout: 5_000 })
 
-        // Template buttons should be visible
-        await expect(page.locator('[data-testid="template-0"]')).toBeVisible({ timeout: 3_000 })
-        await expect(page.locator('[data-testid="template-1"]')).toBeVisible()
+        // Collect all tile test IDs in DOM order
+        const tileIds = await page.locator('[data-testid^="tile-"]').evaluateAll(
+            (els: Element[]) => els.map(el => el.getAttribute('data-testid')!)
+        )
 
-        // Click second template
-        await page.locator('[data-testid="template-1"]').click()
-        await page.waitForTimeout(300)
+        // Expected order:
+        // Scripts → AI → User → SubFlow → Informer → Expectation → Group → Starting
+        const EXPECTED_ORDER = [
+            'tile-job-default', 'tile-job-script', 'tile-job-js',
+            'tile-job-ts', 'tile-job-sh', 'tile-job-py',
+            'tile-job-ai', 'tile-job-planner', 'tile-job-worker', 'tile-job-reviewer',
+            'tile-user-code-reviewer', 'tile-user-approval',
+            'tile-subflow-default', 'tile-subflow-ai-pipeline',
+            'tile-informer-sticker', 'tile-informer-pink-sticker',
+            'tile-informer-section', 'tile-informer-heading',
+            'tile-informer-caption', 'tile-informer-web',
+            'tile-expectation-artifact', 'tile-expectation-tool-call', 'tile-expectation-pr',
+            'tile-group-pipeline', 'tile-group-stage',
+            'tile-starting-default',
+        ]
 
-        // Label field should update to the second template's label
+        expect(tileIds).toEqual(EXPECTED_ORDER)
+    })
+
+    test('page is scrollable when content overflows', async ({ page }) => {
+        await goto(page)
+        await expect(page.locator('[data-testid="widget-type-select"]')).toBeVisible({ timeout: 5_000 })
+
+        // The page container should allow scrolling (overflow: auto, not hidden)
+        const pageOverflow = await page.evaluate(() => {
+            const el = document.querySelector('[data-testid="widget-type-select"]')?.closest('div[style]') as HTMLElement | null
+            if (!el) return 'no-element'
+            // Walk up to find the page container
+            let parent = el.parentElement
+            while (parent && parent !== document.body) {
+                const style = getComputedStyle(parent)
+                if (style.overflow === 'auto' || style.overflowY === 'auto' ||
+                    style.overflow === 'scroll' || style.overflowY === 'scroll') {
+                    return 'scrollable'
+                }
+                parent = parent.parentElement
+            }
+            return 'not-scrollable'
+        })
+        expect(pageOverflow).toBe('scrollable')
+    })
+
+    test('changing label in config updates the preview node', async ({ page }) => {
+        await goto(page)
+
         const labelField = page.locator('[data-testid="field-label"]')
-        await expect(labelField).toBeVisible()
+        await expect(labelField).toBeVisible({ timeout: 5_000 })
+
+        // Type a unique label
+        const testLabel = 'MyUniqueTestNode'
+        await labelField.fill(testLabel)
+        await page.waitForTimeout(400)
+
+        // The preview card should now contain the new label text
+        const previewSection = page.locator('text=Preview').first().locator('..')
+        const previewText = await previewSection.locator('..').textContent()
+        expect(previewText).toContain(testLabel)
     })
 })

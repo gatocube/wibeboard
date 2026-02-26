@@ -345,26 +345,35 @@ export function WidgetPicker({
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
                             {(() => {
-                                // Priority: Script presets → AI presets → User → SubFlow → Informer → Expectation → rest
-                                const typePrio = (w: WidgetDefinition, t: PresetDefinition): number => {
-                                    if (w.type === 'job' && t.subType !== 'ai') return 0   // Script/JS/TS/SH/PY
-                                    if (w.type === 'job' && t.subType === 'ai') return 1   // AI/Planner/Worker/Reviewer
-                                    if (w.type === 'user') return 2
-                                    if (w.type === 'subflow') return 3
-                                    if (w.type === 'informer') return 4
-                                    if (w.type === 'expectation') return 5
-                                    return 99
+                                // Fine-grained priority per preset type
+                                const PRESET_PRIO: Record<string, number> = {
+                                    // Scripts first
+                                    'job-default': 10, 'job-script': 11, 'job-js': 12,
+                                    'job-ts': 13, 'job-sh': 14, 'job-py': 15,
+                                    // AI presets
+                                    'job-ai': 20, 'job-planner': 21, 'job-worker': 22, 'job-reviewer': 23,
+                                    // User
+                                    'user-code-reviewer': 30, 'user-approval': 31,
+                                    // SubFlow
+                                    'subflow-default': 40, 'subflow-ai-pipeline': 41,
+                                    // Informer
+                                    'informer-sticker': 50, 'informer-pink-sticker': 51,
+                                    'informer-section': 52, 'informer-heading': 53,
+                                    'informer-caption': 54, 'informer-web': 55,
+                                    // Expectation
+                                    'expectation-artifact': 60, 'expectation-tool-call': 61, 'expectation-pr': 62,
+                                    // Group
+                                    'group-pipeline': 70, 'group-stage': 71,
+                                    // Starting
+                                    'starting-default': 80,
                                 }
                                 const allTiles = filtered.flatMap(widget =>
                                     presetRegistry.getByWidget(widget.type).map(tmpl => ({ widget, tmpl }))
                                 )
                                 allTiles.sort((a, b) => {
-                                    const pa = typePrio(a.widget, a.tmpl)
-                                    const pb = typePrio(b.widget, b.tmpl)
-                                    if (pa !== pb) return pa - pb
-                                    const da = a.tmpl.type === a.widget.defaultPreset ? -1 : 0
-                                    const db = b.tmpl.type === b.widget.defaultPreset ? -1 : 0
-                                    return da - db
+                                    const pa = PRESET_PRIO[a.tmpl.type] ?? 999
+                                    const pb = PRESET_PRIO[b.tmpl.type] ?? 999
+                                    return pa - pb
                                 })
                                 return (<>{allTiles.map(({ widget, tmpl }, i) => {
                                     const label = presetRegistry.getByWidget(widget.type).length === 1
@@ -385,7 +394,7 @@ export function WidgetPicker({
                                     return (
                                         <div
                                             key={`${widget.type}-${i}`}
-                                            data-testid={`widget-${widget.type}${presetRegistry.getByWidget(widget.type).length > 1 ? `-${i}` : ''}`}
+                                            data-testid={`tile-${tmpl.type}`}
                                             title={`${widget.label}${presetRegistry.getByWidget(widget.type).length > 1 ? ` — ${tmpl.label}` : ''}: ${tmpl.description}`}
                                             draggable
                                             onDragStart={e => {
