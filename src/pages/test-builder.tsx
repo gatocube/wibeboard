@@ -10,7 +10,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { JobNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
-import type { WidgetPreset } from '@/engine/widget-registry'
+import type { PresetDefinition } from '@/engine/preset-registry'
 import { TimelineDots } from '@/components/TimelineDots'
 import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
 
@@ -264,9 +264,9 @@ function BuilderInner() {
     }, [updateNodeData])
 
     // ── Node created via FlowStudio connector ──
-    const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: WidgetPreset, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
+    const handleNodeCreated = useCallback((nodeId: string, widgetType: string, template: PresetDefinition, rect: { x: number; y: number; width: number; height: number }, sourceNodeId: string | null) => {
         const nodeData: Record<string, any> = {
-            label: template.defaultData.label || template.name,
+            label: template.defaultData.label || template.label,
             ...template.defaultData,
             width: rect.width,
             height: rect.height,

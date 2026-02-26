@@ -20,7 +20,8 @@ import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
-import { widgetRegistry, type WidgetPreset } from '@/engine/widget-registry'
+import { widgetRegistry } from '@/engine/widget-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
 import { AgentMessenger } from '@/engine/AgentMessenger'
 import { runScriptInBrowser } from '@/engine/script-runner'
@@ -78,7 +79,7 @@ const api = new FlowStudioApi()
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
-        const tpl = def?.presets[0]
+        const tpl = presetRegistry.getDefault(def?.type ?? '')
         return {
             nodeType: 'user',
             data: {
@@ -91,7 +92,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     if (widgetType === 'subflow') {
         const def = widgetRegistry.get('subflow')
-        const tpl = def?.presets[0]
+        const tpl = presetRegistry.getDefault(def?.type ?? '')
         return {
             nodeType: 'subflow',
             data: {
@@ -106,7 +107,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         const [prefix, variant] = widgetType.split(':')
         const def = widgetRegistry.get('job')
         const subType = prefix === 'ai' ? 'ai' : variant
-        const tpl = def?.presets.find(t => t.defaultData.subType === subType) || def?.presets[0]
+        const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === subType) || presetRegistry.getDefault(def?.type ?? '')
         const label = tpl?.defaultData.label || `${variant} Script`
         return {
             nodeType: 'job',
@@ -124,7 +125,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     // Fallback: treat as job with default JS script
     const def = widgetRegistry.get('job')
-    const tpl = def?.presets.find(t => t.defaultData.subType === 'js') || def?.presets[0]
+    const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === 'js') || presetRegistry.getDefault(def?.type ?? '')
     const label = tpl?.defaultData.label || 'Script'
     return {
         nodeType: 'job',
@@ -330,7 +331,7 @@ function BuilderSimpleInner() {
     const handleNodeCreated = useCallback((
         nodeId: string,
         widgetType: string,
-        _template: WidgetPreset,
+        _template: PresetDefinition,
         rect: { x: number; y: number; width: number; height: number },
     ) => {
         const { nodeType, data } = resolveWidgetType(widgetType)

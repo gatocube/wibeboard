@@ -17,9 +17,12 @@ import { WidgetPicker } from '@/flow-studio'
 import {
     widgetRegistry,
     type WidgetDefinition,
-    type WidgetPreset,
     GRID_CELL,
-} from '@/widgets/widget-registry'
+} from '@/engine/widget-registry'
+import {
+    presetRegistry,
+    type PresetDefinition,
+} from '@/engine/preset-registry'
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components — use unified JobNode/InformerNode directly
@@ -126,7 +129,7 @@ function getComponent(theme: TemplateName, widgetType: string): React.ComponentT
 
 function buildData(
     widget: WidgetDefinition,
-    template: WidgetPreset,
+    template: PresetDefinition,
     status: Status,
     knockSide: KnockSide,
     width: number,
@@ -140,7 +143,7 @@ function buildData(
 
     const base: Record<string, any> = {
         ...template.defaultData,
-        label: template.defaultData.label || template.name,
+        label: template.defaultData.label || template.label,
         subType,
         width,
         height,
@@ -227,8 +230,8 @@ export function TestWidgetsPage() {
 
 function WidgetGalleryInner() {
     const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('job') ?? null)
-    const [selectedTemplate, setSelectedTemplate] = useState<WidgetPreset | null>(
-        widgetRegistry.get('job')?.presets[0] ?? null
+    const [selectedTemplate, setSelectedTemplate] = useState<PresetDefinition | null>(
+        presetRegistry.getDefault('job') ?? null
     )
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)
@@ -246,7 +249,7 @@ function WidgetGalleryInner() {
 
     const themes = templateRegistry.getAll()
 
-    const handleSelect = useCallback((widget: WidgetDefinition, template: WidgetPreset) => {
+    const handleSelect = useCallback((widget: WidgetDefinition, template: PresetDefinition) => {
         setSelectedWidget(widget)
         setSelectedTemplate(template)
         setStatus('idle')
@@ -640,7 +643,7 @@ function WidgetGalleryInner() {
                                 {selectedWidget.label}
                             </div>
                             <div style={{ fontSize: 8, color: '#64748b', fontFamily: 'Inter' }}>
-                                {selectedTemplate?.name} · {selectedWidget.type}
+                                {selectedTemplate?.label} · {selectedWidget.type}
                             </div>
                         </div>
                     </div>

@@ -14,7 +14,8 @@
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { widgetRegistry, GRID_CELL, type WidgetDefinition, type WidgetPreset } from '@/engine/widget-registry'
+import { widgetRegistry, GRID_CELL, type WidgetDefinition } from '@/engine/widget-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { CodeEditor } from '@/kit'
@@ -43,7 +44,7 @@ const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
 // ── Manifest generator ──────────────────────────────────────────────────────────
 
 function generateManifest(def: WidgetDefinition) {
-    const tpl = def.presets[0]
+    const tpl = presetRegistry.getByWidget(def.type)[0]
     const properties: Record<string, object> = {}
     const required: string[] = []
 
@@ -89,8 +90,8 @@ function generateManifest(def: WidgetDefinition) {
                 h: def.ui.defaultSize.h * GRID_CELL,
             },
         },
-        templates: def.presets.map(t => ({
-            name: t.name, description: t.description, defaultData: t.defaultData,
+        templates: presetRegistry.getByWidget(def.type).map(t => ({
+            name: t.label, description: t.description, defaultData: t.defaultData,
         })),
         schema: {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -287,7 +288,7 @@ export function NodeConfiguratorPage() {
         [allWidgets, selectedType],
     )
 
-    const template = widgetDef.presets[templateIdx] || widgetDef.presets[0]
+    const template = presetRegistry.getByWidget(widgetDef.type)[templateIdx] || presetRegistry.getByWidget(widgetDef.type)[0]
 
     // Re-init nodeData when widget/template changes
     useMemo(() => {
@@ -311,9 +312,9 @@ export function NodeConfiguratorPage() {
     }, [])
 
     // Widget picker selection → auto-populate everything
-    const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: WidgetPreset) => {
+    const handlePickerSelect = useCallback((widget: WidgetDefinition, tmpl: PresetDefinition) => {
         setSelectedType(widget.type)
-        const idx = widget.presets.indexOf(tmpl)
+        const idx = presetRegistry.getByWidget(widget.type).indexOf(tmpl)
         setTemplateIdx(idx >= 0 ? idx : 0)
         setNodeData({ ...tmpl.defaultData })
         setMode('visual')
@@ -477,11 +478,11 @@ export function NodeConfiguratorPage() {
                         </div>
 
                         {/* Template selector */}
-                        {widgetDef.presets.length > 1 && (
+                        {presetRegistry.getByWidget(widgetDef.type).length > 1 && (
                             <div>
                                 <div style={{ ...S.fieldLabel, marginBottom: 4 }}>Template</div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {widgetDef.presets.map((tpl, i) => (
+                                    {presetRegistry.getByWidget(widgetDef.type).map((tpl, i) => (
                                         <button
                                             key={i}
                                             data-testid={`template-${i}`}
@@ -501,7 +502,7 @@ export function NodeConfiguratorPage() {
                                                     fontSize: 11, fontWeight: 600,
                                                     color: i === templateIdx ? '#c084fc' : '#e2e8f0',
                                                 }}>
-                                                    {tpl.name}
+                                                    {tpl.label}
                                                 </div>
                                                 <div style={{ fontSize: 9, color: '#64748b' }}>
                                                     {tpl.description}
@@ -740,8 +741,8 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     const isCode = fieldKey === 'code'
     const codeLanguage: CodeLanguage = useMemo(() => {
         if (!isCode) return 'text'
-        const lang = widgetDef.presets[0]?.defaultData?.language
-            || widgetDef.presets[0]?.defaultData?.subType
+        const lang = presetRegistry.getByWidget(widgetDef.type)[0]?.defaultData?.language
+            || presetRegistry.getByWidget(widgetDef.type)[0]?.defaultData?.subType
         if (lang === 'ts') return 'typescript'
         if (lang === 'js') return 'javascript'
         if (lang === 'py') return 'python'

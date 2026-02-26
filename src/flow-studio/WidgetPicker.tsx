@@ -11,7 +11,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { widgetRegistry, type WidgetDefinition, type WidgetPreset, type WidgetCategory } from '@/engine/widget-registry'
+import { widgetRegistry, type WidgetDefinition, type WidgetCategory } from '@/engine/widget-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
 import { WidgetIcon, CATEGORY_ICONS } from '@/components/WidgetIcon'
 import { Package } from 'lucide-react'
 
@@ -57,7 +58,7 @@ function pushRecent(type: string) {
 interface WidgetPickerProps {
     rectSize: { width: number; height: number }
     gridSize?: { cols: number; rows: number }
-    onSelect: (widget: WidgetDefinition, template: WidgetPreset) => void
+    onSelect: (widget: WidgetDefinition, template: PresetDefinition) => void
     onCancel: () => void
     onHoverWidget?: (widget: WidgetDefinition | null) => void
     embedded?: boolean
@@ -114,15 +115,15 @@ export function WidgetPicker({
     }
 
     // ── Handlers ──
-    const handleSelect = (widget: WidgetDefinition, template: WidgetPreset) => {
+    const handleSelect = (widget: WidgetDefinition, template: PresetDefinition) => {
         pushRecent(widget.type)
         setRecentTypes(getRecentTypes())
         onSelect(widget, template)
     }
 
     const handleWidgetClick = (widget: WidgetDefinition) => {
-        if (widget.presets.length === 1 || compact) {
-            handleSelect(widget, widget.presets[0])
+        if (presetRegistry.getByWidget(widget.type).length === 1 || compact) {
+            handleSelect(widget, presetRegistry.getByWidget(widget.type)[0])
         } else {
             setExpandedWidget(expandedWidget === widget.type ? null : widget.type)
         }
@@ -210,7 +211,7 @@ export function WidgetPicker({
                                     draggable
                                     onDragStart={e => {
                                         e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                            type: widget.type, template: widget.presets[0],
+                                            type: widget.type, template: presetRegistry.getByWidget(widget.type)[0],
                                         }))
                                         e.dataTransfer.effectAllowed = 'move'
                                     }}
@@ -344,16 +345,16 @@ export function WidgetPicker({
                         /* ── Compact tile grid — one tile per template/preset ── */
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 12px' }}>
                             {filtered.flatMap(widget =>
-                                widget.presets.map((tmpl, i) => {
-                                    const label = widget.presets.length === 1
+                                presetRegistry.getByWidget(widget.type).map((tmpl, i) => {
+                                    const label = presetRegistry.getByWidget(widget.type).length === 1
                                         ? widget.label
-                                        : tmpl.name
+                                        : tmpl.label
                                     const truncLabel = label.length > 7 ? label.slice(0, 7) : label
                                     return (
                                         <div
                                             key={`${widget.type}-${i}`}
-                                            data-testid={`widget-${widget.type}${widget.presets.length > 1 ? `-${i}` : ''}`}
-                                            title={`${widget.label}${widget.presets.length > 1 ? ` — ${tmpl.name}` : ''}: ${tmpl.description}`}
+                                            data-testid={`widget-${widget.type}${presetRegistry.getByWidget(widget.type).length > 1 ? `-${i}` : ''}`}
+                                            title={`${widget.label}${presetRegistry.getByWidget(widget.type).length > 1 ? ` — ${tmpl.label}` : ''}: ${tmpl.description}`}
                                             draggable
                                             onDragStart={e => {
                                                 e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
@@ -441,7 +442,7 @@ export function WidgetPicker({
                                                     draggable
                                                     onDragStart={e => {
                                                         e.dataTransfer.setData('application/flowstudio-widget', JSON.stringify({
-                                                            type: widget.type, template: widget.presets[0],
+                                                            type: widget.type, template: presetRegistry.getByWidget(widget.type)[0],
                                                         }))
                                                         e.dataTransfer.effectAllowed = 'move'
                                                     }}
@@ -453,7 +454,7 @@ export function WidgetPicker({
                                                     }}
                                                     onMouseEnter={() => {
                                                         onHoverWidget?.(widget)
-                                                        if (widget.presets.length <= 1) setExpandedWidget(null)
+                                                        if (presetRegistry.getByWidget(widget.type).length <= 1) setExpandedWidget(null)
                                                     }}
                                                     onMouseLeave={() => onHoverWidget?.(null)}
                                                     onClick={() => handleWidgetClick(widget)}
@@ -495,14 +496,14 @@ export function WidgetPicker({
 
                                                 {/* Expanded templates */}
                                                 <AnimatePresence>
-                                                    {expandedWidget === widget.type && widget.presets.length > 1 && (
+                                                    {expandedWidget === widget.type && presetRegistry.getByWidget(widget.type).length > 1 && (
                                                         <motion.div
                                                             initial={{ height: 0, opacity: 0 }}
                                                             animate={{ height: 'auto', opacity: 1 }}
                                                             exit={{ height: 0, opacity: 0 }}
                                                             style={{ overflow: 'hidden', paddingLeft: 36 }}
                                                         >
-                                                            {widget.presets.map((tmpl, i) => (
+                                                            {presetRegistry.getByWidget(widget.type).map((tmpl, i) => (
                                                                 <div
                                                                     key={i}
                                                                     data-testid={`template-${widget.type}-${i}`}
@@ -525,7 +526,7 @@ export function WidgetPicker({
                                                                             ; (e.currentTarget as HTMLElement).style.color = '#94a3b8'
                                                                     }}
                                                                 >
-                                                                    <div style={{ fontWeight: 600 }}>{tmpl.name}</div>
+                                                                    <div style={{ fontWeight: 600 }}>{tmpl.label}</div>
                                                                     <div style={{ fontSize: 8, color: '#64748b' }}>{tmpl.description}</div>
                                                                 </div>
                                                             ))}

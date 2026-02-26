@@ -18,7 +18,8 @@ import {
 } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry, type WidgetPreset } from '@/engine/widget-registry'
+import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry } from '@/engine/widget-registry'
+import { type PresetDefinition } from '@/engine/preset-registry'
 
 import type { FlowStudioProps, ThemeKey, NodeSize } from './types'
 import { useFlowStudioStore } from './FlowStudioStore'
@@ -210,7 +211,7 @@ export const FlowStudio = observer(function FlowStudio({
     // ── Direct node creation from widget data ───────────────────────────────────
     const createNodeFromWidget = useCallback((
         widgetType: string,
-        template: WidgetPreset,
+        template: PresetDefinition,
         position: { x: number; y: number },
         sourceNodeId: string | null = null,
     ) => {
@@ -250,7 +251,7 @@ export const FlowStudio = observer(function FlowStudio({
     }, [nodes, onNodesChange])
 
     // ── Sidebar widget pick handler ─────────────────────────────────────────────
-    const handleSidebarSelect = useCallback((_widget: { type: string }, template: WidgetPreset) => {
+    const handleSidebarSelect = useCallback((_widget: { type: string }, template: PresetDefinition) => {
         // Place at center of current viewport
         const converter = screenToFlowRef.current
         const center = converter
