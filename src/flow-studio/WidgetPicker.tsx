@@ -384,15 +384,16 @@ export function WidgetPicker({
                                             onMouseLeave={() => onHoverWidget?.(null)}
                                             style={{
                                                 width: 48, height: 48, borderRadius: 8,
-                                                background: `${tileColor}15`,
-                                                border: hasBorderColors
-                                                    ? `1px solid transparent` : `1px solid ${tileColor}33`,
-                                                borderImage: hasBorderColors ? `${smoothGradient} 1` : undefined,
+                                                background: hasBorderColors
+                                                    ? smoothGradient
+                                                    : `${tileColor}15`,
+                                                border: hasBorderColors ? 'none' : `1px solid ${tileColor}33`,
+                                                padding: hasBorderColors ? 1 : 0,
                                                 display: 'flex', flexDirection: 'column',
                                                 alignItems: 'center', justifyContent: 'center',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.15s',
-                                                gap: 2,
+                                                gap: hasBorderColors ? 0 : 2,
                                             }}
                                             onMouseOver={e => {
                                                 if (!hasBorderColors) {
@@ -409,10 +410,26 @@ export function WidgetPicker({
                                                 ; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                                             }}
                                         >
-                                            <WidgetIcon type={presetIcon} size={16} />
-                                            <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
-                                                {truncLabel}
-                                            </span>
+                                            {hasBorderColors ? (
+                                                <div style={{
+                                                    width: '100%', height: '100%', borderRadius: 7,
+                                                    background: `${tileColor}15`,
+                                                    display: 'flex', flexDirection: 'column',
+                                                    alignItems: 'center', justifyContent: 'center', gap: 2,
+                                                }}>
+                                                    <WidgetIcon type={presetIcon} size={16} />
+                                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
+                                                        {truncLabel}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <WidgetIcon type={presetIcon} size={16} />
+                                                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>
+                                                        {truncLabel}
+                                                    </span>
+                                                </>
+                                            )}
                                         </div>
                                     )
                                 })
