@@ -25,8 +25,8 @@ export interface WidgetIcons {
 export interface WidgetUI {
     icons: WidgetIcons
     color: string
-    /** Optional border color (e.g. AI nodes get a distinctive colored border) */
-    borderColor?: string
+    /** Optional array of colors for a gradient border (e.g. AI nodes get a multicolor border) */
+    borderColors?: string[]
     defaultSize: { w: number; h: number }
 }
 

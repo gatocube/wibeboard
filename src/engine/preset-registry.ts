@@ -31,7 +31,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-planner', widgetType: 'job', subType: 'ai',
         label: 'Planner', description: 'Strategic planning agent',
         tags: ['agent', 'planner', 'ai', 'strategy'],
-        ui: { icons: { default: 'brain', working: 'loader-2' }, borderColor: '#8b5cf6' },
+        ui: { icons: { default: 'brain', working: 'loader-2' }, borderColors: ['#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b'] },
         defaultData: {
             label: 'Planner', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
@@ -42,7 +42,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-worker', widgetType: 'job', subType: 'ai',
         label: 'Worker', description: 'Task execution agent',
         tags: ['agent', 'worker', 'ai', 'execute'],
-        ui: { icons: { default: 'wrench', working: 'loader-2' }, borderColor: '#06b6d4' },
+        ui: { icons: { default: 'wrench', working: 'loader-2' }, borderColors: ['#06b6d4', '#22c55e', '#f59e0b', '#8b5cf6'] },
         defaultData: {
             label: 'Worker', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
@@ -53,7 +53,7 @@ const PRESETS: Omit<PresetDefinition, 'id'>[] = [
         type: 'job-reviewer', widgetType: 'job', subType: 'ai',
         label: 'Reviewer', description: 'Code review agent',
         tags: ['agent', 'reviewer', 'ai', 'review'],
-        ui: { icons: { default: 'search', working: 'loader-2' }, borderColor: '#f59e0b' },
+        ui: { icons: { default: 'search', working: 'loader-2' }, borderColors: ['#f59e0b', '#8b5cf6', '#06b6d4', '#22c55e'] },
         defaultData: {
             label: 'Reviewer', subType: 'ai', language: 'js',
             code: `export function activate(ctx) {\n   console.log('hello from AI');\n}`,
