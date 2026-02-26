@@ -291,7 +291,19 @@ export const FlowStudio = observer(function FlowStudio({
                     <MermaidRenderer nodes={nodes} edges={edges} />
                 ) : store.renderer === 'mobile' ? (
                     <MobileRenderer nodes={nodes} edges={edges} />
-                ) : (
+                ) : null}
+
+                {/* Floating settings for non-ReactFlow renderers */}
+                {store.renderer !== 'reactflow' && (
+                    <div style={{
+                        position: 'absolute', top: 10, right: 10, zIndex: 20,
+                        display: 'flex', alignItems: 'center', gap: 6,
+                    }}>
+                        <StudioSettings onThemeChange={handleThemeChange} />
+                    </div>
+                )}
+
+                {store.renderer === 'reactflow' && (
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}

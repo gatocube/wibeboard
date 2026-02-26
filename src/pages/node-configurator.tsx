@@ -444,7 +444,7 @@ export function NodeConfiguratorPage() {
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <WidgetIcon type={widgetDef.ui.icons.default} size={14} />
+                            <WidgetIcon type={widgetDef.ui.icons.default} size={14} color={widgetDef.ui.color} />
                             <span>{widgetDef.label}</span>
                         </div>
                         <span style={{
