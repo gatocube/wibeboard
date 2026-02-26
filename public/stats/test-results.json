@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-02-26T21:00:30.925Z",
-  "commit": "82f4a8c",
+  "timestamp": "2026-02-26T21:29:10.154Z",
+  "commit": "ed0ae58",
   "smoke": {
     "suites": [],
     "stats": {}
@@ -36,12 +36,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10923,
+                        "duration": 10922,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:14.377Z",
+                        "startTime": "2026-02-26T21:23:29.590Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -70,12 +70,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1470,
+                        "duration": 1403,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:26.731Z",
+                        "startTime": "2026-02-26T21:23:41.970Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -112,12 +112,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2677,
+                        "duration": 2651,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:28.214Z",
+                        "startTime": "2026-02-26T21:23:43.387Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -146,12 +146,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 762,
+                        "duration": 678,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:30.904Z",
+                        "startTime": "2026-02-26T21:23:46.052Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -180,12 +180,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 6430,
+                        "duration": 6307,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:31.679Z",
+                        "startTime": "2026-02-26T21:23:46.745Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -214,12 +214,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1341,
+                        "duration": 1305,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:38.121Z",
+                        "startTime": "2026-02-26T21:23:53.065Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -256,12 +256,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 6367,
+                        "duration": 6348,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:39.477Z",
+                        "startTime": "2026-02-26T21:23:54.381Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -298,12 +298,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2068,
+                        "duration": 2036,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:45.858Z",
+                        "startTime": "2026-02-26T21:24:00.743Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -340,12 +340,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1742,
+                        "duration": 1800,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:47.940Z",
+                        "startTime": "2026-02-26T21:24:02.791Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -382,12 +382,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2801,
+                        "duration": 2888,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:49.696Z",
+                        "startTime": "2026-02-26T21:24:04.604Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -433,12 +433,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 800,
+                        "duration": 913,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:52.523Z",
+                        "startTime": "2026-02-26T21:24:07.520Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -467,12 +467,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1482,
+                        "duration": 1606,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:53.345Z",
+                        "startTime": "2026-02-26T21:24:08.452Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -501,12 +501,12 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1516,
+                        "duration": 1504,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:54.843Z",
+                        "startTime": "2026-02-26T21:24:10.075Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -535,7 +535,7 @@
                         "workerIndex": 0,
                         "parallelIndex": 0,
                         "status": "timedOut",
-                        "duration": 60034,
+                        "duration": 60036,
                         "error": {
                           "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
                           "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
@@ -556,7 +556,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:54:56.375Z",
+                        "startTime": "2026-02-26T21:24:11.594Z",
                         "annotations": [],
                         "attachments": [
                           {
@@ -570,7 +570,7 @@
                         "workerIndex": 1,
                         "parallelIndex": 0,
                         "status": "timedOut",
-                        "duration": 60600,
+                        "duration": 60560,
                         "error": {
                           "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
                           "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
@@ -591,7 +591,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 1,
-                        "startTime": "2026-02-26T20:55:57.478Z",
+                        "startTime": "2026-02-26T21:25:12.704Z",
                         "annotations": [],
                         "attachments": [
                           {
@@ -631,7 +631,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 2,
-                        "startTime": "2026-02-26T20:56:59.771Z",
+                        "startTime": "2026-02-26T21:26:14.968Z",
                         "annotations": [],
                         "attachments": [
                           {
@@ -689,7 +689,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.128Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -743,7 +743,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.128Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -797,7 +797,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.128Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -851,7 +851,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.128Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -905,7 +905,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.129Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -959,7 +959,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.129Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -1013,7 +1013,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:57:59.931Z",
+                        "startTime": "2026-02-26T21:27:15.129Z",
                         "annotations": [
                           {
                             "type": "skip",
@@ -1069,12 +1069,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10738,
+                        "duration": 10664,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:00.966Z",
+                        "startTime": "2026-02-26T21:27:16.143Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1120,12 +1120,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4485,
+                        "duration": 4425,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:11.818Z",
+                        "startTime": "2026-02-26T21:27:26.911Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1154,12 +1154,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3432,
+                        "duration": 3385,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:16.320Z",
+                        "startTime": "2026-02-26T21:27:31.350Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1188,12 +1188,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3388,
+                        "duration": 3343,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:19.771Z",
+                        "startTime": "2026-02-26T21:27:34.752Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1222,12 +1222,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1788,
+                        "duration": 1779,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:23.199Z",
+                        "startTime": "2026-02-26T21:27:38.128Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1256,12 +1256,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3019,
+                        "duration": 3006,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:25.016Z",
+                        "startTime": "2026-02-26T21:27:39.938Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1290,12 +1290,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2985,
+                        "duration": 2971,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:28.054Z",
+                        "startTime": "2026-02-26T21:27:42.963Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1324,12 +1324,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 3137,
+                        "duration": 3123,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:31.054Z",
+                        "startTime": "2026-02-26T21:27:45.948Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1375,12 +1375,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 554,
+                        "duration": 565,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:34.214Z",
+                        "startTime": "2026-02-26T21:27:49.095Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1409,12 +1409,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1738,
+                        "duration": 1712,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:34.783Z",
+                        "startTime": "2026-02-26T21:27:49.675Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1443,12 +1443,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 950,
+                        "duration": 895,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:36.537Z",
+                        "startTime": "2026-02-26T21:27:51.400Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1494,12 +1494,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1176,
+                        "duration": 1128,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:37.509Z",
+                        "startTime": "2026-02-26T21:27:52.317Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1528,12 +1528,12 @@
                         "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1461,
+                        "duration": 1446,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:38.700Z",
+                        "startTime": "2026-02-26T21:27:53.458Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1548,7 +1548,7 @@
               },
               {
                 "title": "clicking widget in WidgetPicker auto-populates config",
-                "ok": false,
+                "ok": true,
                 "tags": [],
                 "tests": [
                   {
@@ -1561,139 +1561,18 @@
                       {
                         "workerIndex": 3,
                         "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 6134,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 34,
-                            "line": 62
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 60 |\u001b[39m         \u001b[90m// Click on first Note template tile in the compact picker sidebar\u001b[39m\n \u001b[90m 61 |\u001b[39m         \u001b[36mconst\u001b[39m noteWidget \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"widget-informer-0\"]'\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 62 |\u001b[39m         \u001b[36mawait\u001b[39m expect(noteWidget)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5\u001b[39m_000 })\n \u001b[90m    |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 63 |\u001b[39m         \u001b[36mawait\u001b[39m noteWidget\u001b[33m.\u001b[39mclick()\n \u001b[90m 64 |\u001b[39m\n \u001b[90m 65 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m300\u001b[39m)\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 34,
-                              "line": 62
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n\n  60 |         // Click on first Note template tile in the compact picker sidebar\n  61 |         const noteWidget = page.locator('[data-testid=\"widget-informer-0\"]')\n> 62 |         await expect(noteWidget).toBeVisible({ timeout: 5_000 })\n     |                                  ^\n  63 |         await noteWidget.click()\n  64 |\n  65 |         await page.waitForTimeout(300)\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34"
-                          }
-                        ],
+                        "status": "passed",
+                        "duration": 1466,
+                        "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:58:40.173Z",
+                        "startTime": "2026-02-26T21:27:54.916Z",
                         "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-8ae84-icker-auto-populates-config-chromium/error-context.md"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 34,
-                          "line": 62
-                        }
-                      },
-                      {
-                        "workerIndex": 4,
-                        "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 6630,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 34,
-                            "line": 62
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 60 |\u001b[39m         \u001b[90m// Click on first Note template tile in the compact picker sidebar\u001b[39m\n \u001b[90m 61 |\u001b[39m         \u001b[36mconst\u001b[39m noteWidget \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"widget-informer-0\"]'\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 62 |\u001b[39m         \u001b[36mawait\u001b[39m expect(noteWidget)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5\u001b[39m_000 })\n \u001b[90m    |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 63 |\u001b[39m         \u001b[36mawait\u001b[39m noteWidget\u001b[33m.\u001b[39mclick()\n \u001b[90m 64 |\u001b[39m\n \u001b[90m 65 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m300\u001b[39m)\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 34,
-                              "line": 62
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n\n  60 |         // Click on first Note template tile in the compact picker sidebar\n  61 |         const noteWidget = page.locator('[data-testid=\"widget-informer-0\"]')\n> 62 |         await expect(noteWidget).toBeVisible({ timeout: 5_000 })\n     |                                  ^\n  63 |         await noteWidget.click()\n  64 |\n  65 |         await page.waitForTimeout(300)\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34"
-                          }
-                        ],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 1,
-                        "startTime": "2026-02-26T20:58:47.368Z",
-                        "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-8ae84-icker-auto-populates-config-chromium-retry1/error-context.md"
-                          },
-                          {
-                            "name": "trace",
-                            "contentType": "application/zip",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-8ae84-icker-auto-populates-config-chromium-retry1/trace.zip"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 34,
-                          "line": 62
-                        }
-                      },
-                      {
-                        "workerIndex": 5,
-                        "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 6189,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 34,
-                            "line": 62
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 60 |\u001b[39m         \u001b[90m// Click on first Note template tile in the compact picker sidebar\u001b[39m\n \u001b[90m 61 |\u001b[39m         \u001b[36mconst\u001b[39m noteWidget \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"widget-informer-0\"]'\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 62 |\u001b[39m         \u001b[36mawait\u001b[39m expect(noteWidget)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5\u001b[39m_000 })\n \u001b[90m    |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 63 |\u001b[39m         \u001b[36mawait\u001b[39m noteWidget\u001b[33m.\u001b[39mclick()\n \u001b[90m 64 |\u001b[39m\n \u001b[90m 65 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m300\u001b[39m)\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 34,
-                              "line": 62
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"widget-informer-0\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"widget-informer-0\"]')\u001b[22m\n\n\n  60 |         // Click on first Note template tile in the compact picker sidebar\n  61 |         const noteWidget = page.locator('[data-testid=\"widget-informer-0\"]')\n> 62 |         await expect(noteWidget).toBeVisible({ timeout: 5_000 })\n     |                                  ^\n  63 |         await noteWidget.click()\n  64 |\n  65 |         await page.waitForTimeout(300)\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:62:34"
-                          }
-                        ],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 2,
-                        "startTime": "2026-02-26T20:58:55.243Z",
-                        "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-8ae84-icker-auto-populates-config-chromium-retry2/error-context.md"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 34,
-                          "line": 62
-                        }
+                        "attachments": []
                       }
                     ],
-                    "status": "unexpected"
+                    "status": "expected"
                   }
                 ],
                 "id": "d3c660a7463e4918e3b9-8b48c74e79e78a0ab45b",
@@ -1714,15 +1593,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 6,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1470,
+                        "duration": 1365,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:02.584Z",
+                        "startTime": "2026-02-26T21:27:56.394Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1748,15 +1627,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 6,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1426,
+                        "duration": 1351,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:04.149Z",
+                        "startTime": "2026-02-26T21:27:57.773Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -1770,8 +1649,8 @@
                 "column": 5
               },
               {
-                "title": "template selector appears for widgets with multiple templates",
-                "ok": false,
+                "title": "widget picker tiles follow the expected order",
+                "ok": true,
                 "tags": [],
                 "tests": [
                   {
@@ -1782,146 +1661,93 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 6,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 4472,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 66,
-                            "line": 118
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 116 |\u001b[39m\n \u001b[90m 117 |\u001b[39m         \u001b[90m// Template buttons should be visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 118 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-0\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m3\u001b[39m_000 })\n \u001b[90m     |\u001b[39m                                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 119 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-1\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\n \u001b[90m 120 |\u001b[39m\n \u001b[90m 121 |\u001b[39m         \u001b[90m// Click second template\u001b[39m\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 66,
-                              "line": 118
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n\n  116 |\n  117 |         // Template buttons should be visible\n> 118 |         await expect(page.locator('[data-testid=\"template-0\"]')).toBeVisible({ timeout: 3_000 })\n      |                                                                  ^\n  119 |         await expect(page.locator('[data-testid=\"template-1\"]')).toBeVisible()\n  120 |\n  121 |         // Click second template\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66"
-                          }
-                        ],
+                        "status": "passed",
+                        "duration": 1117,
+                        "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:05.592Z",
+                        "startTime": "2026-02-26T21:27:59.139Z",
                         "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-54293-ets-with-multiple-templates-chromium/error-context.md"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 66,
-                          "line": 118
-                        }
-                      },
-                      {
-                        "workerIndex": 7,
-                        "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 4979,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 66,
-                            "line": 118
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 116 |\u001b[39m\n \u001b[90m 117 |\u001b[39m         \u001b[90m// Template buttons should be visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 118 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-0\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m3\u001b[39m_000 })\n \u001b[90m     |\u001b[39m                                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 119 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-1\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\n \u001b[90m 120 |\u001b[39m\n \u001b[90m 121 |\u001b[39m         \u001b[90m// Click second template\u001b[39m\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 66,
-                              "line": 118
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n\n  116 |\n  117 |         // Template buttons should be visible\n> 118 |         await expect(page.locator('[data-testid=\"template-0\"]')).toBeVisible({ timeout: 3_000 })\n      |                                                                  ^\n  119 |         await expect(page.locator('[data-testid=\"template-1\"]')).toBeVisible()\n  120 |\n  121 |         // Click second template\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66"
-                          }
-                        ],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 1,
-                        "startTime": "2026-02-26T20:59:11.125Z",
-                        "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-54293-ets-with-multiple-templates-chromium-retry1/error-context.md"
-                          },
-                          {
-                            "name": "trace",
-                            "contentType": "application/zip",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-54293-ets-with-multiple-templates-chromium-retry1/trace.zip"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 66,
-                          "line": 118
-                        }
-                      },
-                      {
-                        "workerIndex": 8,
-                        "parallelIndex": 0,
-                        "status": "failed",
-                        "duration": 4529,
-                        "error": {
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n",
-                          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66",
-                          "location": {
-                            "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                            "column": 66,
-                            "line": 118
-                          },
-                          "snippet": "\u001b[0m \u001b[90m 116 |\u001b[39m\n \u001b[90m 117 |\u001b[39m         \u001b[90m// Template buttons should be visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 118 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-0\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m3\u001b[39m_000 })\n \u001b[90m     |\u001b[39m                                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 119 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"template-1\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\n \u001b[90m 120 |\u001b[39m\n \u001b[90m 121 |\u001b[39m         \u001b[90m// Click second template\u001b[39m\u001b[0m"
-                        },
-                        "errors": [
-                          {
-                            "location": {
-                              "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                              "column": 66,
-                              "line": 118
-                            },
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"template-0\"]')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"template-0\"]')\u001b[22m\n\n\n  116 |\n  117 |         // Template buttons should be visible\n> 118 |         await expect(page.locator('[data-testid=\"template-0\"]')).toBeVisible({ timeout: 3_000 })\n      |                                                                  ^\n  119 |         await expect(page.locator('[data-testid=\"template-1\"]')).toBeVisible()\n  120 |\n  121 |         // Click second template\n    at /home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts:118:66"
-                          }
-                        ],
-                        "stdout": [],
-                        "stderr": [],
-                        "retry": 2,
-                        "startTime": "2026-02-26T20:59:17.344Z",
-                        "annotations": [],
-                        "attachments": [
-                          {
-                            "name": "error-context",
-                            "contentType": "text/markdown",
-                            "path": "/home/runner/work/wibeboard/wibeboard/test-results/node-configurator.e2e.ts-N-54293-ets-with-multiple-templates-chromium-retry2/error-context.md"
-                          }
-                        ],
-                        "errorLocation": {
-                          "file": "/home/runner/work/wibeboard/wibeboard/tests/node-configurator.e2e.ts",
-                          "column": 66,
-                          "line": 118
-                        }
+                        "attachments": []
                       }
                     ],
-                    "status": "unexpected"
+                    "status": "expected"
                   }
                 ],
-                "id": "d3c660a7463e4918e3b9-4a0e6d95627b38502761",
+                "id": "d3c660a7463e4918e3b9-9741cd8826f2f0fc33b8",
                 "file": "node-configurator.e2e.ts",
                 "line": 109,
+                "column": 5
+              },
+              {
+                "title": "page is scrollable when content overflows",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 30000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 3,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1086,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-26T21:28:00.272Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "d3c660a7463e4918e3b9-86a2536dc5eae886426f",
+                "file": "node-configurator.e2e.ts",
+                "line": 139,
+                "column": 5
+              },
+              {
+                "title": "changing label in config updates the preview node",
+                "ok": true,
+                "tags": [],
+                "tests": [
+                  {
+                    "timeout": 30000,
+                    "annotations": [],
+                    "expectedStatus": "passed",
+                    "projectId": "chromium",
+                    "projectName": "chromium",
+                    "results": [
+                      {
+                        "workerIndex": 3,
+                        "parallelIndex": 0,
+                        "status": "passed",
+                        "duration": 1528,
+                        "errors": [],
+                        "stdout": [],
+                        "stderr": [],
+                        "retry": 0,
+                        "startTime": "2026-02-26T21:28:01.370Z",
+                        "annotations": [],
+                        "attachments": []
+                      }
+                    ],
+                    "status": "expected"
+                  }
+                ],
+                "id": "d3c660a7463e4918e3b9-761ba90d7a430f7a9bbc",
+                "file": "node-configurator.e2e.ts",
+                "line": 162,
                 "column": 5
               }
             ]
@@ -1954,10 +1780,10 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2010,
+                        "duration": 1899,
                         "errors": [],
                         "stdout": [
                           {
@@ -1981,7 +1807,7 @@
                         ],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:23.014Z",
+                        "startTime": "2026-02-26T21:28:02.915Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2024,15 +1850,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 791,
+                        "duration": 744,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:25.132Z",
+                        "startTime": "2026-02-26T21:28:04.839Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2058,15 +1884,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 932,
+                        "duration": 848,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:25.942Z",
+                        "startTime": "2026-02-26T21:28:05.598Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2092,15 +1918,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 965,
+                        "duration": 931,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:26.894Z",
+                        "startTime": "2026-02-26T21:28:06.460Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2126,15 +1952,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 803,
+                        "duration": 785,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:27.873Z",
+                        "startTime": "2026-02-26T21:28:07.406Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2160,15 +1986,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 871,
+                        "duration": 877,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:28.692Z",
+                        "startTime": "2026-02-26T21:28:08.202Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2202,15 +2028,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 780,
+                        "duration": 747,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:29.576Z",
+                        "startTime": "2026-02-26T21:28:09.092Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2236,15 +2062,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 839,
+                        "duration": 810,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:30.373Z",
+                        "startTime": "2026-02-26T21:28:09.851Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2270,15 +2096,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 801,
+                        "duration": 766,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:31.227Z",
+                        "startTime": "2026-02-26T21:28:10.677Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2312,15 +2138,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 725,
+                        "duration": 712,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:32.042Z",
+                        "startTime": "2026-02-26T21:28:11.457Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2346,15 +2172,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1431,
+                        "duration": 1426,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:32.781Z",
+                        "startTime": "2026-02-26T21:28:12.181Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2380,15 +2206,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1494,
+                        "duration": 1397,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:34.225Z",
+                        "startTime": "2026-02-26T21:28:13.622Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2431,15 +2257,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 586,
+                        "duration": 566,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:35.748Z",
+                        "startTime": "2026-02-26T21:28:15.049Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2465,15 +2291,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 757,
+                        "duration": 726,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:36.348Z",
+                        "startTime": "2026-02-26T21:28:15.629Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2499,15 +2325,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1145,
+                        "duration": 1210,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:37.118Z",
+                        "startTime": "2026-02-26T21:28:16.369Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2533,15 +2359,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1204,
+                        "duration": 1171,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:38.276Z",
+                        "startTime": "2026-02-26T21:28:17.592Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2567,15 +2393,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 871,
+                        "duration": 857,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:39.495Z",
+                        "startTime": "2026-02-26T21:28:18.776Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2601,15 +2427,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1225,
+                        "duration": 1239,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:40.382Z",
+                        "startTime": "2026-02-26T21:28:19.651Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2635,15 +2461,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 731,
+                        "duration": 737,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:41.620Z",
+                        "startTime": "2026-02-26T21:28:20.903Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2669,15 +2495,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 972,
+                        "duration": 950,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:42.364Z",
+                        "startTime": "2026-02-26T21:28:21.654Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2703,15 +2529,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1323,
+                        "duration": 1340,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:43.351Z",
+                        "startTime": "2026-02-26T21:28:22.618Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2737,15 +2563,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 703,
+                        "duration": 704,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:44.690Z",
+                        "startTime": "2026-02-26T21:28:23.975Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2771,7 +2597,7 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
                         "duration": 1344,
@@ -2779,7 +2605,7 @@
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:45.409Z",
+                        "startTime": "2026-02-26T21:28:24.693Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2805,15 +2631,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 633,
+                        "duration": 638,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:46.768Z",
+                        "startTime": "2026-02-26T21:28:26.049Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2839,15 +2665,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 648,
+                        "duration": 680,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:47.416Z",
+                        "startTime": "2026-02-26T21:28:26.701Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2873,15 +2699,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 884,
+                        "duration": 886,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:48.078Z",
+                        "startTime": "2026-02-26T21:28:27.393Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2907,15 +2733,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 835,
+                        "duration": 860,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:48.974Z",
+                        "startTime": "2026-02-26T21:28:28.294Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2941,15 +2767,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 978,
+                        "duration": 959,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:49.822Z",
+                        "startTime": "2026-02-26T21:28:29.170Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -2975,15 +2801,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1194,
+                        "duration": 1180,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:50.813Z",
+                        "startTime": "2026-02-26T21:28:30.143Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3009,15 +2835,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 714,
+                        "duration": 715,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:52.019Z",
+                        "startTime": "2026-02-26T21:28:31.334Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3043,15 +2869,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 643,
+                        "duration": 664,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:52.749Z",
+                        "startTime": "2026-02-26T21:28:32.062Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3077,15 +2903,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 970,
+                        "duration": 1006,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:53.409Z",
+                        "startTime": "2026-02-26T21:28:32.742Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3111,15 +2937,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 498,
+                        "duration": 510,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:54.393Z",
+                        "startTime": "2026-02-26T21:28:33.760Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3145,15 +2971,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 742,
+                        "duration": 745,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:54.904Z",
+                        "startTime": "2026-02-26T21:28:34.286Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3179,15 +3005,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 709,
+                        "duration": 683,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:55.662Z",
+                        "startTime": "2026-02-26T21:28:35.043Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3213,15 +3039,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 658,
+                        "duration": 704,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:56.387Z",
+                        "startTime": "2026-02-26T21:28:35.739Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3247,15 +3073,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 1068,
+                        "duration": 1119,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:57.057Z",
+                        "startTime": "2026-02-26T21:28:36.456Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3298,15 +3124,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 10349,
+                        "duration": 10373,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T20:59:58.151Z",
+                        "startTime": "2026-02-26T21:28:37.598Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3332,15 +3158,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 4905,
+                        "duration": 4852,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:08.511Z",
+                        "startTime": "2026-02-26T21:28:47.980Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3366,15 +3192,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2716,
+                        "duration": 2701,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:13.426Z",
+                        "startTime": "2026-02-26T21:28:52.842Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3400,15 +3226,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2874,
+                        "duration": 2805,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:16.155Z",
+                        "startTime": "2026-02-26T21:28:55.552Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3434,15 +3260,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2855,
+                        "duration": 2816,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:19.039Z",
+                        "startTime": "2026-02-26T21:28:58.370Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3468,15 +3294,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 2856,
+                        "duration": 2837,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:21.908Z",
+                        "startTime": "2026-02-26T21:29:01.196Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3502,15 +3328,15 @@
                     "projectName": "chromium",
                     "results": [
                       {
-                        "workerIndex": 9,
+                        "workerIndex": 3,
                         "parallelIndex": 0,
                         "status": "passed",
-                        "duration": 5999,
+                        "duration": 5964,
                         "errors": [],
                         "stdout": [],
                         "stderr": [],
                         "retry": 0,
-                        "startTime": "2026-02-26T21:00:24.775Z",
+                        "startTime": "2026-02-26T21:29:04.045Z",
                         "annotations": [],
                         "attachments": []
                       }
@@ -3529,11 +3355,11 @@
       }
     ],
     "stats": {
-      "startTime": "2026-02-26T20:54:11.262Z",
-      "duration": 379593.029,
-      "expected": 72,
+      "startTime": "2026-02-26T21:23:26.519Z",
+      "duration": 343567.03500000003,
+      "expected": 76,
       "skipped": 7,
-      "unexpected": 3,
+      "unexpected": 1,
       "flaky": 0
     }
   }
