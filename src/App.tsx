@@ -10,13 +10,14 @@ import { IntegrationsPage } from '@/pages/integrations'
 import { UIKitPage } from '@/pages/ui-kit'
 import { ButtonsMenuPage } from '@/pages/buttons-menu'
 import NodeConfiguratorPage from '@/pages/node-configurator'
+import { ThreeJobsPage } from '@/pages/three-jobs'
 import { PluginsPage } from '@/pages/plugins'
 import { PluginPopoutPage } from '@/pages/plugin-popout'
 import { FpsMeter } from '@/components/FpsMeter'
 import { PluginSidePanel, PluginBottomBar } from '@/plugins'
 import { Menu, X, Layout, Layers, Home, GitBranch, Network, Palette, Workflow, Key, Settings, Puzzle } from 'lucide-react'
 
-type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator' | 'plugins' | 'plugin-popout'
+type Page = 'home' | 'builder' | 'builder-simple' | 'two-node' | 'four-node' | 'ai-script' | 'three-jobs' | 'widgets' | 'icons' | 'integrations' | 'ui-kit' | 'buttons-menu' | 'node-configurator' | 'plugins' | 'plugin-popout'
 
 interface NavItem {
     id: Page
@@ -32,6 +33,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'two-node', label: 'Two-Node Scenario', icon: <GitBranch size={14} />, description: 'Tool calling + artifact publishing' },
     { id: 'four-node', label: 'Four-Node Concurrent', icon: <Network size={14} />, description: 'Parallel workers with aggregation' },
     { id: 'ai-script', label: 'AI + Script', icon: <Workflow size={14} />, description: 'Agent → Tests → Review → Deploy' },
+    { id: 'three-jobs', label: '3 Jobs', icon: <GitBranch size={14} />, description: 'Pipeline: +1 → ×3 → +1' },
     { id: 'integrations', label: 'Integrations', icon: <Key size={14} />, description: 'API keys for AI & external services' },
     { id: 'widgets', label: 'Widget Gallery', icon: <Layers size={14} />, description: 'Browse all templates and widgets' },
     { id: 'icons', label: 'Icon Reference', icon: <Palette size={14} />, description: 'All icons used in wibeboard' },
@@ -46,7 +48,7 @@ export function App() {
     const initialPage = (): Page => {
         const params = new URLSearchParams(window.location.search)
         const p = params.get('page')
-        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
+        if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'three-jobs', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
             return p as Page
         }
         return 'builder'
@@ -83,7 +85,7 @@ export function App() {
         const handler = () => {
             const params = new URLSearchParams(window.location.search)
             const p = params.get('page') as Page | null
-            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
+            if (p && ['home', 'builder', 'builder-simple', 'two-node', 'four-node', 'ai-script', 'three-jobs', 'widgets', 'icons', 'integrations', 'ui-kit', 'buttons-menu', 'node-configurator', 'plugins', 'plugin-popout'].includes(p)) {
                 setPage(p)
             } else {
                 setPage('builder')
@@ -270,6 +272,7 @@ export function App() {
                             {page === 'two-node' && <TwoNodeScenarioPage />}
                             {page === 'four-node' && <FourNodeConcurrentPage />}
                             {page === 'ai-script' && <AIScriptScenarioPage />}
+                            {page === 'three-jobs' && <ThreeJobsPage />}
                             {page === 'widgets' && <TestWidgetsPage />}
                             {page === 'icons' && <IconsGalleryPage />}
                             {page === 'integrations' && <IntegrationsPage />}

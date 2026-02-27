@@ -15,6 +15,7 @@ const PAGES = [
     { page: 'ui-kit', label: 'UI Kit' },
     { page: 'buttons-menu', label: 'Buttons Menu' },
     { page: 'node-configurator', label: 'Node Configurator' },
+    { page: 'three-jobs', label: '3 Jobs' },
 ]
 
 test.describe('Page Smoke Tests', () => {
