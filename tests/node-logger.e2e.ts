@@ -141,16 +141,16 @@ test.describe('Node Logger Plugin', () => {
             const registry = (window as any).__presetRegistry
             if (!registry) return { found: false, reason: 'no __presetRegistry on window' }
 
-            const preset = registry.get('job-node-logger')
+            const preset = registry.get('job:job-node-logger')
             if (!preset) {
                 const allKeys = registry.keys?.() || []
-                return { found: false, reason: `preset job-node-logger not found. Keys: ${allKeys.join(', ')}` }
+                return { found: false, reason: `preset job:job-node-logger not found. Keys: ${allKeys.join(', ')}` }
             }
 
             return {
                 found: true,
                 label: preset.label,
-                widgetType: preset.widgetType,
+                widgetType: preset.type,
                 subType: preset.subType,
                 hasCode: typeof preset.defaultData?.code === 'string',
             }

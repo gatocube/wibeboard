@@ -10,9 +10,9 @@ export {
     type WidgetCategory,
     type WidgetUI,
     type WidgetIcons,
-} from '@/engine/widget-registry'
+} from '@/engine/widget-types-registry'
 
 export {
     presetRegistry,
     type PresetDefinition,
-} from '@/engine/preset-registry'
+} from '@/engine/widget-preset-registry'

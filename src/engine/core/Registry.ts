@@ -13,6 +13,8 @@ export interface RegistryItem {
     id: string
     /** Item type (domain-specific classifier) */
     type: string
+    /** Optional unique name (e.g. preset key like 'job-ai') */
+    name?: string
     /** Human-readable label */
     label: string
     /** Description of the item */

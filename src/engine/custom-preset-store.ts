@@ -10,8 +10,8 @@ import * as Automerge from '@automerge/automerge'
 
 /** Serialisable preset (no functions, no id — reconstructed on load) */
 export interface StoredPreset {
+    name: string
     type: string
-    widgetType: string
     subType?: string
     label: string
     description: string
@@ -108,7 +108,7 @@ export class CustomPresetStore {
 
     /** Remove a preset by type */
     remove(type: string): boolean {
-        const idx = this.getAll().findIndex(p => p.type === type)
+        const idx = this.getAll().findIndex(p => p.name === type)
         if (idx < 0) return false
         this.doc = Automerge.change(this.doc, `Remove preset: ${type}`, doc => {
             doc.presets.splice(idx, 1)

@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion } from 'framer-motion'
 import { StickyNote } from 'lucide-react'
 import { BaseNode } from '@/widgets/BaseNode'
+import { subTypeRegistry } from '@/engine/widget-subtypes-registry'
 
 /**
  * NoteNode (wibeglow) — annotation nodes for documentation and visual markers.
@@ -19,21 +20,12 @@ import { BaseNode } from '@/widgets/BaseNode'
  * data.height    — height in px
  */
 
-// ── Color presets ───────────────────────────────────────────────────────────────
-
-const STICKER_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-    yellow: { bg: '#fef3c7', text: '#92400e', border: '#fbbf2444' },
-    pink: { bg: '#fce7f3', text: '#9d174d', border: '#f9a8d444' },
-    green: { bg: '#d1fae5', text: '#065f46', border: '#6ee7b744' },
-    blue: { bg: '#dbeafe', text: '#1e40af', border: '#93c5fd44' },
-    purple: { bg: '#ede9fe', text: '#5b21b6', border: '#c4b5fd44' },
-    orange: { bg: '#ffedd5', text: '#9a3412', border: '#fdba7444' },
-}
+/** Resolve sticker color palette from subtype registry */
+const STICKER_PALETTE = subTypeRegistry.resolvePalette('informer', 'static') ?? {}
 
 function getStickerPalette(color?: string) {
-    if (color && STICKER_COLORS[color]) return STICKER_COLORS[color]
-    // Try hex match — default to yellow
-    return STICKER_COLORS.yellow
+    if (color && STICKER_PALETTE[color]) return STICKER_PALETTE[color]
+    return STICKER_PALETTE.yellow ?? { bg: '#fef3c7', text: '#92400e', border: '#fbbf2444' }
 }
 
 // ── Sticker variant ─────────────────────────────────────────────────────────────

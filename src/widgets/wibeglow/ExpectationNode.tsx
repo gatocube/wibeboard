@@ -2,6 +2,7 @@ import { Handle, Position } from '@xyflow/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, XCircle, Clock, Loader2, FileText, Wrench, Briefcase } from 'lucide-react'
 import { resolveState } from '@/widgets/resolve-state'
+import { subTypeRegistry } from '@/engine/widget-subtypes-registry'
 
 /**
  * ExpectationNode (wibeglow) — assertion node connected on the side of an agent.
@@ -18,12 +19,9 @@ import { resolveState } from '@/widgets/resolve-state'
  * data.height    — height in px
  */
 
-// ── Subtype colors ──────────────────────────────────────────────────────────────
-
-const VARIANT_COLORS: Record<string, string> = {
-    'artifact': '#ec4899',   // pink
-    'tool-call': '#06b6d4',  // cyan
-    'job': '#8b5cf6',        // purple
+/** Resolve variant color from subtype registry, with fallback */
+function getVariantColor(variant: string): string {
+    return subTypeRegistry.resolveColor('expectation', variant)
 }
 
 // ── Status visuals ──────────────────────────────────────────────────────────────
@@ -120,7 +118,7 @@ export function ExpectationNode({ data }: { data: any }) {
     const st = resolveState(data)
     const status = st.status || data.status || 'idle'
     const variant = data.variant || data.subType || 'artifact'
-    const accentColor = data.color || VARIANT_COLORS[variant] || '#64748b'
+    const accentColor = data.color || getVariantColor(variant)
     const progress = st.progress ?? data.progress ?? 0
     const cfg = getStatusConfig(status, accentColor)
     const VariantIcon = VARIANT_ICON[variant] || FileText

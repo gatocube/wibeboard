@@ -8,7 +8,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { IconButton, ICON_BUTTON_COLORS, IconSelector, type IconButtonColor, type IconButtonSize } from '@/kit'
+import { IconButton, ICON_BUTTON_COLORS, IconSelector, ToggleGroup, ToggleGroupItem, type IconButtonColor, type IconButtonSize } from '@/components/kit'
 import { WidgetIcon } from '@/components/WidgetIcon'
 import { Plus, Settings, Pencil, ArrowRight, Code, Cpu, Zap, Star, Heart, Globe, Shield, UserCircle, Construction } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -56,6 +56,10 @@ export function UIKitPage() {
             <div style={{ height: 32 }} />
 
             <ExpectationNodeSection />
+
+            <div style={{ height: 32 }} />
+
+            <ToggleGroupSection />
         </div>
     )
 }
@@ -904,3 +908,110 @@ function ExpectationNodeSection() {
     )
 }
 
+// ── 6. ToggleGroup showcase ─────────────────────────────────────────────────────
+
+function ToggleGroupSection() {
+    const [theme, setTheme] = useState('wibeglow')
+    const [size, setSize] = useState('md')
+    const [align, setAlign] = useState('left')
+
+    return (
+        <section>
+            <h2 style={{
+                fontSize: 13, fontWeight: 700, color: '#e2e8f0',
+                marginBottom: 16,
+                display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+                <span style={{
+                    width: 20, height: 20, borderRadius: 5,
+                    background: 'rgba(139,92,246,0.15)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10,
+                }}>🔘</span>
+                ToggleGroup
+            </h2>
+
+            <p style={{ fontSize: 10, color: '#64748b', marginBottom: 16 }}>
+                Pill-style toggle group for selecting between mutually exclusive options.
+                Inspired by <strong style={{ color: '#94a3b8' }}>shadcn/ui toggle-group</strong>.
+            </p>
+
+            {/* Default variant — Sizes */}
+            <div style={{ marginBottom: 20 }}>
+                <div style={{
+                    fontSize: 9, fontWeight: 600, color: '#64748b',
+                    textTransform: 'uppercase', letterSpacing: '0.5px',
+                    marginBottom: 10,
+                }}>
+                    Default — sm / md / lg
+                </div>
+                <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <ToggleGroup value={theme} onChange={setTheme} size="sm">
+                            <ToggleGroupItem value="wibeglow">WibeGlow</ToggleGroupItem>
+                            <ToggleGroupItem value="pixel">Pixel</ToggleGroupItem>
+                            <ToggleGroupItem value="ghub">GitHub</ToggleGroupItem>
+                        </ToggleGroup>
+                        <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>sm</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <ToggleGroup value={theme} onChange={setTheme} size="md">
+                            <ToggleGroupItem value="wibeglow">WibeGlow</ToggleGroupItem>
+                            <ToggleGroupItem value="pixel">Pixel</ToggleGroupItem>
+                            <ToggleGroupItem value="ghub">GitHub</ToggleGroupItem>
+                        </ToggleGroup>
+                        <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>md</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <ToggleGroup value={theme} onChange={setTheme} size="lg">
+                            <ToggleGroupItem value="wibeglow">WibeGlow</ToggleGroupItem>
+                            <ToggleGroupItem value="pixel">Pixel</ToggleGroupItem>
+                            <ToggleGroupItem value="ghub">GitHub</ToggleGroupItem>
+                        </ToggleGroup>
+                        <span style={{ fontSize: 7, color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}>lg</span>
+                    </div>
+                    <span style={{ fontSize: 9, color: '#8b5cf6', fontFamily: "'JetBrains Mono', monospace" }}>
+                        selected: {theme}
+                    </span>
+                </div>
+            </div>
+
+            {/* Outline variant */}
+            <div style={{ marginBottom: 20 }}>
+                <div style={{
+                    fontSize: 9, fontWeight: 600, color: '#64748b',
+                    textTransform: 'uppercase', letterSpacing: '0.5px',
+                    marginBottom: 10,
+                }}>
+                    Outline variant
+                </div>
+                <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <ToggleGroup value={size} onChange={setSize} variant="outline" size="md">
+                        <ToggleGroupItem value="sm">Small</ToggleGroupItem>
+                        <ToggleGroupItem value="md">Medium</ToggleGroupItem>
+                        <ToggleGroupItem value="lg">Large</ToggleGroupItem>
+                    </ToggleGroup>
+                    <span style={{ fontSize: 9, color: '#8b5cf6', fontFamily: "'JetBrains Mono', monospace" }}>
+                        selected: {size}
+                    </span>
+                </div>
+            </div>
+
+            {/* Disabled items */}
+            <div>
+                <div style={{
+                    fontSize: 9, fontWeight: 600, color: '#64748b',
+                    textTransform: 'uppercase', letterSpacing: '0.5px',
+                    marginBottom: 10,
+                }}>
+                    With disabled item
+                </div>
+                <ToggleGroup value={align} onChange={setAlign} size="md">
+                    <ToggleGroupItem value="left">Left</ToggleGroupItem>
+                    <ToggleGroupItem value="center">Center</ToggleGroupItem>
+                    <ToggleGroupItem value="right" disabled>Right</ToggleGroupItem>
+                </ToggleGroup>
+            </div>
+        </section>
+    )
+}

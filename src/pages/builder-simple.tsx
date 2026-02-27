@@ -19,15 +19,15 @@
 import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 // (individual widget imports replaced by useThemeAwareNodeTypes)
-import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
-import { widgetRegistry } from '@/engine/widget-registry'
-import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
+import { FlowStudio, FlowStudioStoreProvider, useFlowHistory } from '@/flow-studio'
+import { widgetRegistry } from '@/engine/widget-types-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/widget-preset-registry'
 import { FlowStudioApi } from '@/engine/FlowStudioApi'
 import { generateId } from '@/engine/core'
 import { AgentMessenger } from '@/engine/AgentMessenger'
 import { runScriptInBrowser } from '@/engine/script-runner'
 import { EventsPanel, type FlowEvent } from '@/flow-studio/EventsPanel'
-import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
+import { NodeSettingsPanel } from '@/components/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
 import { useThemeAwareNodeTypes } from '@/widgets/theme-aware-nodes'
@@ -77,7 +77,7 @@ const api = new FlowStudioApi()
 function resolveWidgetType(widgetType: string): { nodeType: string; data: Record<string, any> } {
     if (widgetType === 'user') {
         const def = widgetRegistry.get('user')
-        const tpl = presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
+        const tpl = presetRegistry.getDefault(def?.type ?? '')
         return {
             nodeType: 'user',
             data: {
@@ -90,7 +90,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     if (widgetType === 'subflow') {
         const def = widgetRegistry.get('subflow')
-        const tpl = presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
+        const tpl = presetRegistry.getDefault(def?.type ?? '')
         return {
             nodeType: 'subflow',
             data: {
@@ -105,7 +105,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         const [prefix, variant] = widgetType.split(':')
         const def = widgetRegistry.get('job')
         const subType = prefix === 'ai' ? 'ai' : variant
-        const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === subType) || presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
+        const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === subType) || presetRegistry.getDefault(def?.type ?? '')
         const label = tpl?.defaultData.label || `${variant} Script`
         return {
             nodeType: 'job',
@@ -123,7 +123,7 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
     }
     // Fallback: treat as job with default JS script
     const def = widgetRegistry.get('job')
-    const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === 'js') || presetRegistry.getDefault(def?.type ?? '', def?.defaultPreset)
+    const tpl = presetRegistry.getByWidget(def?.type ?? '').find(t => t.defaultData.subType === 'js') || presetRegistry.getDefault(def?.type ?? '')
     const label = tpl?.defaultData.label || 'Script'
     return {
         nodeType: 'job',
@@ -138,9 +138,6 @@ function resolveWidgetType(widgetType: string): { nodeType: string; data: Record
         },
     }
 }
-
-// ── History entry for undo / redo ──
-interface HistoryEntry { nodes: Node[]; edges: Edge[] }
 
 // ── Page wrapper (provides context) ──
 export default function BuilderSimplePage() {
@@ -166,36 +163,28 @@ function BuilderSimpleInner() {
     const nodes = active?.nodes || []
     const edges = active?.edges || []
 
-    // ── Undo / Redo ──
-    const historyRef = useRef<HistoryEntry[]>([{ nodes, edges }])
-    const historyIndexRef = useRef(0)
-    const skipPushRef = useRef(false)
-    const { fitView } = useReactFlow()
-    const [canUndo, setCanUndo] = useState(false)
-    const [canRedo, setCanRedo] = useState(false)
+    // ── Undo / Redo (via shared hook) ──
+    const updateWorkflow = useCallback((updatedNodes: Node[], updatedEdges: Edge[]) => {
+        setWorkflows(prev => prev.map(w =>
+            w.id === activeId ? { ...w, nodes: updatedNodes, edges: updatedEdges } : w
+        ))
+    }, [activeId])
 
-    const updateUndoRedoState = useCallback(() => {
-        setCanUndo(historyIndexRef.current > 0)
-        setCanRedo(historyIndexRef.current < historyRef.current.length - 1)
-    }, [])
+    const { pushHistory, undo, redo, canUndo, canRedo, resetHistory } = useFlowHistory(updateWorkflow)
+
+    const { fitView } = useReactFlow()
 
     // ── Auto-fit when node count changes or workflow switches ──
     const prevCountRef = useRef(nodes.length)
     useEffect(() => {
         if (nodes.length !== prevCountRef.current) {
             prevCountRef.current = nodes.length
-            // Always fit all nodes into the visible canvas area
             const t = setTimeout(() => {
                 fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM, duration: 300 })
             }, 100)
             return () => clearTimeout(t)
         }
     }, [nodes.length, fitView])
-
-    // ── Persist workflows to localStorage (disabled for now) ──
-    // useEffect(() => {
-    //     saveWorkflows(workflows, activeId)
-    // }, [workflows, activeId])
 
     // ── Reset history when switching workflows ──
     const prevActiveIdRef = useRef(activeId)
@@ -204,62 +193,11 @@ function BuilderSimpleInner() {
             prevActiveIdRef.current = activeId
             const wf = workflows.find(w => w.id === activeId)
             if (wf) {
-                historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
-                historyIndexRef.current = 0
-                updateUndoRedoState()
-                // Center viewport on the new workflow's nodes
+                resetHistory(wf.nodes, wf.edges)
                 setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 100)
             }
         }
-    }, [activeId, workflows, updateUndoRedoState, fitView])
-
-    const updateWorkflow = useCallback((updatedNodes: Node[], updatedEdges: Edge[]) => {
-        setWorkflows(prev => prev.map(w =>
-            w.id === activeId ? { ...w, nodes: updatedNodes, edges: updatedEdges } : w
-        ))
-    }, [activeId])
-
-    const pushHistory = useCallback((nextNodes: Node[], nextEdges: Edge[]) => {
-        if (skipPushRef.current) { skipPushRef.current = false; return }
-        const idx = historyIndexRef.current
-        historyRef.current = historyRef.current.slice(0, idx + 1)
-        historyRef.current.push({ nodes: nextNodes, edges: nextEdges })
-        historyIndexRef.current = historyRef.current.length - 1
-        updateUndoRedoState()
-    }, [updateUndoRedoState])
-
-    const undo = useCallback(() => {
-        const idx = historyIndexRef.current
-        if (idx <= 0) return
-        historyIndexRef.current = idx - 1
-        const entry = historyRef.current[idx - 1]
-        skipPushRef.current = true
-        updateWorkflow(entry.nodes, entry.edges)
-        updateUndoRedoState()
-    }, [updateWorkflow, updateUndoRedoState])
-
-    const redo = useCallback(() => {
-        const idx = historyIndexRef.current
-        if (idx >= historyRef.current.length - 1) return
-        historyIndexRef.current = idx + 1
-        const entry = historyRef.current[idx + 1]
-        skipPushRef.current = true
-        updateWorkflow(entry.nodes, entry.edges)
-        updateUndoRedoState()
-    }, [updateWorkflow, updateUndoRedoState])
-
-    // Keyboard shortcuts
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
-                e.preventDefault()
-                if (e.shiftKey) redo()
-                else undo()
-            }
-        }
-        window.addEventListener('keydown', handler)
-        return () => window.removeEventListener('keydown', handler)
-    }, [undo, redo])
+    }, [activeId, workflows, resetHistory, fitView])
 
     // ── Use refs for synced mutations ──
     const nodesRef = useRef(nodes)
@@ -483,13 +421,9 @@ function BuilderSimpleInner() {
         const wf = createWorkflow(`Workflow ${workflows.length + 1}`)
         setWorkflows(prev => [...prev, wf])
         setActiveId(wf.id)
-        // Reset history for the new workflow
-        historyRef.current = [{ nodes: wf.nodes, edges: wf.edges }]
-        historyIndexRef.current = 0
-        updateUndoRedoState()
-        // Fit viewport to show the starting node (use longer timeout to ensure React re-rendered)
+        resetHistory(wf.nodes, wf.edges)
         setTimeout(() => fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM }), 200)
-    }, [workflows.length, fitView, updateUndoRedoState])
+    }, [workflows.length, fitView, resetHistory])
 
     const handleSelectWorkflow = useCallback((id: string) => {
         setActiveId(id)
@@ -574,58 +508,11 @@ function BuilderSimpleInner() {
                     onConfigure={handleConfigure}
                     onRename={handleRename}
                     hideBeforeButton={hideBeforeButton}
+                    onUndo={undo}
+                    onRedo={redo}
+                    canUndo={canUndo}
+                    canRedo={canRedo}
                 >
-                    {/* Undo/Redo buttons — left edge */}
-                    <div
-                        data-testid="undo-redo-bar"
-                        style={{
-                            position: 'absolute', left: 16, top: '50%',
-                            transform: 'translateY(-50%)',
-                            display: 'flex', flexDirection: 'column', gap: 6,
-                            zIndex: 10,
-                        }}
-                    >
-                        <button
-                            data-testid="undo-btn"
-                            onClick={undo}
-                            disabled={!canUndo}
-                            title="Undo (Cmd+Z)"
-                            style={{
-                                width: 44, height: 44,
-                                borderRadius: 10,
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                background: canUndo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
-                                color: canUndo ? '#e2e8f0' : '#334155',
-                                cursor: canUndo ? 'pointer' : 'not-allowed',
-                                fontSize: 18,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                backdropFilter: 'blur(8px)',
-                                transition: 'all 0.2s',
-                            }}
-                        >
-                            ↩
-                        </button>
-                        <button
-                            data-testid="redo-btn"
-                            onClick={redo}
-                            disabled={!canRedo}
-                            title="Redo (Cmd+Shift+Z)"
-                            style={{
-                                width: 44, height: 44,
-                                borderRadius: 10,
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                background: canRedo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
-                                color: canRedo ? '#e2e8f0' : '#334155',
-                                cursor: canRedo ? 'pointer' : 'not-allowed',
-                                fontSize: 18,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                backdropFilter: 'blur(8px)',
-                                transition: 'all 0.2s',
-                            }}
-                        >
-                            ↪
-                        </button>
-                    </div>
                     <EventsPanel events={events} />
                 </FlowStudio>
                 {settingsNode && (

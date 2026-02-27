@@ -1,6 +1,6 @@
 import React from 'react'
 import type { PluginDefinition } from '../types'
-import { presetRegistry } from '@/engine/preset-registry'
+import { presetRegistry } from '@/engine/widget-preset-registry'
 
 /**
  * ── Node Logger Plugin ──────────────────────────────────────────────────────
@@ -81,8 +81,8 @@ When inserted between two nodes, the logger script outputs:
     onEnable() {
         // Register the "Node Logger" preset in the PresetRegistry
         presetRegistry.registerCustom({
-            type: PRESET_ID,
-            widgetType: 'job',
+            name: PRESET_ID,
+            type: 'job',
             subType: 'js',
             label: 'Node Logger',
             description: 'Logs node type, subtype, ID, left/right neighbor info',
@@ -99,7 +99,7 @@ When inserted between two nodes, the logger script outputs:
 
     onDisable() {
         // Unregister the preset when the plugin is disabled
-        presetRegistry.unregister(PRESET_ID)
+        presetRegistry.removeCustom(`job:${PRESET_ID}`)
     },
 
     // ── Side Panel ───────────────────────────────────────────────────────────────

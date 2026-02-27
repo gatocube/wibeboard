@@ -11,8 +11,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { widgetRegistry, type WidgetDefinition, type WidgetCategory } from '@/engine/widget-registry'
-import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
+import { widgetRegistry, type WidgetDefinition, type WidgetCategory } from '@/engine/widget-types-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/widget-preset-registry'
 import { WidgetIcon, CATEGORY_ICONS } from '@/components/WidgetIcon'
 import { Package } from 'lucide-react'
 
@@ -355,14 +355,14 @@ export function WidgetPicker({
                             {(() => {
                                 // Top-8 tiles in exact order, everything else after
                                 const PRESET_PRIO: Record<string, number> = {
-                                    'job-script': 0,               // Script
-                                    'job-ai': 1,                   // AI
-                                    'user-code-reviewer': 2,       // User
-                                    'subflow-default': 3,          // Subflow
-                                    'informer-sticker': 4,         // Info
-                                    'expectation-artifact': 5,     // Artifact
-                                    'expectation-tool-call': 6,    // Tool
-                                    'informer-web': 7,             // Webpage
+                                    'job:job-script': 0,               // Script
+                                    'job:job-ai': 1,                   // AI
+                                    'user:default': 2,                 // User
+                                    'subflow:default': 3,              // Subflow
+                                    'informer:default': 4,             // Info
+                                    'expectation:default': 5,          // Artifact
+                                    'expectation:expectation-tool-call': 6,    // Tool
+                                    'informer:informer-web': 7,        // Webpage
                                 }
                                 const allTiles = filtered.flatMap(widget =>
                                     presetRegistry.getByWidget(widget.type).map(tmpl => ({ widget, tmpl }))
@@ -371,13 +371,13 @@ export function WidgetPicker({
                                 const builtIn = allTiles.filter(t => !t.tmpl.tags.includes('custom'))
                                 const custom = allTiles.filter(t => t.tmpl.tags.includes('custom'))
                                 builtIn.sort((a, b) => {
-                                    const pa = PRESET_PRIO[a.tmpl.type] ?? 999
-                                    const pb = PRESET_PRIO[b.tmpl.type] ?? 999
+                                    const pa = PRESET_PRIO[a.tmpl.id] ?? 999
+                                    const pb = PRESET_PRIO[b.tmpl.id] ?? 999
                                     return pa - pb
                                 })
 
                                 const renderTile = ({ widget, tmpl }: { widget: WidgetDefinition; tmpl: PresetDefinition }, i: number, isCustom?: boolean) => {
-                                    const isPriority = tmpl.type in PRESET_PRIO
+                                    const isPriority = tmpl.id in PRESET_PRIO
                                     const label = (presetRegistry.getByWidget(widget.type).length === 1 || isPriority) && !isCustom
                                         ? widget.label
                                         : tmpl.label
@@ -394,8 +394,8 @@ export function WidgetPicker({
                                         : undefined
                                     return (
                                         <div
-                                            key={`${tmpl.type}-${i}`}
-                                            data-testid={`tile-${tmpl.type}`}
+                                            key={`${tmpl.name}-${i}`}
+                                            data-testid={`tile-${tmpl.id}`}
                                             title={`${tmpl.label}: ${tmpl.description}`}
                                             draggable
                                             onDragStart={e => {
@@ -459,10 +459,10 @@ export function WidgetPicker({
                                             {/* Delete button for custom presets */}
                                             {isCustom && (
                                                 <button
-                                                    data-testid={`delete-${tmpl.type}`}
+                                                    data-testid={`delete-${tmpl.name}`}
                                                     onClick={e => {
                                                         e.stopPropagation()
-                                                        presetRegistry.removeCustom(tmpl.type)
+                                                        presetRegistry.removeCustom(tmpl.id)
                                                     }}
                                                     style={{
                                                         position: 'absolute', top: -4, right: -4,
@@ -511,7 +511,7 @@ export function WidgetPicker({
                                                 >
                                                     {custom.map((t, i) => (
                                                         <div
-                                                            key={t.tmpl.type}
+                                                            key={t.tmpl.name}
                                                             draggable
                                                             data-testid={`custom-tile-${i}`}
                                                             onDragStart={e => {

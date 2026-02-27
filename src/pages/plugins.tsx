@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Puzzle, ToggleLeft, ToggleRight, ChevronDown, ChevronRight, Shield, FileCode } from 'lucide-react'
-import { CodeEditor } from '@/kit/CodeEditor'
+import { CodeEditor } from '@/components/kit/CodeEditor'
 import {
     getPlugins,
     isPluginEnabled,

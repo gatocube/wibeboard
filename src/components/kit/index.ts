@@ -6,3 +6,6 @@ export type { IconButtonProps, IconButtonColor, IconButtonSize } from './IconBut
 export { SwipeButtons, type SwipeButtonsProps, type SwipeButtonsActivation, type SwipeButtonsDirection } from './SwipeButtons'
 export { IconSelector } from './IconSelector'
 export { CodeEditor, type CodeEditorProps, type CodeLanguage } from './CodeEditor'
+export { ToggleGroup, ToggleGroupItem } from './ToggleGroup'
+export type { ToggleGroupProps, ToggleGroupItemProps, ToggleGroupSize, ToggleGroupVariant } from './ToggleGroup'
+

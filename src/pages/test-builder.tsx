@@ -8,9 +8,9 @@
 import { ReactFlowProvider, Panel, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { JobNode, GroupNode, PlaceholderNode } from '@/widgets/wibeglow'
-import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
+import { FlowStudio, FlowStudioStoreProvider, useFlowHistory } from '@/flow-studio'
 import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
-import type { PresetDefinition } from '@/engine/preset-registry'
+import type { PresetDefinition } from '@/engine/widget-preset-registry'
 import { generateId, now } from '@/engine/core'
 import { TimelineDots } from '@/components/TimelineDots'
 import { getWorkflowStore, type WorkflowMeta } from '@/engine/workflow-store'
@@ -70,6 +70,13 @@ function BuilderInner() {
     const [edges, setEdges] = useState<Edge[]>(initialEdges)
     const isDragging = useRef(false)
     const [editMode, setEditMode] = useState(true)
+
+    // ── Undo / Redo ──
+    const applySnapshot = useCallback((snapNodes: Node[], snapEdges: Edge[]) => {
+        setNodes(snapNodes)
+        setEdges(snapEdges)
+    }, [])
+    const { pushHistory, undo, redo, canUndo, canRedo } = useFlowHistory(applySnapshot)
 
     // ── Workflow persistence ──
     const [workflows, setWorkflows] = useState<WorkflowMeta[]>([])
@@ -209,13 +216,15 @@ function BuilderInner() {
                         } else {
                             isDragging.current = false
                             result[idx] = { ...result[idx], position: snapToGrid(change.position) }
+                            // Push history on drag end
+                            setTimeout(() => pushHistory(result, edges), 0)
                         }
                     }
                 }
             }
             return result
         })
-    }, [snapToGrid])
+    }, [snapToGrid, pushHistory, edges])
 
     // ── Update node data helper ──
     const updateNodeData = useCallback((id: string, patch: Record<string, any>) => {
@@ -330,6 +339,10 @@ function BuilderInner() {
             gridGap={GRID_SIZE}
             editMode={editMode}
             onNodeCreated={handleNodeCreated}
+            onUndo={undo}
+            onRedo={redo}
+            canUndo={canUndo}
+            canRedo={canRedo}
             onAddBefore={(nodeId) => {
                 // Insert a new node between the incoming source and this node
                 const incomingEdge = edges.find(e => e.target === nodeId)
@@ -373,12 +386,74 @@ function BuilderInner() {
                     }]
                 })
             }}
+            onAddAfter={(nodeId, widgetType) => {
+                const sourceNode = nodes.find(n => n.id === nodeId)
+                if (!sourceNode) return
+
+                let nodeType = 'agent'
+                let subType = 'ai'
+                let label = 'Agent'
+                let language = 'js'
+
+                if (widgetType.startsWith('script:')) {
+                    language = widgetType.split(':')[1] || 'js'
+                    nodeType = `script-${language}`
+                    subType = 'script'
+                    label = `script.${language}`
+                } else if (widgetType === 'user') {
+                    nodeType = 'job'
+                    subType = 'user'
+                    label = 'User'
+                }
+
+                const newNodeId = generateId('node')
+                const newX = sourceNode.position.x + (sourceNode.width || 200) + 100
+                const newY = sourceNode.position.y
+
+                const newNodeData: Record<string, any> = {
+                    label, subType,
+                    width: subType === 'script' ? 280 : 200,
+                    height: subType === 'script' ? 200 : 120,
+                }
+
+                if (subType === 'script') {
+                    newNodeData.language = language
+                    newNodeData.configured = false
+                    newNodeData.logs = []
+                    newNodeData.status = 'idle'
+                    newNodeData.onSaveScript = (code: string) => updateNodeData(newNodeId, { code, configured: true })
+                    newNodeData.onRunScript = () => handleRunScript(newNodeId)
+                } else if (subType === 'ai') {
+                    newNodeData.color = '#8b5cf6'
+                    newNodeData.agent = 'Claude 3.5'
+                }
+
+                setNodes(nds => [...nds, {
+                    id: newNodeId,
+                    type: nodeType,
+                    position: { x: newX, y: newY },
+                    data: newNodeData,
+                    style: { width: newNodeData.width, height: newNodeData.height },
+                }])
+
+                setEdges(eds => [...eds, {
+                    id: `edge-${nodeId}-${newNodeId}`,
+                    source: nodeId,
+                    target: newNodeId,
+                    animated: true,
+                    style: { stroke: '#8b5cf6', strokeWidth: 1.5 },
+                }])
+            }}
             onRename={(nodeId, newName) => {
                 updateNodeData(nodeId, { label: newName })
             }}
-            onConfigure={(nodeId) => {
-                console.log('Configure node:', nodeId)
-                // TODO: open configuration panel for the node
+            onConfigure={(nodeId, action) => {
+                if (action === 'delete') {
+                    setNodes(nds => nds.filter(n => n.id !== nodeId))
+                    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId))
+                } else {
+                    console.log('Configure node:', nodeId)
+                }
             }}
             onSizeChange={(size) => {
                 const presets: Record<string, { w: number; h: number }> = {

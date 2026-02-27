@@ -19,7 +19,7 @@ import { FlowStudioStore } from '@/flow-studio/FlowStudioStore'
 import { JobNode } from '@/widgets/wibeglow/JobNode'
 import { UserNode } from '@/widgets/wibeglow/UserNode'
 import { PlaceholderNode } from '@/widgets/wibeglow/PlaceholderNode'
-import type { PresetDefinition } from '@/engine/preset-registry'
+import type { PresetDefinition } from '@/engine/widget-preset-registry'
 
 // ── Node types ───────────────────────────────────────────────────────────────
 

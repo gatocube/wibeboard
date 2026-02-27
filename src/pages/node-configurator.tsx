@@ -14,24 +14,30 @@
 
 import { useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { widgetRegistry, GRID_CELL, type WidgetDefinition } from '@/engine/widget-registry'
-import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
+import { widgetRegistry, GRID_CELL, type WidgetDefinition } from '@/engine/widget-types-registry'
+import { presetRegistry, type PresetDefinition } from '@/engine/widget-preset-registry'
+import { subTypeRegistry, type FieldSchema } from '@/engine/widget-subtypes-registry'
 import { WidgetPicker } from '@/flow-studio/WidgetPicker'
 import { WidgetIcon } from '@/components/WidgetIcon'
-import { CodeEditor, IconSelector } from '@/kit'
-import type { CodeLanguage } from '@/kit'
+import { CodeEditor, IconSelector, ToggleGroup, ToggleGroupItem } from '@/components/kit'
+import type { CodeLanguage } from '@/components/kit'
 import { generateId } from '@/engine/core'
+import type { ThemeKey } from '@/flow-studio/types'
 
 // Widget node components for live preview
 import {
     JobNode, GroupNode, InformerNode, ExpectationNode,
     UserNode, SubFlowNode, StartingNode, ArtifactNode,
 } from '@/widgets/wibeglow'
+import * as pixel from '@/widgets/pixel'
+import * as ghub from '@/widgets/ghub'
 
-// ── Node component map ──────────────────────────────────────────────────────────
+// ── Node component map (per theme) ──────────────────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- widget components expect NodeProps but we render standalone
-const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
+type NodeComp = React.ComponentType<any>
+
+const WIBEGLOW_COMPONENTS: Record<string, NodeComp> = {
     job: JobNode,
     group: GroupNode,
     informer: InformerNode,
@@ -42,35 +48,59 @@ const NODE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     artifact: ArtifactNode,
 }
 
+const THEME_COMPONENTS: Record<ThemeKey, Record<string, NodeComp>> = {
+    wibeglow: WIBEGLOW_COMPONENTS,
+    pixel: {
+        job: pixel.JobNode,
+        informer: pixel.InformerNode,
+    },
+    ghub: {
+        job: ghub.JobNode,
+        informer: ghub.InformerNode,
+    },
+}
+
+/** Resolve the component for a widget type under a given theme, falling back to wibeglow. */
+function resolvePreviewComponent(theme: ThemeKey, widgetType: string): NodeComp | undefined {
+    return THEME_COMPONENTS[theme]?.[widgetType] ?? WIBEGLOW_COMPONENTS[widgetType]
+}
+
 // ── Manifest generator ──────────────────────────────────────────────────────────
 
 function generateManifest(def: WidgetDefinition) {
     const tpl = presetRegistry.getByWidget(def.type)[0]
-    const properties: Record<string, object> = {}
-    const required: string[] = []
+    const subType = tpl?.subType || tpl?.defaultData?.subType
 
-    if (tpl) {
-        for (const [key, value] of Object.entries(tpl.defaultData)) {
-            const t = typeof value
-            if (t === 'string') {
-                const prop: Record<string, any> = { type: 'string', default: value }
-                if (key === 'subType' && def.subTypes?.length) {
-                    prop.enum = def.subTypes.map(s => s.value)
-                    prop.enumLabels = def.subTypes.map(s => s.label)
-                }
-                properties[key] = prop
-            } else if (t === 'number') {
-                properties[key] = { type: 'number', default: value }
-            } else if (t === 'boolean') {
-                properties[key] = { type: 'boolean', default: value }
-            } else if (Array.isArray(value)) {
-                properties[key] = { type: 'array', default: value, items: {} }
-            } else if (value !== null && t === 'object') {
-                properties[key] = { type: 'object', default: value }
+    // Use schema-driven property generation
+    const settingsSchema = subTypeRegistry.getSettingsSchema(def.type, subType)
+    const stateSchema = subTypeRegistry.getStateSchema(def.type, subType)
+
+    const toJsonSchema = (schema: Record<string, FieldSchema>) => {
+        const properties: Record<string, any> = {}
+        const required: string[] = []
+        for (const [key, field] of Object.entries(schema)) {
+            const prop: Record<string, any> = { type: field.type === 'enum' ? 'string' : field.type }
+            if (field.description) prop.description = field.description
+            if (field.default !== undefined) prop.default = field.default
+            if (field.format) prop.format = field.format
+            if (field.readOnly) prop.readOnly = true
+            if (field.min !== undefined) prop.minimum = field.min
+            if (field.max !== undefined) prop.maximum = field.max
+            if (field.enum) {
+                prop.enum = field.enum.map(e => e.value)
+                prop.enumLabels = field.enum.map(e => e.label)
             }
-            if (key === 'label') required.push(key)
+            if (field.items) {
+                prop.items = { type: field.items.type === 'enum' ? 'string' : field.items.type }
+            }
+            properties[key] = prop
+            if (field.required) required.push(key)
         }
+        return { properties, required }
     }
+
+    const settings = toJsonSchema(settingsSchema)
+    const state = toJsonSchema(stateSchema)
 
     return {
         name: def.type,
@@ -81,15 +111,11 @@ function generateManifest(def: WidgetDefinition) {
         color: def.ui.color,
         category: def.category,
         tags: def.tags,
-        subTypes: def.subTypes || [],
+        subTypes: presetRegistry.getSubTypes(def.type),
         ui: {
             icons: def.ui.icons,
             color: def.ui.color,
             defaultSize: def.ui.defaultSize,       // grid units
-            defaultSizePx: {                        // computed pixels
-                w: def.ui.defaultSize.w * GRID_CELL,
-                h: def.ui.defaultSize.h * GRID_CELL,
-            },
         },
         templates: presetRegistry.getByWidget(def.type).map(t => ({
             name: t.label, description: t.description, defaultData: t.defaultData,
@@ -99,9 +125,11 @@ function generateManifest(def: WidgetDefinition) {
             title: `${def.label} Node`,
             description: def.description,
             type: 'object',
-            properties,
-            required,
+            properties: { ...settings.properties, ...state.properties },
+            required: [...settings.required, ...state.required],
         },
+        settingsSchema,
+        stateSchema,
     }
 }
 
@@ -257,6 +285,7 @@ function buildPreviewData(
     width: number,
     height: number,
     debugMode: boolean,
+    themeName?: ThemeKey,
 ): Record<string, any> {
     return {
         ...nodeData,
@@ -264,6 +293,7 @@ function buildPreviewData(
         height,
         debugMode,
         _debugId: 'cfg-preview',
+        ...(themeName ? { _themeName: themeName, _themeType: 'night' } : {}),
         state: nodeData.state || {
             status: nodeData.status || 'idle',
             progress: nodeData.progress || 0,
@@ -278,6 +308,7 @@ function buildPreviewData(
 export function NodeConfiguratorPage() {
     const allWidgets = useMemo(() => widgetRegistry.getAll(), [])
     const [selectedType, setSelectedType] = useState(allWidgets[0]?.type || 'job')
+    const [selectedTheme, setSelectedTheme] = useState<ThemeKey>('wibeglow')
 
     const [mode, setMode] = useState<Mode>('visual')
     const [rawJson, setRawJson] = useState('')
@@ -317,10 +348,14 @@ export function NodeConfiguratorPage() {
     }, [])
 
     const handleModeSwitch = useCallback((m: Mode) => {
-        if (m === 'raw') setRawJson(JSON.stringify(nodeData, null, 2))
+        if (m === 'raw') {
+            const subType = (nodeData.subType as string) || undefined
+            const structured = subTypeRegistry.resolveNodeData(widgetDef.type, subType, nodeData)
+            setRawJson(JSON.stringify(structured, null, 2))
+        }
         setMode(m)
         setParseError(null)
-    }, [nodeData])
+    }, [nodeData, widgetDef.type])
 
     const handleRawChange = useCallback((val: string) => {
         setRawJson(val)
@@ -328,26 +363,50 @@ export function NodeConfiguratorPage() {
     }, [])
 
     const handleRawApply = useCallback(() => {
-        try { setNodeData(JSON.parse(rawJson)); setParseError(null) } catch (err: any) { setParseError(err.message) }
+        try {
+            const parsed = JSON.parse(rawJson)
+            // If structured { settings, state }, flatten back to nodeData
+            if (parsed.settings || parsed.state) {
+                setNodeData({ ...parsed.settings, ...parsed.state })
+            } else {
+                setNodeData(parsed)
+            }
+            setParseError(null)
+        } catch (err: any) { setParseError(err.message) }
     }, [rawJson])
 
     const updateField = useCallback((key: string, value: any) => {
         setNodeData(prev => ({ ...prev, [key]: value }))
     }, [])
 
-    // ── Preview data ──
-    const previewW = widgetDef.ui.defaultSize.w * GRID_CELL || 200
-    const previewH = widgetDef.ui.defaultSize.h * GRID_CELL || 120
-    const previewData = useMemo(
-        () => buildPreviewData(nodeData, previewW, previewH, false),
-        [nodeData, previewW, previewH],
+    // ── Preview sizes (grid units) ──
+    const defaultGU = widgetDef.ui.defaultSize   // { w, h } in grid units
+    const compactGU = { w: 3, h: 3 }
+    const mediumGU = { w: defaultGU.w, h: defaultGU.h }
+    // Large = 2× default, clamped to fit column (~268px inner → 13 gu max width)
+    const largeGU = {
+        w: Math.min(defaultGU.w * 2, 13),
+        h: Math.min(defaultGU.h * 2, 13),
+    }
+
+    // Apply theme only when nodeData doesn't specify an explicit _themeName
+    const effectiveTheme = nodeData._themeName || selectedTheme
+
+    const compactData = useMemo(
+        () => buildPreviewData(nodeData, compactGU.w * GRID_CELL, compactGU.h * GRID_CELL, false, nodeData._themeName ? undefined : selectedTheme),
+        [nodeData, compactGU.w, compactGU.h, selectedTheme],
     )
-    const debugPreviewData = useMemo(
-        () => buildPreviewData(nodeData, previewW, previewH, true),
-        [nodeData, previewW, previewH],
+    const mediumData = useMemo(
+        () => buildPreviewData(nodeData, mediumGU.w * GRID_CELL, mediumGU.h * GRID_CELL, false, nodeData._themeName ? undefined : selectedTheme),
+        [nodeData, mediumGU.w, mediumGU.h, selectedTheme],
+    )
+    const largeData = useMemo(
+        () => buildPreviewData(nodeData, largeGU.w * GRID_CELL, largeGU.h * GRID_CELL, false, nodeData._themeName ? undefined : selectedTheme),
+        [nodeData, largeGU.w, largeGU.h, selectedTheme],
     )
 
-    const PreviewComponent = NODE_COMPONENTS[widgetDef.type]
+    // Resolve component per effective theme, falling back to wibeglow
+    const PreviewComponent = resolvePreviewComponent(effectiveTheme, widgetDef.type)
 
     return (
         <div style={S.page}>
@@ -356,83 +415,60 @@ export function NodeConfiguratorPage() {
 
             {/* ── Column 1: Preview ── */}
             <div style={S.col1}>
-                {/* Normal preview */}
-                <div style={S.card}>
-                    <div style={S.cardHeader}>Preview</div>
-                    <div style={{
-                        ...S.cardBody,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        minHeight: 140, background: '#0a0a14',
-                    }}>
-                        <div className="hide-handles" style={{
-                            width: previewW, height: previewH,
-                            position: 'relative',
-                        }}>
-                            <ReactFlowProvider>
-                                {PreviewComponent ? (
-                                    <PreviewComponent data={previewData} />
-                                ) : (
-                                    <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
-                                )}
-                            </ReactFlowProvider>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Debug preview */}
+                {/* Theme selector bar */}
                 <div style={S.card}>
                     <div style={{
                         ...S.cardHeader,
-                        display: 'flex', alignItems: 'center', gap: 6,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     }}>
-                        <span style={{ color: '#10b981' }}>⬤</span>
-                        Debug Preview
+                        <span>Theme</span>
                     </div>
-                    <div style={{
-                        ...S.cardBody,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        minHeight: 140, background: '#0a0a14',
-                    }}>
-                        <div className="hide-handles" style={{
-                            width: previewW, height: previewH,
-                            position: 'relative',
-                        }}>
-                            <ReactFlowProvider>
-                                {PreviewComponent ? (
-                                    <PreviewComponent data={debugPreviewData} />
-                                ) : (
-                                    <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
-                                )}
-                            </ReactFlowProvider>
-                        </div>
+                    <div style={{ ...S.cardBody, padding: '8px 12px' }}>
+                        <ToggleGroup
+                            value={selectedTheme}
+                            onChange={(v) => setSelectedTheme(v as ThemeKey)}
+                            size="sm"
+                            style={{ width: '100%' }}
+                        >
+                            <ToggleGroupItem value="wibeglow" testId="preview-theme-wibeglow">WibeGlow</ToggleGroupItem>
+                            <ToggleGroupItem value="pixel" testId="preview-theme-pixel">Pixel</ToggleGroupItem>
+                            <ToggleGroupItem value="ghub" testId="preview-theme-ghub">GitHub</ToggleGroupItem>
+                        </ToggleGroup>
                     </div>
                 </div>
 
-                {/* Widget info */}
-                <div style={S.card}>
-                    <div style={S.cardHeader}>Info</div>
-                    <div style={{ ...S.cardBody, fontSize: 10, color: '#94a3b8', lineHeight: 1.6 }}>
-                        <div><strong style={{ color: '#e2e8f0' }}>Type:</strong> {widgetDef.type}</div>
-                        <div><strong style={{ color: '#e2e8f0' }}>Category:</strong> {widgetDef.category}</div>
-                        <div><strong style={{ color: '#e2e8f0' }}>Size:</strong> {previewW}×{previewH} px</div>
-                        <div style={{ marginTop: 4 }}>{widgetDef.description}</div>
-                        {widgetDef.subTypes && widgetDef.subTypes.length > 0 && (
-                            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8 }}>
-                                {widgetDef.subTypes.map(st => (
-                                    <span key={st.value} style={{
-                                        padding: '2px 8px', borderRadius: 4,
-                                        background: `${st.color || '#8b5cf6'}20`,
-                                        border: `1px solid ${st.color || '#8b5cf6'}33`,
-                                        fontSize: 9, color: st.color || '#8b5cf6',
-                                        fontWeight: 500,
-                                    }}>
-                                        {st.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
+                {/* Compact preview */}
+                <PreviewCard
+                    label="Compact"
+                    guW={compactGU.w}
+                    guH={compactGU.h}
+                    data={compactData}
+                    nodeData={nodeData}
+                    widgetDef={widgetDef}
+                    PreviewComponent={PreviewComponent}
+                />
+
+                {/* Medium preview */}
+                <PreviewCard
+                    label="Medium"
+                    guW={mediumGU.w}
+                    guH={mediumGU.h}
+                    data={mediumData}
+                    nodeData={nodeData}
+                    widgetDef={widgetDef}
+                    PreviewComponent={PreviewComponent}
+                />
+
+                {/* Large preview */}
+                <PreviewCard
+                    label="Large"
+                    guW={largeGU.w}
+                    guH={largeGU.h}
+                    data={largeData}
+                    nodeData={nodeData}
+                    widgetDef={widgetDef}
+                    PreviewComponent={PreviewComponent}
+                />
             </div>
 
             {/* ── Column 2: Configurator ── */}
@@ -581,10 +617,10 @@ export function NodeConfiguratorPage() {
                             onClick={() => {
                                 const name = prompt('Preset name:', nodeData.label || 'My Preset')
                                 if (!name) return
-                                const presetType = `custom-${generateId('preset')}`
+                                const presetName = `custom-${generateId('preset')}`
                                 presetRegistry.registerCustom({
-                                    type: presetType,
-                                    widgetType: widgetDef.type,
+                                    name: presetName,
+                                    type: widgetDef.type,
                                     subType: nodeData.subType,
                                     label: name,
                                     description: `Custom ${widgetDef.label} preset`,
@@ -630,6 +666,65 @@ export function NodeConfiguratorPage() {
                     embedded
                     compact
                 />
+            </div>
+        </div>
+    )
+}
+
+// ── Preview Card (reusable for compact / medium / large) ─────────────────────────────
+
+function PreviewCard({ label, guW, guH, data, nodeData, widgetDef, PreviewComponent }: {
+    label: string
+    guW: number
+    guH: number
+    data: Record<string, any>
+    nodeData: Record<string, any>
+    widgetDef: WidgetDefinition
+    PreviewComponent: React.ComponentType<any> | undefined
+}) {
+    const pxW = guW * GRID_CELL
+    const pxH = guH * GRID_CELL
+
+    return (
+        <div style={S.card}>
+            <div style={{
+                ...S.cardHeader,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+                <span>{label}</span>
+                <span style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 9, color: '#8b5cf6', fontWeight: 600,
+                    letterSpacing: 0,
+                }}>
+                    {guW}×{guH} · {pxW}×{pxH}px
+                </span>
+            </div>
+            <div style={{
+                ...S.cardBody,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexDirection: 'column',
+                minHeight: pxH + 32, background: '#0a0a14',
+                gap: 6,
+            }}>
+                <div className="hide-handles" style={{
+                    width: pxW, height: pxH,
+                    position: 'relative',
+                }}>
+                    <ReactFlowProvider>
+                        {PreviewComponent ? (
+                            <PreviewComponent data={data} />
+                        ) : (
+                            <FallbackPreview nodeData={nodeData} widgetDef={widgetDef} />
+                        )}
+                    </ReactFlowProvider>
+                </div>
+                <span style={{
+                    fontSize: 8, color: '#475569',
+                    fontFamily: "'JetBrains Mono', monospace",
+                }}>
+                    {pxW}×{pxH}px
+                </span>
             </div>
         </div>
     )
@@ -741,7 +836,8 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
     const t = typeof value
 
     // Check if this field has enum options (subType)
-    const isEnum = fieldKey === 'subType' && widgetDef.subTypes && widgetDef.subTypes.length > 0
+    const subTypes = presetRegistry.getSubTypes(widgetDef.type)
+    const isEnum = fieldKey === 'subType' && subTypes.length > 0
 
     // Detect code language from sibling data
     const isCode = fieldKey === 'code'
@@ -802,7 +898,7 @@ function VisualField({ fieldKey, value, widgetDef, onChange }: {
                     onChange={e => handleChange(e.target.value)}
                     data-testid={`field-${fieldKey}`}
                 >
-                    {widgetDef.subTypes!.map(st => (
+                    {subTypes.map(st => (
                         <option key={st.value} value={st.value}>
                             {st.label} ({st.value})
                         </option>

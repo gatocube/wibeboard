@@ -3,7 +3,7 @@
  */
 
 import type { Node, Edge, NodeTypes, OnNodesChange, Viewport } from '@xyflow/react'
-import type { PresetDefinition } from '@/engine/preset-registry'
+import type { PresetDefinition } from '@/engine/widget-preset-registry'
 
 // ── Visual types ────────────────────────────────────────────────────────────────
 
@@ -80,4 +80,15 @@ export interface FlowStudioProps {
      * Useful for showing a node configuration panel after creation.
      */
     sidebarContent?: React.ReactNode
+
+    // ── Undo / Redo ──
+
+    /** Undo callback — FlowStudio renders the button when provided */
+    onUndo?: () => void
+    /** Redo callback */
+    onRedo?: () => void
+    /** Whether undo is available (controls button disabled state) */
+    canUndo?: boolean
+    /** Whether redo is available (controls button disabled state) */
+    canRedo?: boolean
 }

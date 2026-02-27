@@ -9,6 +9,7 @@ import { ShimmeringText, SplittingText } from '@/components/animate-ui'
 import { BaseNode } from '@/widgets/BaseNode'
 import { WidgetIcon, AnimatedIcon } from '@/components/WidgetIcon'
 import { resolveState } from '@/widgets/resolve-state'
+import { subTypeRegistry } from '@/engine/widget-subtypes-registry'
 
 /**
  * JobNode (wibeglow) — Unified modern dark node for agents and scripts.
@@ -31,11 +32,13 @@ import { resolveState } from '@/widgets/resolve-state'
  * data.width / data.height — dimensions
  */
 
-const LANG_COLORS: Record<string, string> = {
-    js: '#f7df1e', ts: '#3178c6', sh: '#89e051', py: '#3776ab',
+/** Resolve language color from subtype registry, with fallback */
+function getLangColor(lang: string): string {
+    return subTypeRegistry.resolveColor('job', lang)
 }
-const LANG_LABELS: Record<string, string> = {
-    js: 'JavaScript', ts: 'TypeScript', sh: 'Shell', py: 'Python',
+/** Resolve language label from subtype registry, with fallback */
+function getLangLabel(lang: string): string {
+    return subTypeRegistry.getBySubType('job', lang)?.label ?? lang
 }
 
 export function JobNode({ data }: { data: any }) {
@@ -308,7 +311,7 @@ function AgentVariant({ data }: { data: any }) {
 
 function ScriptVariant({ data }: { data: any }) {
     const lang = data.language || 'js'
-    const langColor = LANG_COLORS[lang] || '#8b5cf6'
+    const langColor = getLangColor(lang)
     const w = data.width || 280
     const h = data.height || 200
     const isConfigured = data.configured
@@ -382,7 +385,7 @@ function ScriptVariant({ data }: { data: any }) {
                                 background: `${langColor}18`, padding: '1px 6px', borderRadius: 4,
                                 textTransform: 'uppercase', letterSpacing: '0.5px',
                             }}>
-                                {LANG_LABELS[lang] || lang}
+                                {getLangLabel(lang)}
                             </div>
                         </div>
 

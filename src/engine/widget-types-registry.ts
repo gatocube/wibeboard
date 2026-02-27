@@ -1,8 +1,8 @@
 /**
  * Widget Registry — root widget type definitions for the builder.
  *
- * Each widget defines: type, label, ui, category, description, subTypes.
- * Presets are stored separately in preset-registry.ts.
+ * Each widget defines: type, label, ui, category, description.
+ * Presets are stored separately in widget-preset-registry.ts.
  *
  * ALL sizes are stored in **grid units** (gu).
  * Use GRID_CELL to convert: pixels = gu * GRID_CELL.
@@ -37,11 +37,7 @@ export type WidgetCategory = 'AI' | 'Script' | 'Job' | 'Layout' | 'Informer' | '
 export interface WidgetDefinition extends RegistryItem {
     category: WidgetCategory
     ui: WidgetUI
-    /** Preset ID used when creating a node with no explicit preset */
-    defaultPreset: string
     disabled?: boolean
-    /** Available sub-types for this widget */
-    subTypes?: { value: string; label: string; color?: string }[]
 }
 
 // ── Widget Definitions ─────────────────────────────────────────────────────────
@@ -49,7 +45,6 @@ export interface WidgetDefinition extends RegistryItem {
 const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     {
         type: 'job',
-        defaultPreset: 'job-default',
         label: 'Job',
         category: 'Job',
         tags: ['agent', 'worker', 'ai', 'llm', 'task', 'execute', 'script', 'code', 'python', 'typescript', 'javascript', 'shell'],
@@ -59,18 +54,10 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
             color: '#8b5cf6',
             defaultSize: { w: 10, h: 6 },
         },
-        subTypes: [
-            { value: 'ai', label: 'AI Agent', color: '#8b5cf6' },
-            { value: 'js', label: 'JavaScript', color: '#f7df1e' },
-            { value: 'ts', label: 'TypeScript', color: '#3178c6' },
-            { value: 'sh', label: 'Shell', color: '#4caf50' },
-            { value: 'py', label: 'Python', color: '#3776ab' },
-        ],
     },
     // ── SubFlow ──
     {
         type: 'subflow',
-        defaultPreset: 'subflow-default',
         label: 'SubFlow',
         category: 'SubFlow',
         tags: ['subflow', 'scope', 'container', 'nested', 'group', 'boundary'],
@@ -84,7 +71,6 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Layout ──
     {
         type: 'group',
-        defaultPreset: 'group-pipeline',
         label: 'Group',
         category: 'Layout',
         tags: ['group', 'container', 'pipeline', 'section'],
@@ -98,7 +84,6 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── User (human interaction) ──
     {
         type: 'user',
-        defaultPreset: 'user-code-reviewer',
         label: 'User',
         category: 'Job',
         tags: ['user', 'human', 'review', 'approval', 'gate', 'interaction'],
@@ -112,7 +97,6 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
     // ── Informer ──
     {
         type: 'informer',
-        defaultPreset: 'informer-sticker',
         label: 'Informer',
         category: 'Informer',
         tags: ['informer', 'note', 'sticker', 'annotation', 'comment', 'post-it', 'label', 'group', 'section', 'web', 'iframe'],
@@ -122,16 +106,10 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
             color: '#fbbf24',
             defaultSize: { w: 8, h: 6 },
         },
-        subTypes: [
-            { value: 'static', label: 'Static', color: '#fbbf24' },
-            { value: 'interactive', label: 'Interactive', color: '#06b6d4' },
-            { value: 'web', label: 'Web', color: '#8b5cf6' },
-        ],
     },
     // ── Expectation ──
     {
         type: 'expectation',
-        defaultPreset: 'expectation-artifact',
         label: 'Expectation',
         category: 'Expectation',
         tags: ['expectation', 'assert', 'verify', 'check', 'artifact', 'tool', 'test'],
@@ -141,16 +119,10 @@ const WIDGETS: Omit<WidgetDefinition, 'id'>[] = [
             color: '#10b981',
             defaultSize: { w: 8, h: 4 },
         },
-        subTypes: [
-            { value: 'artifact', label: 'Artifact', color: '#ec4899' },
-            { value: 'tool-call', label: 'Tool Call', color: '#06b6d4' },
-            { value: 'job', label: 'Job', color: '#8b5cf6' },
-        ],
     },
     // ── Starting (flow entry point) ──
     {
         type: 'starting',
-        defaultPreset: 'starting-default',
         label: 'Starting',
         category: 'Starting',
         tags: ['start', 'begin', 'entry', 'trigger', 'play'],

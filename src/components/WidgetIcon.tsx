@@ -23,7 +23,7 @@ import {
     AlertTriangle, CheckCircle, Circle, CircleDot, Loader2, Timer, XCircle,
     Search, Clock, Magnet, Telescope, Satellite,
     Rewind, Briefcase, ClipboardCheck, UserCircle, Brain, Wrench,
-    FileCode, FileType, type LucideProps,
+    FileCode, FileType, icons as allLucideIcons, type LucideProps,
 } from 'lucide-react'
 
 // ── Icon mapping ────────────────────────────────────────────────────────────────
@@ -99,6 +99,12 @@ export const WIDGET_ICON_COLORS: Record<string, string> = {
 
 // ── Build IconRegistry instance from existing maps ──────────────────────────────
 
+/** PascalCase → kebab-case  (e.g. "ArrowUpRight" → "arrow-up-right") */
+function toKebab(s: string): string {
+    return s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').replace(/([A-Z])([A-Z][a-z])/g, '$1-$2').toLowerCase()
+}
+
+// Start with the hand-picked icons (they have custom aliases & colors)
 const iconEntries: Omit<IconDefinition, 'id'>[] = Object.keys(ICON_MAP).map(key => ({
     type: key,
     label: key,
@@ -107,6 +113,24 @@ const iconEntries: Omit<IconDefinition, 'id'>[] = Object.keys(ICON_MAP).map(key 
     component: ICON_MAP[key],
     color: WIDGET_ICON_COLORS[key] ?? '#8b5cf6',
 }))
+
+// Merge ALL lucide-react icons (kebab-cased), skipping ones already in the hand-picked set
+const existingTypes = new Set(iconEntries.map(e => e.type))
+for (const [pascalName, component] of Object.entries(allLucideIcons)) {
+    const kebab = toKebab(pascalName)
+    if (!existingTypes.has(kebab)) {
+        existingTypes.add(kebab)
+        iconEntries.push({
+            type: kebab,
+            label: pascalName,
+            description: `Lucide: ${pascalName}`,
+            tags: [kebab, pascalName.toLowerCase()],
+            component: component as React.ComponentType<LucideProps>,
+            color: '#94a3b8',    // neutral slate for all auto-registered
+            category: 'Lucide',
+        })
+    }
+}
 
 export const iconRegistry = new IconRegistry(iconEntries)
 

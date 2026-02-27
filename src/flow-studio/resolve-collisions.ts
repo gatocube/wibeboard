@@ -9,7 +9,7 @@
  */
 
 import type { Node } from '@xyflow/react'
-import { GRID_CELL } from '@/engine/widget-registry'
+import { GRID_CELL } from '@/engine/widget-types-registry'
 
 export interface CollisionOptions {
     /** Minimum gap between nodes in px (default: GRID_CELL = 20px = 1 grid unit) */

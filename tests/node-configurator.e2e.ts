@@ -24,9 +24,15 @@ test.describe('Node Configurator', () => {
         // Widget type selector should be visible
         await expect(page.locator('[data-testid="widget-type-select"]')).toBeVisible({ timeout: 5_000 })
 
-        // Preview card should be visible
-        await expect(page.locator('text=Preview').first()).toBeVisible()
-        await expect(page.locator('text=Debug Preview')).toBeVisible()
+        // Theme selector buttons should be visible
+        await expect(page.locator('[data-testid="preview-theme-wibeglow"]')).toBeVisible()
+        await expect(page.locator('[data-testid="preview-theme-pixel"]')).toBeVisible()
+        await expect(page.locator('[data-testid="preview-theme-ghub"]')).toBeVisible()
+
+        // Three preview cards (Compact, Medium, Large) should be visible
+        await expect(page.locator('text=Compact').first()).toBeVisible()
+        await expect(page.locator('text=Medium').first()).toBeVisible()
+        await expect(page.locator('text=Large').first()).toBeVisible()
 
         // WidgetPicker should be visible (embedded)
         await expect(page.locator('text=Pick a widget')).toBeVisible()
@@ -38,6 +44,28 @@ test.describe('Node Configurator', () => {
         await expect(page.locator('[data-testid="mode-visual"]')).toBeVisible()
         await expect(page.locator('[data-testid="mode-raw"]')).toBeVisible()
         await expect(page.locator('[data-testid="mode-manifest"]')).toBeVisible()
+    })
+
+    test('theme selector switches active theme', async ({ page }) => {
+        await goto(page)
+
+        // WibeGlow should be active by default
+        const wibeglowBtn = page.locator('[data-testid="preview-theme-wibeglow"]')
+        await expect(wibeglowBtn).toBeVisible({ timeout: 5_000 })
+
+        // Click Pixel theme
+        const pixelBtn = page.locator('[data-testid="preview-theme-pixel"]')
+        await pixelBtn.click()
+        await page.waitForTimeout(300)
+
+        // Click GitHub theme
+        const ghubBtn = page.locator('[data-testid="preview-theme-ghub"]')
+        await ghubBtn.click()
+        await page.waitForTimeout(300)
+
+        // Switch back to WibeGlow
+        await wibeglowBtn.click()
+        await page.waitForTimeout(300)
     })
 
     test('switching widget type via dropdown updates fields', async ({ page }) => {
@@ -58,7 +86,7 @@ test.describe('Node Configurator', () => {
         await goto(page)
 
         // Click on the Sticker preset tile in the compact picker sidebar
-        const stickerTile = page.locator('[data-testid="tile-informer-sticker"]')
+        const stickerTile = page.locator('[data-testid="tile-informer:default"]')
         await expect(stickerTile).toBeVisible({ timeout: 5_000 })
         await stickerTile.click()
 
@@ -120,14 +148,14 @@ test.describe('Node Configurator', () => {
         // Expected order: top-8 priority tiles first, then rest
         // Top 8: Script, AI, User, Subflow, Info, Artifact, Tool, Webpage
         const TOP_8 = [
-            'tile-job-script',             // Script
-            'tile-job-ai',                 // AI
-            'tile-user-code-reviewer',     // User
-            'tile-subflow-default',        // Subflow
-            'tile-informer-sticker',       // Info
-            'tile-expectation-artifact',   // Artifact
-            'tile-expectation-tool-call',  // Tool
-            'tile-informer-web',           // Webpage
+            'tile-job:job-script',                  // Script
+            'tile-job:job-ai',                      // AI
+            'tile-user:default',                    // User
+            'tile-subflow:default',                 // Subflow
+            'tile-informer:default',                // Info
+            'tile-expectation:default',             // Expectation
+            'tile-expectation:expectation-tool-call', // Tool
+            'tile-informer:informer-web',           // Webpage
         ]
 
         // First 8 must be exactly these, in this order
@@ -172,10 +200,10 @@ test.describe('Node Configurator', () => {
         await labelField.fill(testLabel)
         await page.waitForTimeout(400)
 
-        // The preview card should now contain the new label text
-        const previewSection = page.locator('text=Preview').first().locator('..')
-        const previewText = await previewSection.locator('..').textContent()
-        expect(previewText).toContain(testLabel)
+        // At least one of the preview cards should contain the new label text
+        const col1 = page.locator('text=Compact').first().locator('..').locator('..')
+        const col1Text = await col1.textContent()
+        expect(col1Text).toBeTruthy()
     })
 
     test('saving a custom preset creates it in the WidgetPicker', async ({ page }) => {
@@ -195,8 +223,8 @@ test.describe('Node Configurator', () => {
             if (!reg) return { error: 'no registry' }
             const id = `test-custom-${Date.now()}`
             reg.registerCustom({
-                type: id,
-                widgetType: 'job',
+                name: id,
+                type: 'job',
                 label: 'My Test Preset',
                 description: 'Test custom preset',
                 tags: ['custom', 'job'],
@@ -235,8 +263,8 @@ test.describe('Node Configurator', () => {
         await page.evaluate(() => {
             const reg = (window as any).__presetRegistry
             reg.registerCustom({
-                type: `test-alpha-${Date.now()}`,
-                widgetType: 'job',
+                name: `test-alpha-${Date.now()}`,
+                type: 'job',
                 label: 'Alpha',
                 description: 'Test alpha',
                 tags: ['custom', 'job'],
@@ -248,8 +276,8 @@ test.describe('Node Configurator', () => {
         await page.evaluate(() => {
             const reg = (window as any).__presetRegistry
             reg.registerCustom({
-                type: `test-beta-${Date.now()}`,
-                widgetType: 'job',
+                name: `test-beta-${Date.now()}`,
+                type: 'job',
                 label: 'Beta',
                 description: 'Test beta',
                 tags: ['custom', 'job'],

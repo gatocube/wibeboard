@@ -9,6 +9,7 @@ export { NodeButtonsMenu } from './NodeButtonsMenu'
 export { NodeConfigPanel } from './NodeConfigPanel'
 export { FlowStudioStoreProvider, useFlowStudioStore } from './FlowStudioStore'
 export { resolveCollisions, findNonOverlappingPosition } from './resolve-collisions'
+export { useFlowHistory } from './useFlowHistory'
 
 export type {
     FlowStudioProps,

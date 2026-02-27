@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { SwipeButtons, type SwipeButtonsActivation } from '@/kit'
+import { SwipeButtons, type SwipeButtonsActivation } from '@/components/kit'
 
 // ── Activation mode pill selector ───────────────────────────────────────────────
 

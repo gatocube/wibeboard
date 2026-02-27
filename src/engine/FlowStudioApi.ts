@@ -25,7 +25,7 @@ import type { Node, Edge } from '@xyflow/react'
 import { FlowStudioStore } from '../flow-studio/FlowStudioStore'
 import type { StepStore } from './automerge-store'
 import type { ThemeKey, NodeSize } from '../flow-studio/types'
-import { GRID_CELL, widgetRegistry } from './widget-registry'
+import { GRID_CELL, widgetRegistry } from './widget-types-registry'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

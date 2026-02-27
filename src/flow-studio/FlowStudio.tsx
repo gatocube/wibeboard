@@ -18,8 +18,8 @@ import {
 } from '@xyflow/react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry } from '@/engine/widget-registry'
-import { type PresetDefinition } from '@/engine/preset-registry'
+import { GRID_CELL, MIN_NODE_SIZE, widgetRegistry } from '@/engine/widget-types-registry'
+import { type PresetDefinition } from '@/engine/widget-preset-registry'
 import { generateId } from '@/engine/core'
 
 import type { FlowStudioProps, ThemeKey, NodeSize } from './types'
@@ -27,7 +27,7 @@ import { useFlowStudioStore } from './FlowStudioStore'
 import { StudioSettings } from './StudioSettings'
 import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { WidgetPicker } from './WidgetPicker'
-import { SwipeButtons } from '@/kit/SwipeButtons'
+import { SwipeButtons } from '@/components/kit/SwipeButtons'
 import { resolveCollisions, findNonOverlappingPosition } from './resolve-collisions'
 import { MobileRenderer } from './renderers/MobileRenderer'
 
@@ -73,6 +73,10 @@ export const FlowStudio = observer(function FlowStudio({
     onRename,
     hideBeforeButton,
     sidebarContent,
+    onUndo,
+    onRedo,
+    canUndo = false,
+    canRedo = false,
 }: FlowStudioProps) {
     const { fitView: rfFitView } = useReactFlow()
     const store = useFlowStudioStore()
@@ -94,6 +98,20 @@ export const FlowStudio = observer(function FlowStudio({
         store.setCurrentSize(s)
         onSizeChange?.(s)
     }
+
+    // ── Undo / Redo keyboard shortcuts ──────────────────────────────────────────
+    useEffect(() => {
+        if (!onUndo && !onRedo) return
+        const handler = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+                e.preventDefault()
+                if (e.shiftKey) onRedo?.()
+                else onUndo?.()
+            }
+        }
+        window.addEventListener('keydown', handler)
+        return () => window.removeEventListener('keydown', handler)
+    }, [onUndo, onRedo])
 
     const canvasBg = bgColor || THEME_CANVAS[store.theme]
     const gridColor = THEME_BG[store.theme]
@@ -386,6 +404,60 @@ export const FlowStudio = observer(function FlowStudio({
                                 />
                             </div>
                         </Panel>
+
+                        {/* Undo/Redo buttons — left edge, vertically centered */}
+                        {onUndo && (
+                            <div
+                                data-testid="undo-redo-bar"
+                                style={{
+                                    position: 'absolute', left: 16, top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    display: 'flex', flexDirection: 'column', gap: 6,
+                                    zIndex: 10,
+                                }}
+                            >
+                                <button
+                                    data-testid="undo-btn"
+                                    onClick={onUndo}
+                                    disabled={!canUndo}
+                                    title="Undo (Cmd+Z)"
+                                    style={{
+                                        width: 44, height: 44,
+                                        borderRadius: 10,
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        background: canUndo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
+                                        color: canUndo ? '#e2e8f0' : '#334155',
+                                        cursor: canUndo ? 'pointer' : 'not-allowed',
+                                        fontSize: 18,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        backdropFilter: 'blur(8px)',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    ↩
+                                </button>
+                                <button
+                                    data-testid="redo-btn"
+                                    onClick={onRedo}
+                                    disabled={!canRedo}
+                                    title="Redo (Cmd+Shift+Z)"
+                                    style={{
+                                        width: 44, height: 44,
+                                        borderRadius: 10,
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        background: canRedo ? 'rgba(15,15,26,0.9)' : 'rgba(15,15,26,0.5)',
+                                        color: canRedo ? '#e2e8f0' : '#334155',
+                                        cursor: canRedo ? 'pointer' : 'not-allowed',
+                                        fontSize: 18,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        backdropFilter: 'blur(8px)',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    ↪
+                                </button>
+                            </div>
+                        )}
 
                         {children}
                     </ReactFlow>

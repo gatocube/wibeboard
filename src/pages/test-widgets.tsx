@@ -18,11 +18,11 @@ import {
     widgetRegistry,
     type WidgetDefinition,
     GRID_CELL,
-} from '@/engine/widget-registry'
+} from '@/engine/widget-types-registry'
 import {
     presetRegistry,
     type PresetDefinition,
-} from '@/engine/preset-registry'
+} from '@/engine/widget-preset-registry'
 import { templateRegistry, type TemplateName } from '@/templates/template-registry'
 
 // Theme node components — use unified JobNode/InformerNode directly
@@ -179,7 +179,8 @@ function buildData(
         const langLabels: Record<string, string> = { js: 'JavaScript', ts: 'TypeScript', sh: 'Shell', py: 'Python' }
         base.agent = langLabels[subType || 'js'] || subType
         base.language = subType
-        base.color = widget.subTypes?.find(s => s.value === subType)?.color || widget.ui.color
+        const presetSubs = presetRegistry.getSubTypes(widget.type)
+        base.color = presetSubs.find(s => s.value === subType)?.color || widget.ui.color
         base.configured = true
         base.code = template.defaultData.code || '// empty'
         base.logs = status === 'done' ? ['> Running...', 'Output: hello', '> Done ✓'] : status === 'running' ? ['> Running...'] : []
@@ -231,7 +232,7 @@ export function TestWidgetsPage() {
 function WidgetGalleryInner() {
     const [selectedWidget, setSelectedWidget] = useState<WidgetDefinition | null>(widgetRegistry.get('job') ?? null)
     const [selectedTemplate, setSelectedTemplate] = useState<PresetDefinition | null>(
-        presetRegistry.getDefault('job', widgetRegistry.get('job')?.defaultPreset) ?? null
+        presetRegistry.getDefault('job') ?? null
     )
     const [status, setStatus] = useState<Status>('idle')
     const [knockSide, setKnockSide] = useState<KnockSide>(null)
@@ -256,7 +257,8 @@ function WidgetGalleryInner() {
         setKnockSide(null)
         setProgress(0)
         // Set first subType if available
-        setActiveSubType(widget.subTypes?.[0]?.value ?? template.defaultData.subType)
+        const subs = presetRegistry.getSubTypes(widget.type)
+        setActiveSubType(subs[0]?.value ?? template.defaultData.subType)
     }, [])
 
     const sizes = selectedWidget ? getSizes(selectedWidget) : []
@@ -650,31 +652,34 @@ function WidgetGalleryInner() {
                 )}
 
                 {/* SubType selector */}
-                {selectedWidget?.subTypes && selectedWidget.subTypes.length > 1 && (
-                    <div>
-                        <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>SubType</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                            {selectedWidget.subTypes.map(st => (
-                                <button
-                                    key={st.value}
-                                    data-testid={`subtype-${st.value}`}
-                                    onClick={() => setActiveSubType(st.value)}
-                                    style={{
-                                        padding: '3px 6px', borderRadius: 4,
-                                        border: 'none', cursor: 'pointer',
-                                        background: activeSubType === st.value ? `${st.color || '#8b5cf6'}33` : 'rgba(255,255,255,0.04)',
-                                        color: activeSubType === st.value ? (st.color || '#8b5cf6') : '#64748b',
-                                        fontSize: 8, fontWeight: 600,
-                                        fontFamily: "'JetBrains Mono', monospace",
-                                        textTransform: 'uppercase' as const,
-                                    }}
-                                >
-                                    {st.label}
-                                </button>
-                            ))}
+                {(() => {
+                    const subs = selectedWidget ? presetRegistry.getSubTypes(selectedWidget.type) : []
+                    return subs.length > 1 ? (
+                        <div>
+                            <div style={{ fontSize: 8, fontWeight: 700, color: '#475569', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>SubType</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                                {subs.map(st => (
+                                    <button
+                                        key={st.value}
+                                        data-testid={`subtype-${st.value}`}
+                                        onClick={() => setActiveSubType(st.value)}
+                                        style={{
+                                            padding: '3px 6px', borderRadius: 4,
+                                            border: 'none', cursor: 'pointer',
+                                            background: activeSubType === st.value ? `${st.color || '#8b5cf6'}33` : 'rgba(255,255,255,0.04)',
+                                            color: activeSubType === st.value ? (st.color || '#8b5cf6') : '#64748b',
+                                            fontSize: 8, fontWeight: 600,
+                                            fontFamily: "'JetBrains Mono', monospace",
+                                            textTransform: 'uppercase' as const,
+                                        }}
+                                    >
+                                        {st.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    ) : null
+                })()}
 
                 {/* Status */}
                 <div>
