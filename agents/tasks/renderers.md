@@ -1,8 +1,7 @@
-
-[] isDone
+[x] notNow
 
 Right now we have one flow renderer: ReacFlow
-We should add more renderers that we could select in FlowStudio settings.
+We should add more renderers in the future that we could select in FlowStudio settings.
 
 - ThreeFiber renderer - renders node in 3D via react three fiber library
 - Ascii renderer - renders node in ascii art, let use https://github.com/DeoVolenteGames/ascii-renderer

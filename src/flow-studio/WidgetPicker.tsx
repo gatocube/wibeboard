@@ -377,7 +377,8 @@ export function WidgetPicker({
                                 })
 
                                 const renderTile = ({ widget, tmpl }: { widget: WidgetDefinition; tmpl: PresetDefinition }, i: number, isCustom?: boolean) => {
-                                    const label = presetRegistry.getByWidget(widget.type).length === 1 && !isCustom
+                                    const isPriority = tmpl.type in PRESET_PRIO
+                                    const label = (presetRegistry.getByWidget(widget.type).length === 1 || isPriority) && !isCustom
                                         ? widget.label
                                         : tmpl.label
                                     const truncLabel = label.length > 7 ? label.slice(0, 7) : label
