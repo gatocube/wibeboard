@@ -646,3 +646,42 @@ test.describe('Builder Demo Simple — widget picker and mouse connect', () => {
         await breath()
     })
 })
+
+test.describe('Global Theme Switching', () => {
+    test('changing theme updates node appearance', async ({ page }) => {
+        await openPage(page)
+
+        // Add a job node via SwipeButtons — use correct helpers
+        await clickNode(page, 'start-1')
+        await clickSwipeBtn(page, 'swipe-btn-add-after')
+        await clickSwipeBtn(page, 'ext-after-job')
+        await page.waitForTimeout(600)
+
+        // There should now be 2 nodes
+        expect(await nodeCount(page)).toBe(2)
+
+        // Capture the job node's innerHTML before theme change
+        const jobNode = page.locator('.react-flow__node').nth(1)
+        const htmlBefore = await jobNode.innerHTML()
+
+        // Open settings and switch to pixel theme
+        await page.getByTestId('settings-btn').click()
+        await page.waitForTimeout(300)
+        await page.getByTestId('theme-pixel').click()
+        await page.waitForTimeout(500)
+
+        // The job node's innerHTML should have changed (different template rendering)
+        const htmlAfter = await jobNode.innerHTML()
+        expect(htmlAfter).not.toBe(htmlBefore)
+
+        // Switch back to wibeglow
+        await page.getByTestId('theme-wibeglow').click()
+        await page.waitForTimeout(500)
+
+        // Should match the original rendering
+        const htmlRestored = await jobNode.innerHTML()
+        expect(htmlRestored).toBe(htmlBefore)
+
+        await breath()
+    })
+})

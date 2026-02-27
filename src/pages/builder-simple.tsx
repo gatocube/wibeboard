@@ -18,7 +18,7 @@
 
 import { ReactFlowProvider, useReactFlow, type Node, type Edge, applyNodeChanges, type NodeChange } from '@xyflow/react'
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { StartingNode, JobNode, UserNode, SubFlowNode } from '@/widgets/wibeglow'
+// (individual widget imports replaced by useThemeAwareNodeTypes)
 import { FlowStudio, FlowStudioStoreProvider } from '@/flow-studio'
 import { widgetRegistry } from '@/engine/widget-registry'
 import { presetRegistry, type PresetDefinition } from '@/engine/preset-registry'
@@ -30,13 +30,10 @@ import { EventsPanel, type FlowEvent } from '@/flow-studio/EventsPanel'
 import { NodeSettingsPanel } from '@/kit/NodeSettingsPanel'
 import '@xyflow/react/dist/style.css'
 
-// ── Node types ──
-const nodeTypes = {
-    starting: StartingNode,
-    job: JobNode,
-    user: UserNode,
-    subflow: SubFlowNode,
-}
+import { useThemeAwareNodeTypes } from '@/widgets/theme-aware-nodes'
+
+// Starting node is always wibeglow (no pixel/ghub variant)
+const WIDGET_TYPES = ['starting', 'job', 'user', 'subflow']
 
 // ── iPad-friendly constants ──
 const DEFAULT_ZOOM = 0.85
@@ -306,7 +303,7 @@ function BuilderSimpleInner() {
         [workflows, activeId],
     )
 
-    const memoNodeTypes = useMemo(() => nodeTypes, [])
+    const memoNodeTypes = useThemeAwareNodeTypes(api.state, WIDGET_TYPES)
 
     // ── Add After handler ──
     const handleAddAfter = useCallback((sourceNodeId: string, widgetType: string) => {
