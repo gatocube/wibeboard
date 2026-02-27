@@ -29,9 +29,6 @@ import { ZoomAutosizeWatcher, ScreenToFlowBridge } from './ZoomAutosize'
 import { WidgetPicker } from './WidgetPicker'
 import { SwipeButtons } from '@/kit/SwipeButtons'
 import { resolveCollisions, findNonOverlappingPosition } from './resolve-collisions'
-import { ThreeFiberRenderer } from './renderers/ThreeFiberRenderer'
-import { AsciiFlowRenderer } from './renderers/AsciiRenderer'
-import { MermaidRenderer } from './renderers/MermaidRenderer'
 import { MobileRenderer } from './renderers/MobileRenderer'
 
 // ── Theme backgrounds ───────────────────────────────────────────────────────────
@@ -289,13 +286,7 @@ export const FlowStudio = observer(function FlowStudio({
         >
             {/* Canvas area */}
             <div style={{ flex: 1, position: 'relative', height: '100%' }}>
-                {store.renderer === 'three-fiber' ? (
-                    <ThreeFiberRenderer nodes={nodes} edges={edges} />
-                ) : store.renderer === 'ascii' ? (
-                    <AsciiFlowRenderer nodes={nodes} edges={edges} />
-                ) : store.renderer === 'mermaid' ? (
-                    <MermaidRenderer nodes={nodes} edges={edges} />
-                ) : store.renderer === 'mobile' ? (
+                {store.renderer === 'mobile' ? (
                     <MobileRenderer nodes={nodes} edges={edges} />
                 ) : null}
 

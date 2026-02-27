@@ -46,7 +46,7 @@ const initialNodes: Node[] = [
         type: 'script-js',
         position: { x: 320, y: 60 },
         data: {
-            label: 'process.js', language: 'js', configured: true,
+            label: 'process.js', language: 'js', configured: true, subType: 'script',
             code: `export function activate(ctx) {\n   console.log('Processing', ctx.node.name);\n   console.log('Step 1: validate input');\n   console.log('Step 2: transform data');\n   console.log('Done!');\n}`,
             logs: [], status: 'idle', width: 280, height: 200,
         },

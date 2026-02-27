@@ -70,8 +70,11 @@ test.describe('Integrations Page', () => {
         const ollamaCard = page.getByTestId('integration-card-ollama')
         await expect(ollamaCard).toBeVisible()
 
-        // Fill the URL
-        await ollamaCard.locator('input[type="text"]').fill('http://localhost:11434')
+        // Fill the URL, only if the field is not pre-populated/disabled via environment variable
+        const input = ollamaCard.locator('input[type="text"]')
+        if (!await input.isDisabled()) {
+            await input.fill('http://localhost:11434')
+        }
 
         // Test connection
         await ollamaCard.locator('button:has-text("Test Connection")').click()

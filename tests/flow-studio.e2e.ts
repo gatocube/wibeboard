@@ -17,6 +17,10 @@ test.setTimeout(60_000)
 
 /** Navigate to builder page and wait for ReactFlow to fully render */
 async function openBuilder(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.removeItem('flowstudio_workflows')
+        localStorage.removeItem('flowstudio_active_workflow')
+    })
     await page.goto('/')
     await page.waitForSelector('.react-flow__renderer', { timeout: 10_000 })
     await expect(page.locator('.react-flow__node').first()).toBeVisible({ timeout: 5_000 })
@@ -108,7 +112,9 @@ test.describe('FlowStudio — node creation', () => {
     // ── 4. Script execution still works ─────────────────────────────────────
 
     test('script Run button executes and shows logs', async ({ page }) => {
-        await page.locator('button[title="Run"]').click()
+        const runBtn = page.getByTestId('run-script-btn').first()
+        await expect(runBtn).toBeVisible({ timeout: 10_000 })
+        await runBtn.click()
         await expect(page.locator('text=Processing process.js')).toBeVisible({ timeout: 5_000 })
         await expect(page.locator('text=validate input')).toBeVisible()
         await expect(page.locator('text=6 lines')).toBeVisible({ timeout: 2_000 })
