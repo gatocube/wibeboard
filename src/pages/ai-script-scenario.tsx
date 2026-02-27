@@ -347,6 +347,7 @@ function AIScriptInner() {
     const initialSize = (params.get('size') as NodeSize) || 'M'
     const [nodeSize, setNodeSize] = useState<NodeSize>(initialSize)
     const [showJson, setShowJson] = useState(false)
+    const [editMode, setEditMode] = useState(false)
     const sz = SIZE_PRESETS[nodeSize]
 
     useEffect(() => {
@@ -726,7 +727,7 @@ function AIScriptInner() {
             currentSize={nodeSize}
             onSizeChange={setNodeSize}
             gridGap={GRID_SIZE}
-            editMode
+            editMode={editMode}
             onNodeCreated={handleNodeCreated}
             onAddAfter={handleAddAfter}
             onAddBefore={handleAddBefore}
@@ -760,6 +761,20 @@ function AIScriptInner() {
                     background: 'rgba(15,15,26,0.9)',
                     border: '1px solid rgba(255,255,255,0.08)',
                 }}>
+                    <button
+                        onClick={() => setEditMode(e => !e)}
+                        title={editMode ? 'Switch to view mode' : 'Switch to edit mode'}
+                        style={{
+                            background: editMode ? 'rgba(139,92,246,0.15)' : 'transparent',
+                            color: editMode ? '#8b5cf6' : '#64748b',
+                            border: editMode ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10,
+                            fontWeight: 600, cursor: 'pointer',
+                            fontFamily: "'JetBrains Mono', monospace",
+                        }}
+                    >
+                        ✏️
+                    </button>
                     <button
                         onClick={() => setShowJson(j => !j)}
                         style={{
