@@ -33,6 +33,7 @@
         "@react-three/fiber": "^9.5.0",
         "@xyflow/react": "^12.10.1",
         "bdx-swipe-menu": "github:gatocube/BdxSwipeMenu#v0.1.0",
+        "beautiful-mermaid": "^1.1.3",
         "elkjs": "^0.11.0",
         "framer-motion": "^12.34.3",
         "lucide-react": "^0.575.0",
