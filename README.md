@@ -4,7 +4,7 @@
 
 Interactive widget-based flow builder with customizable visual themes.
 
-**🌐 [Live Demo →](https://gatocube.github.io/wibeboard/)** · **📊 [Test Stats →](https://gatocube.github.io/wibeboard/stats/)**
+**🌐 [Live Demo →](https://gatocube.github.io/wibeboard/)** · **📊 [Test Stats →](https://gatocube.github.io/wibeboard/stats/)** · **📦 [Bundle Stats →](https://gatocube.github.io/wibeboard/stats.html)**
 
 ## Quick Start
 
