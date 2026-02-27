@@ -685,3 +685,102 @@ test.describe('Global Theme Switching', () => {
         await breath()
     })
 })
+
+test.describe('Node visibility — not behind WidgetPicker sidebar', () => {
+    test('created nodes stay within the ReactFlow canvas bounds', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // Add 3 job nodes to push the flow to the right
+        for (let i = 0; i < 3; i++) {
+            const lastNodeId = i === 0 ? 'start-1' : await getLastNodeId(page)
+            await clickNode(page, lastNodeId)
+            await clickSwipeBtn(page, 'swipe-btn-add-after')
+            await clickSwipeBtn(page, 'ext-after-job')
+            await page.waitForTimeout(800) // allow auto-fit to settle
+        }
+
+        expect(await nodeCount(page)).toBe(4) // 1 start + 3 jobs
+
+        // Get the ReactFlow container's bounding rect (excludes sidebar)
+        const canvasRect = await page.evaluate(() => {
+            const el = document.querySelector('.react-flow')
+            if (!el) return null
+            const r = el.getBoundingClientRect()
+            return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }
+        })
+        expect(canvasRect).toBeTruthy()
+
+        // Every node should be within the canvas bounds (with small tolerance)
+        const nodes = page.locator('.react-flow__node')
+        const count = await nodes.count()
+        const tolerance = 20 // px tolerance for edge cases
+
+        for (let i = 0; i < count; i++) {
+            const box = await nodes.nth(i).boundingBox()
+            expect(box, `Node ${i} should have a bounding box`).toBeTruthy()
+            if (box && canvasRect) {
+                // Node's right edge should not extend past the canvas right edge
+                expect(
+                    box.x + box.width,
+                    `Node ${i} right edge (${box.x + box.width}) should be within canvas right (${canvasRect.right + tolerance})`,
+                ).toBeLessThanOrEqual(canvasRect.right + tolerance)
+
+                // Node's left edge should be within canvas
+                expect(
+                    box.x,
+                    `Node ${i} left edge (${box.x}) should be within canvas left (${canvasRect.left - tolerance})`,
+                ).toBeGreaterThanOrEqual(canvasRect.left - tolerance)
+            }
+        }
+
+        await breath()
+    })
+
+    test('node added from WidgetPicker sidebar lands within visible canvas', async ({ page }) => {
+        await openPage(page)
+        await breath(1000)
+
+        // Click a widget in the sidebar to add a node
+        const jobWidget = page.locator('[data-testid="widget-job"]')
+        await expect(jobWidget).toBeVisible({ timeout: 5_000 })
+        await jobWidget.click()
+        await page.waitForTimeout(400)
+
+        const template = page.locator('[data-testid="template-job-0"]')
+        await expect(template).toBeVisible({ timeout: 3_000 })
+        await template.click()
+        await page.waitForTimeout(800)
+
+        expect(await nodeCount(page)).toBe(2) // start + new job
+
+        // Get canvas bounds
+        const canvasRect = await page.evaluate(() => {
+            const el = document.querySelector('.react-flow')
+            if (!el) return null
+            const r = el.getBoundingClientRect()
+            return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }
+        })
+        expect(canvasRect).toBeTruthy()
+
+        // The new node should be fully within the canvas (not behind sidebar)
+        const newNodeId = await getLastNodeId(page)
+        const newNode = page.locator(`.react-flow__node[data-id="${newNodeId}"]`)
+        const box = await newNode.boundingBox()
+        expect(box).toBeTruthy()
+
+        if (box && canvasRect) {
+            expect(
+                box.x + box.width,
+                `New node right edge should be within canvas`,
+            ).toBeLessThanOrEqual(canvasRect.right + 10)
+
+            expect(
+                box.x,
+                `New node left edge should be within canvas`,
+            ).toBeGreaterThanOrEqual(canvasRect.left - 10)
+        }
+
+        await breath()
+    })
+})

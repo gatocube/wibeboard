@@ -77,7 +77,7 @@ export const FlowStudio = observer(function FlowStudio({
     hideBeforeButton,
     sidebarContent,
 }: FlowStudioProps) {
-    useReactFlow() // ensure we're inside ReactFlowProvider
+    const { fitView: rfFitView } = useReactFlow()
     const store = useFlowStudioStore()
 
     // ── Edit mode (internal, seeded from prop) ──────────────────────────────────
@@ -267,7 +267,9 @@ export const FlowStudio = observer(function FlowStudio({
             ? converter({ x: cx, y: cy })
             : { x: 200, y: 200 }
         createNodeFromWidget(_widget.type, template, center)
-    }, [createNodeFromWidget])
+        // Auto-fit viewport to include the new node
+        setTimeout(() => rfFitView({ padding: 0.3, duration: 300 }), 150)
+    }, [createNodeFromWidget, rfFitView])
 
     // ── Wrapper ref callback ────────────────────────────────────────────────────
     const wrapperRef = useCallback((el: HTMLDivElement | null) => {

@@ -181,34 +181,16 @@ function BuilderSimpleInner() {
 
     // ── Auto-fit when node count changes or workflow switches ──
     const prevCountRef = useRef(nodes.length)
-    const { getViewport } = useReactFlow()
     useEffect(() => {
         if (nodes.length !== prevCountRef.current) {
             prevCountRef.current = nodes.length
-            // Only fitView if a node is significantly outside the viewport
+            // Always fit all nodes into the visible canvas area
             const t = setTimeout(() => {
-                const vp = getViewport()
-                // Use the ReactFlow container's actual size (accounts for sidebar)
-                const rfEl = document.querySelector('.react-flow') as HTMLElement | null
-                const vpW = rfEl?.clientWidth ?? window.innerWidth
-                const vpH = rfEl?.clientHeight ?? window.innerHeight
-                // Allow 20% overflow before triggering fitView
-                const marginX = vpW * 0.2
-                const marginY = vpH * 0.2
-                const allFit = nodes.every(n => {
-                    const sx = n.position.x * vp.zoom + vp.x
-                    const sy = n.position.y * vp.zoom + vp.y
-                    const sw = ((n.measured?.width ?? n.width ?? 60) as number) * vp.zoom
-                    const sh = ((n.measured?.height ?? n.height ?? 60) as number) * vp.zoom
-                    return sx >= -marginX && sy >= -marginY && sx + sw <= vpW + marginX && sy + sh <= vpH + marginY
-                })
-                if (!allFit) {
-                    fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM })
-                }
+                fitView({ padding: FIT_VIEW_PADDING, maxZoom: DEFAULT_ZOOM, duration: 300 })
             }, 100)
             return () => clearTimeout(t)
         }
-    }, [nodes.length, fitView, getViewport, nodes])
+    }, [nodes.length, fitView])
 
     // ── Persist workflows to localStorage (disabled for now) ──
     // useEffect(() => {
