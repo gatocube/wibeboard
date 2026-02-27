@@ -188,8 +188,10 @@ function BuilderSimpleInner() {
             // Only fitView if a node is significantly outside the viewport
             const t = setTimeout(() => {
                 const vp = getViewport()
-                const vpW = window.innerWidth
-                const vpH = window.innerHeight
+                // Use the ReactFlow container's actual size (accounts for sidebar)
+                const rfEl = document.querySelector('.react-flow') as HTMLElement | null
+                const vpW = rfEl?.clientWidth ?? window.innerWidth
+                const vpH = rfEl?.clientHeight ?? window.innerHeight
                 // Allow 20% overflow before triggering fitView
                 const marginX = vpW * 0.2
                 const marginY = vpH * 0.2

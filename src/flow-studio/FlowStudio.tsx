@@ -257,10 +257,14 @@ export const FlowStudio = observer(function FlowStudio({
 
     // ── Sidebar widget pick handler ─────────────────────────────────────────────
     const handleSidebarSelect = useCallback((_widget: { type: string }, template: PresetDefinition) => {
-        // Place at center of current viewport
+        // Place at center of the ReactFlow canvas (not the full window)
         const converter = screenToFlowRef.current
+        const el = wrapperElRef.current
+        const rect = el?.getBoundingClientRect()
+        const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2
+        const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2
         const center = converter
-            ? converter({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+            ? converter({ x: cx, y: cy })
             : { x: 200, y: 200 }
         createNodeFromWidget(_widget.type, template, center)
     }, [createNodeFromWidget])
